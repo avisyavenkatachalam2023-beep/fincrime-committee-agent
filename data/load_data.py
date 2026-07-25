@@ -76,19 +76,31 @@ JURIS_CANONICAL_COLS = [
 # Add more mappings here as the real dataset schema becomes known.
 # ---------------------------------------------------------------------------
 TXN_ALIASES: dict[str, str] = {
-    # Possible Kaggle column names                   → canonical
+    # Possible Kaggle column names                   -> canonical
     "txn_id": "transaction_id",
     "id": "transaction_id",
     "trans_id": "transaction_id",
     "date": "timestamp",
     "datetime": "timestamp",
-    "time": "timestamp",
+    # NOTE: 'time' maps to nothing — handled in post-processing for SAML-D
     "from_account": "sender_account",
     "to_account": "receiver_account",
     "source_account": "sender_account",
     "dest_account": "receiver_account",
     "originator": "sender_account",
     "beneficiary": "receiver_account",
+    # SAML-D exact column names
+    "sender_account": "sender_account",
+    "receiver_account": "receiver_account",
+    "sender_bank_location": "sender_country",
+    "receiver_bank_location": "receiver_country",
+    "payment_currency": "currency",
+    "received_currency": "received_currency",   # keep as extra
+    "is_laundering": "is_suspicious",
+    "laundering_type": "typology",
+    "amount": "amount",
+    "payment_type": "payment_type",
+    # generic alternatives
     "from_bank": "sender_bank",
     "to_bank": "receiver_bank",
     "from_country": "sender_country",
@@ -101,7 +113,6 @@ TXN_ALIASES: dict[str, str] = {
     "suspicious": "is_suspicious",
     "label": "is_suspicious",
     "fraud": "is_suspicious",
-    "laundering_type": "typology",
     "ml_type": "typology",
     "type": "typology",
 }
@@ -129,6 +140,70 @@ JURIS_ALIASES: dict[str, str] = {
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
+def _postprocess_saml_d(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Handle SAML-D specific column transformations after alias mapping:
+    - Merge 'Date' + 'Time' columns into a single 'timestamp'
+    - Ensure sender_bank / receiver_bank default to sender_country / receiver_country
+    - Generate synthetic transaction_id if missing
+    """
+    # Merge Date + Time into timestamp
+    # Note: 'Date' may have been aliased to 'timestamp' by _normalise_columns
+    if 'timestamp' in df.columns and 'Time' in df.columns:
+        df['timestamp'] = pd.to_datetime(
+            df['timestamp'].astype(str) + ' ' + df['Time'].astype(str),
+            errors='coerce'
+        )
+        df = df.drop(columns=['Time'], errors='ignore')
+    elif 'timestamp' not in df.columns or df['timestamp'].isna().all():
+        if 'Date' in df.columns and 'Time' in df.columns:
+            df['timestamp'] = pd.to_datetime(
+                df['Date'].astype(str) + ' ' + df['Time'].astype(str),
+                errors='coerce'
+            )
+            df = df.drop(columns=['Date', 'Time'], errors='ignore')
+        elif 'Date' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['Date'], errors='coerce')
+            df = df.drop(columns=['Date'], errors='ignore')
+
+    # sender_bank defaults to sender_country for SAML-D (no separate bank column)
+    if 'sender_bank' not in df.columns or df['sender_bank'].isna().all():
+        if 'sender_country' in df.columns:
+            df['sender_bank'] = df['sender_country']
+    if 'receiver_bank' not in df.columns or df['receiver_bank'].isna().all():
+        if 'receiver_country' in df.columns:
+            df['receiver_bank'] = df['receiver_country']
+
+    # Generate transaction_id if not present
+    if 'transaction_id' not in df.columns or df['transaction_id'].isna().all():
+        import uuid as _uuid
+        df['transaction_id'] = [f"TXN_{i:07d}" for i in range(len(df))]
+
+    # Normalise is_suspicious to bool (SAML-D uses 0/1 integers)
+    if 'is_suspicious' in df.columns:
+        df['is_suspicious'] = df['is_suspicious'].astype(bool)
+
+    # Normalise typology: map SAML-D laundering_type values to uppercase
+    if 'typology' in df.columns:
+        def _map_typology(val):
+            if pd.isna(val):
+                return 'NORMAL'
+            v = str(val).upper()
+            if 'STRUCT' in v or 'CASH' in v:
+                return 'STRUCTURING'
+            if 'SMURF' in v or 'SCATTER' in v:
+                return 'SMURFING'
+            if 'LAYER' in v or 'CYCLE' in v or 'FAN' in v:
+                return 'LAYERING'
+            if 'NORMAL' in v:
+                return 'NORMAL'
+            return v
+        df['typology'] = df['typology'].apply(_map_typology)
+
+    # Drop Time column if still hanging around
+    df = df.drop(columns=['Time'], errors='ignore')
+    return df
 
 def _resolve_data_dir(data_dir: str | Path) -> Path:
     """
@@ -343,6 +418,7 @@ def load_transactions(data_dir: str | Path = "data") -> pd.DataFrame:
 
     # --- Try raw/ first (Kaggle) ---
     raw_candidates = [
+        "SAML-D.csv",                  # actual SAML-D Kaggle dataset filename
         "transactions.csv",
         "HI-Small_Trans.csv",          # common SAML-D filename
         "HI-Large_Trans.csv",
@@ -369,6 +445,7 @@ def load_transactions(data_dir: str | Path = "data") -> pd.DataFrame:
 
     df = pd.read_csv(path, low_memory=False)
     df = _normalise_columns(df, TXN_ALIASES)
+    df = _postprocess_saml_d(df)
     df = _add_missing_cols(df, TXN_CANONICAL_COLS)
     df = _coerce_transactions(df)
 

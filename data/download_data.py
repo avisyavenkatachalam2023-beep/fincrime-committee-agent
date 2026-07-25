@@ -12,10 +12,17 @@ import sys
 import zipfile
 import shutil
 import importlib.util
+import io
 from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
+
+# Force UTF-8 output on Windows to prevent cp1252 UnicodeEncodeError
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 # ---------------------------------------------------------------------------
 # Bootstrap: ensure project root is on sys.path so sibling imports work
@@ -103,7 +110,7 @@ def download_from_kaggle() -> bool:
     _ensure_dir(RAW_DIR)
     zip_path = RAW_DIR / f"{KAGGLE_DATASET_NAME}.zip"
 
-    _print_banner("Attempting Kaggle dataset download …")
+    _print_banner("Attempting Kaggle dataset download...")
     print(f"  URL   : {KAGGLE_API_URL}")
     print(f"  Target: {zip_path}\n")
 
@@ -125,7 +132,7 @@ def download_from_kaggle() -> bool:
                             pct = downloaded / total_bytes * 100
                             print(f"\r  Progress: {pct:5.1f}%  ({downloaded:,} / {total_bytes:,} bytes)", end="")
 
-        print(f"\n  Download complete → {zip_path}")
+        print(f"\n  Download complete -> {zip_path}")
 
     except requests.exceptions.HTTPError as exc:
         print(f"\n[ERROR] HTTP {exc.response.status_code}: {exc.response.reason}")
@@ -150,7 +157,7 @@ def download_from_kaggle() -> bool:
 
     # --- Extract the ZIP ---
     try:
-        _print_banner(f"Extracting {zip_path.name} → {RAW_DIR}")
+        _print_banner(f"Extracting {zip_path.name} -> {RAW_DIR}")
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(RAW_DIR)
         zip_path.unlink()  # remove zip after extraction
@@ -193,7 +200,7 @@ def run_synthetic_generator() -> bool:
     bool
         True if the generator ran without raising an exception, False otherwise.
     """
-    _print_banner("Falling back to synthetic data generation …")
+    _print_banner("Falling back to synthetic data generation...")
     print(f"  Script: {SYNTHETIC_SCRIPT}\n")
 
     if not SYNTHETIC_SCRIPT.exists():
@@ -241,10 +248,10 @@ def main() -> None:
         success = run_synthetic_generator()
 
     if success:
-        _print_banner("Data acquisition pipeline COMPLETE ✓")
+        _print_banner("Data acquisition pipeline COMPLETE [OK]")
         sys.exit(0)
     else:
-        _print_banner("Data acquisition pipeline FAILED ✗  — check errors above.")
+        _print_banner("Data acquisition pipeline FAILED -- check errors above.")
         sys.exit(1)
 
 
