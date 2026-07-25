@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+data/charts/
+data/raw/
+*.png
+.DS_Store

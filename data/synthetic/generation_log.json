@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-07-25T12:47:43.297125Z",
+  "parameters": {
+    "rng_seed": 42,
+    "total_transactions": 10000,
+    "normal_fraction": 0.8,
+    "structuring_fraction": 0.15,
+    "smurfing_fraction": 0.03,
+    "layering_fraction": 0.02,
+    "mutation_injection_count": 50,
+    "normal_lognormal_mean": 8000,
+    "normal_lognormal_sigma": 1.5,
+    "structuring_amount_min": 8500,
+    "structuring_amount_max": 9999,
+    "structuring_cluster_min_txns": 5,
+    "structuring_cluster_max_txns": 15,
+    "structuring_window_days": 7,
+    "smurfing_amount_min": 8500,
+    "smurfing_amount_max": 9999,
+    "smurfing_senders_per_cluster": [
+      3,
+      8
+    ],
+    "layering_chain_length": 4,
+    "layering_decay_min_pct": 0.05,
+    "layering_decay_max_pct": 0.15,
+    "layering_window_hours": 48,
+    "mutation_center": 9200,
+    "mutation_sigma": 300,
+    "date_range_start": "2022-01-01",
+    "date_range_end": "2023-12-31",
+    "num_customers": 500,
+    "pep_fraction": 0.05,
+    "high_risk_jurisdiction_fraction": 0.1
+  },
+  "actual_counts": {
+    "normal": 8000,
+    "structuring": 1500,
+    "smurfing": 300,
+    "layering": 200,
+    "mutations_injected": 50,
+    "total_transactions": 10050,
+    "customers": 500,
+    "jurisdictions": 20
+  },
+  "typology_counts": {
+    "NORMAL": 8000,
+    "STRUCTURING": 1550,
+    "SMURFING": 300,
+    "LAYERING": 200
+  },
+  "suspicious_rate": 0.20398009950248755,
+  "amount_stats": {
+    "min": 11.06,
+    "max": 1422983.7,
+    "mean": 25206.05176517413,
+    "median": 9056.545,
+    "std": 63101.20657731687
+  }
+}
