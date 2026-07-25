@@ -57,16 +57,33 @@ This is an agent-driven system that accepts natural-language instructions and au
 ```
 
 ## 3. Dataset Information
-- **SAML-D dataset**: Oztas, B. (2023). Synthetic Anti-Money Laundering Dataset (SAML-D). Kaggle. https://www.kaggle.com/datasets/berkanoztas/synthetic-transaction-monitoring-dataset-aml
+- **Primary Dataset**: SAML-D (Synthetic Anti-Money Laundering Dataset)
+- **Source**: Kaggle — https://www.kaggle.com/datasets/berkanoztas/synthetic-transaction-monitoring-dataset-aml
+- **Author**: Oztas, B. (2023)
 - **License**: CC0 Public Domain
-- **Fields used**: All fields
-- **Synthetic Augmentation**: Customer profiles, jurisdiction list, injected structuring patterns
-- **Generation Logic**: 
-  - 80% normal transactions: lognormal amount distribution
-  - 15% structuring: clusters of 5-15 txns, $8,500-$9,999 in 7-day windows
-  - 3% smurfing: multiple senders to same receiver in $8,500-$9,999 bands
-  - 2% layering: chains A→B→C→D, 5-15% decay per hop
-  - 50 Mutated records injected for Benford testing (N(9200, 300^2))
+- **Fields Used**: sender/receiver bank, country, payment type, currency, amount, timestamp, is_suspicious label, laundering_type.
+- **Alternative/Supplement Note**: If more complex network-relationship structure is required in future builds, IBM AMLSim (GitHub) may be used as a graph-native synthetic dataset supplement.
+
+**Synthetic Augmentation Required for this Build**:
+To support the specialized agents in our Financial Crime Committee, we programmatically augmented the Kaggle dataset with the following synthetic tables (documented here per hackathon rules):
+
+1. **Synthetic Customer Profile Table** *(Used by KYC/UBO Analyst Agent)*
+   - **Fields**: declared occupation, declared income band, account open date, country of residence.
+   - **Generation Logic**: Generated using simple, documented random logic (`numpy.random` distributions) to map synthetic occupations to income bands. *Note: All data is entirely synthetic; no real people or entities are represented or fabricated.*
+
+2. **Synthetic High-Risk Jurisdiction List** *(Used by Sanctions/PEP Agent)*
+   - **Fields**: country code, risk level, risk reason.
+   - **Disclaimer**: *This is an illustrative/synthetic dataset created strictly for demonstration purposes and is NOT a real sanctions list.*
+
+3. **Evolved Laundering Injection** *(Used to demonstrate Forensic tools)*
+   - **Logic**: We optionally injected 50 deliberately mutated structuring patterns into the dataset. Instead of using flat $9,999 amounts, amounts are varied around thresholds with Gaussian noise (drawn from `N(9200, 300^2)` and clipped to `[8000, 9999]`) and irregular timing.
+   - **Purpose**: This demonstrates how our forensic accounting tools (Benford's Law and threshold-proximity clustering) can catch "evolved" laundering patterns that naive fixed-threshold rules would completely miss.
+
+**Baseline Synthetic Generation Logic** (Fallback if Kaggle is unreachable):
+- 80% normal transactions: amounts ~lognormal(mean=8000, sigma=1.5).
+- 15% structuring: clusters of 5-15 txns under $10,000 threshold within 7 days.
+- 3% smurfing: multiple sender accounts, single receiver, near-threshold amounts.
+- 2% layering: A→B→C→D chains within 48h, amounts decay 5-15% per hop.
 
 ## 4. Solution Approach
 The system replicates a real bank's Financial Crime Committee: a forensic-accounting detection engine (Benford's Law + structuring-threshold clustering) feeds a panel of specialist agents (Transaction Monitoring, KYC/UBO, Sanctions/PEP, Network Analyst) who debate each case. A Chair Agent synthesizes their votes, outputting an actual Risk Memo and Committee Meeting Minutes.
