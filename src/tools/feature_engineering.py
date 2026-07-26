@@ -49,18 +49,106 @@ class FeatureEngineeringTool:
             amount_deviation_zscore, rapid_cash_out_ratio.
         """
         if customer_id is not None:
-            cids = [customer_id]
-        else:
-            # Collect unique senders
-            cids = transactions_df["sender_account"].dropna().unique().tolist()
-
-        rows: list[dict] = []
-        for cid in cids:
             try:
-                rows.append(self._compute_for_customer(transactions_df, cid, window_days))
+                row = self._compute_for_customer(transactions_df, customer_id, window_days)
+                return pd.DataFrame([row]).set_index("customer_id")
             except Exception as exc:
-                logger.warning("Feature computation failed for %s: %s", cid, exc)
-        return pd.DataFrame(rows) if rows else pd.DataFrame()
+                logger.warning("Feature computation failed for %s: %s", customer_id, exc)
+                return pd.DataFrame()
+
+        # Bulk path: vectorised via groupby instead of looping per-customer and
+        # re-scanning the full DataFrame each time (O(n) per customer -> O(n * customers)).
+        return self._compute_all_features_bulk(transactions_df, window_days)
+
+    def _compute_all_features_bulk(
+        self, transactions_df: pd.DataFrame, window_days: int = 30
+    ) -> pd.DataFrame:
+        """Vectorised bulk feature computation for every customer at once.
+
+        Uses groupby aggregation instead of one full-DataFrame scan per
+        customer, which is the only way this scales to the Kaggle SAML-D
+        dataset (tens of thousands of unique accounts).
+
+        Note: ``rapid_cash_out_ratio`` requires matching each customer's
+        inbound transactions against outbound transactions within a time
+        window — an inherently pairwise operation that is too expensive to
+        compute for every customer in bulk. It is set to 0.0 here; callers
+        that need the exact value for a single customer should call
+        ``rapid_cash_out_ratio`` directly (as the orchestrator does for the
+        selected top customer).
+        """
+        df = transactions_df.dropna(subset=["sender_account"]).copy()
+        if df.empty:
+            return pd.DataFrame()
+        if not pd.api.types.is_datetime64_any_dtype(df["timestamp"]):
+            df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+
+        grouped = df.groupby("sender_account")
+        transaction_count = grouped.size()
+        avg_amount = grouped["amount"].mean()
+        index = transaction_count.index
+
+        # Per-customer rolling window, anchored to that customer's own last activity
+        max_ts = grouped["timestamp"].transform("max")
+        cutoff = max_ts - pd.to_timedelta(window_days, unit="D")
+        windowed = df[df["timestamp"] >= cutoff]
+        win_grouped = windowed.groupby("sender_account")
+
+        velocity = (win_grouped.size() / max(window_days, 1)).reindex(index, fill_value=0.0)
+        rolling_sum_30d = win_grouped["amount"].sum().reindex(index, fill_value=0.0)
+
+        low, high = 10_000.0 * 0.85, 10_000.0 * 0.999
+        sub_mask = (windowed["amount"] >= low) & (windowed["amount"] < high)
+        sub_threshold_count = (
+            windowed[sub_mask].groupby("sender_account").size().reindex(index, fill_value=0)
+        )
+
+        global_mean = df["amount"].mean()
+        global_std = df["amount"].std()
+        if global_std:
+            amount_deviation_zscore = (avg_amount - global_mean) / global_std
+        else:
+            amount_deviation_zscore = pd.Series(0.0, index=index)
+
+        regularity = grouped.apply(self._regularity_from_group)
+
+        result = pd.DataFrame(
+            {
+                "customer_id": index,
+                "transaction_count": transaction_count.values,
+                "avg_amount": avg_amount.reindex(index).values,
+                "velocity": velocity.reindex(index).values,
+                "rolling_sum_30d": rolling_sum_30d.reindex(index).values,
+                "sub_threshold_count": sub_threshold_count.reindex(index).values,
+                "structuring_regularity_score": regularity.reindex(index).fillna(0.0).values,
+                "amount_deviation_zscore": amount_deviation_zscore.reindex(index).fillna(0.0).values,
+                "rapid_cash_out_ratio": 0.0,
+            }
+        ).set_index("customer_id")
+        return result
+
+    @staticmethod
+    def _regularity_from_group(group: pd.DataFrame) -> float:
+        """Same scoring logic as ``structuring_regularity_score``, applied to
+        an already-filtered per-customer group (used by the vectorised bulk path).
+        """
+        if len(group) < 3:
+            return 0.0
+        group = group.sort_values("timestamp")
+        times = group["timestamp"].astype(np.int64) // 10**9
+        gaps = np.diff(times.values).astype(float)
+        amount_vals = group["amount"].values.astype(float)
+
+        def inv_cv(arr: np.ndarray) -> float:
+            mean = arr.mean()
+            if mean == 0:
+                return 0.0
+            cv = arr.std() / mean
+            return float(np.clip(1.0 - cv, 0.0, 1.0))
+
+        time_regularity = inv_cv(gaps) if len(gaps) >= 2 else 0.0
+        amount_regularity = inv_cv(amount_vals)
+        return float((time_regularity + amount_regularity) / 2.0)
 
     def compute_structuring_features(
         self,
@@ -80,29 +168,32 @@ class FeatureEngineeringTool:
             DataFrame with structuring features, one row per customer.
         """
         if customer_id is not None:
-            cids = [customer_id]
-        else:
-            cids = transactions_df["sender_account"].dropna().unique().tolist()
-
-        rows: list[dict] = []
-        for cid in cids:
             try:
-                cust_txns = self._sender_txns(transactions_df, cid)
-                rows.append(
-                    {
-                        "customer_id": cid,
-                        "sub_threshold_count": self.sub_threshold_count(transactions_df, cid),
-                        "structuring_regularity_score": self.structuring_regularity_score(
-                            transactions_df, cid
-                        ),
-                        "rolling_sum_30d": self.rolling_sum(transactions_df, cid, 30),
-                        "velocity": self.velocity(transactions_df, cid, 30),
-                        "transaction_count": int(len(cust_txns)),
-                    }
-                )
+                cust_txns = self._sender_txns(transactions_df, customer_id)
+                row = {
+                    "customer_id": customer_id,
+                    "sub_threshold_count": self.sub_threshold_count(transactions_df, customer_id),
+                    "structuring_regularity_score": self.structuring_regularity_score(
+                        transactions_df, customer_id
+                    ),
+                    "rolling_sum_30d": self.rolling_sum(transactions_df, customer_id, 30),
+                    "velocity": self.velocity(transactions_df, customer_id, 30),
+                    "transaction_count": int(len(cust_txns)),
+                }
+                return pd.DataFrame([row]).set_index("customer_id")
             except Exception as exc:
-                logger.warning("Structuring feature failed for %s: %s", cid, exc)
-        return pd.DataFrame(rows) if rows else pd.DataFrame()
+                logger.warning("Structuring feature failed for %s: %s", customer_id, exc)
+                return pd.DataFrame()
+
+        # Bulk path: same vectorised logic as compute_all_features, just a
+        # narrower column set.
+        full = self._compute_all_features_bulk(transactions_df, window_days=30)
+        if full.empty:
+            return full
+        return full[
+            ["sub_threshold_count", "structuring_regularity_score", "rolling_sum_30d",
+             "velocity", "transaction_count"]
+        ]
 
     # ------------------------------------------------------------------
     # Individual feature methods

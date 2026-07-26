@@ -57,6 +57,12 @@ class MLAnomalyDetector:
             "rolling_sum_30d",
         ]
         self._is_fitted: bool = False
+        # Decision-function range observed at fit() time, used to normalise
+        # scores to [0, 1] consistently for both batch and single-row
+        # predictions (see predict()/predict_single() docstrings for why this
+        # can't just be recomputed from whatever batch is being scored).
+        self._train_score_min: float = 0.0
+        self._train_score_max: float = 0.0
 
     # ------------------------------------------------------------------
     # Training
@@ -79,6 +85,13 @@ class MLAnomalyDetector:
         X_scaled = self.scaler.fit_transform(X)
         self.model.fit(X_scaled)
         self._is_fitted = True
+
+        # Capture the training population's decision_function range so later
+        # single-row scoring has something meaningful to normalise against.
+        train_scores = self.model.decision_function(X_scaled)
+        self._train_score_min = float(train_scores.min())
+        self._train_score_max = float(train_scores.max())
+
         logger.info(
             "MLAnomalyDetector fitted on %d samples with %d features.",
             X.shape[0],
@@ -123,11 +136,16 @@ class MLAnomalyDetector:
         # IsolationForest labels: -1 = outlier, 1 = inlier
         labels = self.model.predict(X_scaled)
 
-        # Normalise raw scores to [0, 1] where 1 = most anomalous.
-        # decision_function returns more negative values for anomalies.
-        min_score, max_score = raw_scores.min(), raw_scores.max()
+        # Normalise raw scores to [0, 1] where 1 = most anomalous, using the
+        # range observed at fit() time rather than the range of *this* batch.
+        # This matters because predict()/predict_single() are frequently
+        # called with a single row (one customer) — a batch of 1 always has
+        # min == max, which would force every single-row score to 0.0
+        # regardless of how anomalous that customer actually is.
+        min_score, max_score = self._train_score_min, self._train_score_max
         if max_score - min_score > 0:
             anomaly_scores = 1.0 - (raw_scores - min_score) / (max_score - min_score)
+            anomaly_scores = np.clip(anomaly_scores, 0.0, 1.0)
         else:
             anomaly_scores = np.zeros(len(raw_scores))
 

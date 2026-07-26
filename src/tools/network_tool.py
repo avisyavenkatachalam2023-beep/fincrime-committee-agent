@@ -71,28 +71,30 @@ class NetworkAnalysisTool:
         """
         G = nx.DiGraph()
 
-        edge_data: dict[tuple[str, str], dict] = {}
-        for _, row in transactions_df.iterrows():
-            sender = str(row["sender_account"])
-            receiver = str(row["receiver_account"])
-            amount = float(row.get("amount", 0.0))
-            key = (sender, receiver)
-            if key not in edge_data:
-                edge_data[key] = {"weight": 0.0, "txn_count": 0}
-            edge_data[key]["weight"] += amount
-            edge_data[key]["txn_count"] += 1
+        # Vectorised edge aggregation instead of a Python-level row loop,
+        # which does not scale to the Kaggle SAML-D dataset (200k+ rows).
+        df = transactions_df.copy()
+        df["sender_account"] = df["sender_account"].astype(str)
+        df["receiver_account"] = df["receiver_account"].astype(str)
+        amount_col = df["amount"].fillna(0.0) if "amount" in df.columns else pd.Series(0.0, index=df.index)
+        df["_amount"] = amount_col
 
-        for (src, dst), attrs in edge_data.items():
-            G.add_edge(src, dst, **attrs)
+        edges = (
+            df.groupby(["sender_account", "receiver_account"])["_amount"]
+            .agg(weight="sum", txn_count="count")
+            .reset_index()
+        )
+        for src, dst, weight, txn_count in edges.itertuples(index=False, name=None):
+            G.add_edge(src, dst, weight=float(weight), txn_count=int(txn_count))
 
-        # Attach account-level metadata if columns exist
+        # Attach account-level metadata (first non-null value per sender) if columns exist
         for col in ["sender_bank", "sender_country"]:
-            if col in transactions_df.columns:
-                for _, row in transactions_df.iterrows():
-                    node = str(row["sender_account"])
-                    attr_key = col.replace("sender_", "")
-                    if node in G.nodes and attr_key not in G.nodes[node]:
-                        G.nodes[node][attr_key] = row[col]
+            if col in df.columns:
+                attr_key = col.replace("sender_", "")
+                first_vals = df.dropna(subset=[col]).drop_duplicates(subset=["sender_account"])
+                for node, value in zip(first_vals["sender_account"], first_vals[col]):
+                    if node in G.nodes:
+                        G.nodes[node][attr_key] = value
 
         logger.info(
             "Built transaction graph: %d nodes, %d edges.", G.number_of_nodes(), G.number_of_edges()
@@ -121,10 +123,19 @@ class NetworkAnalysisTool:
         """
         degree_cent = nx.degree_centrality(G)
 
-        # Betweenness is expensive on large graphs; use k-sample approximation
+        # Betweenness is expensive on large graphs (each sampled source runs a
+        # full shortest-path search). Two levers keep it responsive on the
+        # Kaggle-scale graph (100k+ nodes):
+        #   1. k-sample approximation instead of exact all-pairs.
+        #   2. Unweighted BFS instead of weighted Dijkstra — coordination
+        #      structure (hop distance) matters more here than dollar-weighted
+        #      paths, and BFS is an order of magnitude faster.
         n = G.number_of_nodes()
-        k = min(n, 500) if n > 500 else None
-        betweenness_cent = nx.betweenness_centrality(G, k=k, normalized=True, weight="weight")
+        if n > 500:
+            k = 100 if n > 20_000 else 500
+        else:
+            k = None
+        betweenness_cent = nx.betweenness_centrality(G, k=k, normalized=True, weight=None)
 
         centrality: dict[str, dict] = {}
         for node in G.nodes():
@@ -233,16 +244,24 @@ class NetworkAnalysisTool:
         transactions_df: pd.DataFrame,
         customer_id: str,
         customers_df: Optional[pd.DataFrame] = None,
+        G: Optional[nx.DiGraph] = None,
+        centrality: Optional[dict[str, dict]] = None,
+        communities: Optional[dict[str, int]] = None,
     ) -> dict:
         """Perform network analysis scoped to a specific customer account.
 
-        Builds the full graph, then extracts the ego-network (the customer and
-        all direct neighbours) for focused metrics.
+        Extracts the ego-network (the customer and all direct neighbours) for
+        focused metrics.
 
         Args:
             transactions_df: Full transactions DataFrame.
             customer_id: Sender (or receiver) account identifier.
             customers_df: Optional customers DataFrame for PEP / risk enrichment.
+            G: Precomputed graph. If omitted, it is built from
+                ``transactions_df`` (expensive on large datasets — prefer
+                passing the graph already built by ``run()``).
+            centrality: Precomputed centrality scores; recomputed if omitted.
+            communities: Precomputed community partition; recomputed if omitted.
 
         Returns:
             Dictionary with keys:
@@ -251,9 +270,12 @@ class NetworkAnalysisTool:
             connected_flagged_accounts (list), interpretation (str),
             ego_network_size (int), chart_path (str).
         """
-        G = self.build_graph(transactions_df)
-        centrality = self.compute_centrality(G)
-        communities = self.detect_communities(G)
+        if G is None:
+            G = self.build_graph(transactions_df)
+        if centrality is None:
+            centrality = self.compute_centrality(G)
+        if communities is None:
+            communities = self.detect_communities(G)
 
         node_centrality = centrality.get(customer_id, {})
         community_id = communities.get(customer_id, -1)
@@ -456,7 +478,8 @@ class NetworkAnalysisTool:
 
         if focus_customer is not None:
             result["entity_analysis"] = self.analyze_entity(
-                transactions_df, focus_customer, customers_df
+                transactions_df, focus_customer, customers_df,
+                G=G, centrality=centrality, communities=communities,
             )
 
         return result

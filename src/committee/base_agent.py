@@ -2,7 +2,7 @@
 base_agent.py
 -------------
 Abstract base class for all AML Financial Crime Committee specialist agents.
-Handles Gemini API initialization, prompt formatting, response parsing,
+Handles Groq API initialization, prompt formatting, response parsing,
 and rule-based fallback logic.
 """
 
@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 load_dotenv()
 
@@ -30,8 +30,8 @@ VOTE_THRESHOLDS = {
     "REPORT": (60.0, 100.0),
 }
 
-PRIMARY_MODEL = "gemini-2.0-flash"
-FALLBACK_MODEL = "gemini-1.5-flash"
+PRIMARY_MODEL = "llama-3.3-70b-versatile"
+FALLBACK_MODEL = "llama-3.1-8b-instant"
 
 
 class BaseCommitteeAgent(ABC):
@@ -41,7 +41,7 @@ class BaseCommitteeAgent(ABC):
     Subclasses must supply a unique ``agent_name`` and ``system_prompt`` that
     define the specialist's role and the signals they focus on.  The
     ``deliberate`` method drives the full workflow:
-        1. Attempt to call the Gemini API.
+        1. Attempt to call the Groq API.
         2. Parse and validate the JSON response.
         3. Fall back to the rule-based heuristic if the API call fails or the
            response cannot be parsed.
@@ -49,7 +49,7 @@ class BaseCommitteeAgent(ABC):
 
     def __init__(self, agent_name: str, system_prompt: str) -> None:
         """
-        Initialise the agent and configure the Gemini client.
+        Initialise the agent and configure the Groq client.
 
         Parameters
         ----------
@@ -60,62 +60,47 @@ class BaseCommitteeAgent(ABC):
         """
         self.agent_name = agent_name
         self.system_prompt = system_prompt
-        self._model: Optional[genai.GenerativeModel] = None
-        self._gemini_available: bool = False
-        self._init_gemini()
+        self._client = None
+        self._model_name = None
+        self._llm_available: bool = False
+        self._init_llm()
 
     # ------------------------------------------------------------------
-    # Gemini initialisation
+    # LLM initialisation
     # ------------------------------------------------------------------
 
-    def _init_gemini(self) -> None:
+    def _init_llm(self) -> None:
         """
-        Load the Gemini API key from the environment and configure the
-        ``google-generativeai`` client.  Sets ``self._gemini_available``
+        Load the Groq API key from the environment and configure the
+        ``groq`` client.  Sets ``self._llm_available``
         to ``False`` if the key is missing or the model cannot be reached.
         """
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             logger.warning(
-                "[%s] GEMINI_API_KEY not found — rule-based fallback will be used.",
+                "[%s] GROQ_API_KEY not found — rule-based fallback will be used.",
                 self.agent_name,
             )
-            self._gemini_available = False
+            self._llm_available = False
             return
 
-        genai.configure(api_key=api_key)
-
-        generation_config = genai.GenerationConfig(
-            temperature=0.2,
-            max_output_tokens=1024,
-            response_mime_type="application/json",
-        )
-
-        for model_name in (PRIMARY_MODEL, FALLBACK_MODEL):
-            try:
-                self._model = genai.GenerativeModel(
-                    model_name=model_name,
-                    system_instruction=self.system_prompt,
-                    generation_config=generation_config,
-                )
-                # Quick connectivity probe (very short prompt)
-                probe = self._model.generate_content("ping")
-                _ = probe.text  # raises if generation failed
-                self._gemini_available = True
-                logger.info("[%s] Gemini model '%s' ready.", self.agent_name, model_name)
-                break
-            except Exception as exc:  # noqa: BLE001
-                logger.warning(
-                    "[%s] Could not initialise model '%s': %s",
-                    self.agent_name,
-                    model_name,
-                    exc,
-                )
-                self._model = None
-
-        if not self._gemini_available:
+        try:
+            self._client = Groq(api_key=api_key)
+            self._model_name = PRIMARY_MODEL
+            self._llm_available = True
+            logger.info("[%s] Groq client ready using %s.", self.agent_name, self._model_name)
+        except Exception as exc:
             logger.warning(
-                "[%s] All Gemini models unavailable — rule-based fallback active.",
+                "[%s] Could not initialise Groq client: %s",
+                self.agent_name,
+                exc,
+            )
+            self._client = None
+            self._llm_available = False
+
+        if not self._llm_available:
+            logger.warning(
+                "[%s] LLM unavailable — rule-based fallback active.",
                 self.agent_name,
             )
 
@@ -127,7 +112,7 @@ class BaseCommitteeAgent(ABC):
         """
         Main entry point.  Produce a vote dict for the supplied *case_file*.
 
-        Attempts the Gemini API first; falls back to ``_rule_based_fallback``
+        Attempts the Groq API first; falls back to ``_rule_based_fallback``
         on any failure.
 
         Parameters
@@ -142,12 +127,12 @@ class BaseCommitteeAgent(ABC):
         """
         result: Optional[dict] = None
 
-        if self._gemini_available and self._model is not None:
+        if self._llm_available and self._client is not None:
             try:
-                result = self._call_gemini(case_file)
+                result = self._call_llm(case_file)
             except Exception as exc:  # noqa: BLE001
                 logger.error(
-                    "[%s] Gemini call failed (%s); using fallback.", self.agent_name, exc
+                    "[%s] LLM call failed (%s); using fallback.", self.agent_name, exc
                 )
 
         if result is None:
@@ -158,12 +143,12 @@ class BaseCommitteeAgent(ABC):
         return result
 
     # ------------------------------------------------------------------
-    # Gemini interaction
+    # LLM interaction
     # ------------------------------------------------------------------
 
-    def _call_gemini(self, case_file: dict) -> dict:
+    def _call_llm(self, case_file: dict) -> dict:
         """
-        Format *case_file* as a readable brief, call the Gemini API,
+        Format *case_file* as a readable brief, call the Groq API,
         and parse the JSON response into the standard vote dict.
 
         Parameters
@@ -181,7 +166,7 @@ class BaseCommitteeAgent(ABC):
         ValueError
             If the response cannot be parsed or required keys are missing.
         RuntimeError
-            If the Gemini API call itself fails.
+            If the Groq API call itself fails.
         """
         brief = self._format_case_brief(case_file)
         prompt = (
@@ -191,10 +176,19 @@ class BaseCommitteeAgent(ABC):
         )
 
         try:
-            response = self._model.generate_content(prompt)
-            raw_text = response.text.strip()
+            response = self._client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": self.system_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                model=self._model_name,
+                response_format={"type": "json_object"},
+                temperature=0.2,
+                max_tokens=1024,
+            )
+            raw_text = response.choices[0].message.content.strip()
         except Exception as exc:
-            raise RuntimeError(f"Gemini API error: {exc}") from exc
+            raise RuntimeError(f"Groq API error: {exc}") from exc
 
         # Strip markdown code fences if present
         raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
@@ -203,20 +197,20 @@ class BaseCommitteeAgent(ABC):
         try:
             parsed = json.loads(raw_text)
         except json.JSONDecodeError as exc:
-            raise ValueError(f"Non-JSON response from Gemini: {raw_text[:300]}") from exc
+            raise ValueError(f"Non-JSON response from Groq: {raw_text[:300]}") from exc
 
         return self._validate_and_normalise(parsed)
 
     def _validate_and_normalise(self, parsed: dict) -> dict:
         """
-        Validate that the Gemini JSON response contains the required keys and
+        Validate that the LLM JSON response contains the required keys and
         that values are within acceptable ranges.  Normalises casing on the
         vote field.
 
         Parameters
         ----------
         parsed : dict
-            Raw parsed JSON from Gemini.
+            Raw parsed JSON from Groq.
 
         Returns
         -------
@@ -231,11 +225,11 @@ class BaseCommitteeAgent(ABC):
         required_keys = {"vote", "reasoning", "confidence", "key_signals"}
         missing = required_keys - parsed.keys()
         if missing:
-            raise ValueError(f"Gemini response missing keys: {missing}")
+            raise ValueError(f"LLM response missing keys: {missing}")
 
         vote = str(parsed["vote"]).upper().strip()
         if vote not in VOTE_LEVELS:
-            raise ValueError(f"Invalid vote value from Gemini: '{vote}'")
+            raise ValueError(f"Invalid vote value from LLM: '{vote}'")
 
         confidence = float(parsed["confidence"])
         confidence = max(0.0, min(1.0, confidence))
@@ -258,7 +252,7 @@ class BaseCommitteeAgent(ABC):
     def _rule_based_fallback(self, case_file: dict) -> dict:
         """
         Produce a vote based solely on the ``risk_score`` field using fixed
-        thresholds.  Used when the Gemini API is unavailable.
+        thresholds.  Used when the LLM API is unavailable.
 
         Thresholds
         ----------
@@ -322,7 +316,7 @@ class BaseCommitteeAgent(ABC):
     def _format_case_brief(self, case_file: dict) -> str:
         """
         Render *case_file* as structured human-readable text suitable for
-        injection into a Gemini prompt.
+        injection into an LLM prompt.
 
         Parameters
         ----------

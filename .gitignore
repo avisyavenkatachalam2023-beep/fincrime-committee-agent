@@ -4,5 +4,6 @@ __pycache__/
 .pytest_cache/
 data/charts/
 data/raw/
+app/static/uploads/
 *.png
 .DS_Store

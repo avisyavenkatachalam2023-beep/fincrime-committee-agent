@@ -395,7 +395,7 @@
     </div>
     <div class="sidebar-section">
       <h3>System</h3>
-      <div class="stat-row"><span class="stat-label">Model</span><span class="stat-val" style="color:var(--muted);font-size:.7rem">Gemini 2.0 Flash</span></div>
+      <div class="stat-row"><span class="stat-label">Model</span><span class="stat-val" style="color:var(--muted);font-size:.7rem">Groq — Llama 3.3 70B</span></div>
       <div class="stat-row"><span class="stat-label">API</span><span class="stat-val green">FastAPI v1</span></div>
       <div class="stat-row"><span class="stat-label">Version</span><span class="stat-val" style="color:var(--muted)">1.0.0</span></div>
     </div>
@@ -411,8 +411,15 @@
         <input id="query-input" type="text"
           placeholder="e.g. Find structuring patterns in the last 30 days…"
           onkeydown="if(event.key==='Enter') analyze()" />
-        <button class="btn btn-ghost" onclick="previewPlan()" id="plan-btn">Preview Plan</button>
-        <button class="btn btn-primary" onclick="analyze()" id="analyze-btn">Analyze ↵</button>
+        <input id="image-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" onchange="onImageSelected(event)" />
+        <button class="btn btn-ghost" title="Attach an image (transaction screenshot, KYC document, wire receipt…)" onclick="document.getElementById('image-input').click()" id="attach-btn">📎 Attach</button>
+        <button class="btn btn-ghost" onclick="previewPlan()" id="plan-btn" disabled>Preview Plan</button>
+        <button class="btn btn-primary" onclick="analyze()" id="analyze-btn" disabled>Analyze ↵</button>
+      </div>
+      <div id="image-preview-row" style="display:none; align-items:center; gap:.6rem; margin-top:.7rem">
+        <img id="image-preview-thumb" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" />
+        <span id="image-preview-name" style="font-size:.75rem;color:var(--muted)"></span>
+        <button class="btn btn-ghost" style="padding:.2rem .6rem;font-size:.7rem" onclick="clearImage()">✕ Remove</button>
       </div>
     </div>
 
@@ -423,6 +430,19 @@
     <div class="spinner-wrap" id="spinner">
       <div class="spinner"></div>
       <span class="spinner-label" id="spinner-label">Running AML Orchestrator…</span>
+    </div>
+
+    <!-- Analysis unavailable — shown instead of (never alongside) results whenever
+         any API call fails, so a dead backend can never appear to have produced
+         a real answer. -->
+    <div class="card" id="analysis-unavailable" style="display:none; border-color: rgba(248,81,73,.4)">
+      <div class="card-body" style="display:flex; align-items:center; gap:.85rem">
+        <span style="font-size:1.4rem">⚠️</span>
+        <div>
+          <div style="font-weight:700; color:var(--red)">Analysis unavailable</div>
+          <div id="analysis-unavailable-detail" style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Backend not reachable — please retry.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Results -->
@@ -491,41 +511,99 @@
 <div id="toast"></div>
 
 <script>
-const API = 'http://localhost:8000';
+// Same-origin by default so this works regardless of host/port (local dev,
+// Docker, or a deployed server) — index.html is served by the same FastAPI
+// app that exposes /api/v1/*, so there's never a cross-origin case in practice.
+const API = window.location.origin;
+
+// ── Shared "backend unreachable" state ──────────────────────────────────────
+// Every code path that talks to the API funnels failures through this pair
+// of functions, so a dead/unreachable backend can never leave a stale or
+// partial result panel on screen — the results area and the error banner are
+// mutually exclusive, always.
+let apiOnline = false;
+
+function showUnavailable(detail) {
+  // Only the shared results panel is forced closed here — callers that have
+  // their own inline error UI (e.g. previewPlan's red message inside
+  // #plan-preview) are responsible for that element themselves, so this
+  // doesn't clobber a message a caller just wrote.
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('analysis-unavailable-detail').textContent =
+    detail || 'Backend not reachable — please retry.';
+  document.getElementById('analysis-unavailable').style.display = 'block';
+}
+
+function hideUnavailable() {
+  document.getElementById('analysis-unavailable').style.display = 'none';
+}
+
+function setControlsEnabled(enabled) {
+  document.getElementById('analyze-btn').disabled = !enabled;
+  document.getElementById('plan-btn').disabled = !enabled;
+}
 
 // ── Health check ────────────────────────────────────────────────────────────
 async function checkHealth() {
   try {
     const r = await fetch(`${API}/health`);
     const data = await r.json();
-    if (data.status === 'ok') {
-      document.getElementById('status-dot').style.background = 'var(--green)';
-      document.getElementById('status-dot').style.boxShadow = '0 0 6px var(--green)';
-      document.getElementById('status-text').textContent = 'API Online';
+    const dot = document.getElementById('status-dot');
+    const txt = document.getElementById('status-text');
+    if (data.status === 'ok' && data.data_loaded) {
+      apiOnline = true;
+      dot.style.background = 'var(--green)';
+      dot.style.boxShadow = '0 0 6px var(--green)';
+      txt.textContent = `API Online — ${(data.rows||0).toLocaleString()} rows loaded`;
+      setControlsEnabled(true);
+    } else if (data.status === 'ok') {
+      // Server is up but still loading the dataset — not a failure, but a
+      // query started now would either 503 or hit an empty cache, so keep
+      // the controls disabled until data_loaded flips true.
+      apiOnline = false;
+      dot.style.background = 'var(--orange)';
+      dot.style.boxShadow = '0 0 6px var(--orange)';
+      txt.textContent = 'Loading data…';
+      setControlsEnabled(false);
     }
   } catch {
-    document.getElementById('status-dot').style.background = 'var(--red)';
-    document.getElementById('status-dot').style.boxShadow = '0 0 6px var(--red)';
-    document.getElementById('status-text').textContent = 'API Offline';
+    const wasOnline = apiOnline;
+    apiOnline = false;
+    const dot = document.getElementById('status-dot');
+    dot.style.background = 'var(--red)';
+    dot.style.boxShadow = '0 0 6px var(--red)';
+    document.getElementById('status-text').textContent = 'API Offline — run: uvicorn app.main:app --port 8000';
+    setControlsEnabled(false);
+    // If the backend just died mid-session, any previously-rendered results
+    // (or a previously-successful plan preview) are now unverifiable — don't
+    // leave them on screen looking current.
+    if (wasOnline) {
+      document.getElementById('plan-preview').style.display = 'none';
+      showUnavailable('Backend not reachable — the last connection to the API was lost.');
+    }
   }
 }
 
 // ── Dataset stats ────────────────────────────────────────────────────────────
 async function loadDatasetStats() {
-  try {
-    const r = await fetch(`${API}/api/v1/dataset-info`);
-    const d = await r.json();
-    const el = document.getElementById('dataset-stats');
-    el.innerHTML = `
-      <div class="stat-row"><span class="stat-label">Source</span><span class="stat-val gold">${d.source || 'N/A'}</span></div>
-      <div class="stat-row"><span class="stat-label">Total Txns</span><span class="stat-val">${(d.total_transactions||0).toLocaleString()}</span></div>
-      <div class="stat-row"><span class="stat-label">Suspicious</span><span class="stat-val red">${(d.suspicious_count||0).toLocaleString()}</span></div>
-      <div class="stat-row"><span class="stat-label">Susp. Rate</span><span class="stat-val orange">${d.suspicious_rate_pct||0}%</span></div>
-    `;
-  } catch {
-    document.getElementById('dataset-stats').innerHTML =
-      '<div class="stat-row"><span class="stat-label">Status</span><span class="stat-val red">Error loading</span></div>';
+  const el = document.getElementById('dataset-stats');
+  el.innerHTML = '<div class="stat-row"><span class="stat-label">Status</span><span class="stat-val" style="color:var(--orange)">Loading…</span></div>';
+  // Retry a few times since data loads at startup
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const r = await fetch(`${API}/api/v1/dataset-info`);
+      if (!r.ok) { await new Promise(res => setTimeout(res, 3000)); continue; }
+      const d = await r.json();
+      el.innerHTML = `
+        <div class="stat-row"><span class="stat-label">Source</span><span class="stat-val gold">${d.source||'N/A'}</span></div>
+        <div class="stat-row"><span class="stat-label">Loaded Txns</span><span class="stat-val">${(d.total_transactions||0).toLocaleString()}</span></div>
+        <div class="stat-row"><span class="stat-label">Suspicious</span><span class="stat-val red">${(d.suspicious_count||0).toLocaleString()}</span></div>
+        <div class="stat-row"><span class="stat-label">Susp. Rate</span><span class="stat-val orange">${d.suspicious_rate_pct||0}%</span></div>
+      `;
+      return;
+    } catch { await new Promise(res => setTimeout(res, 3000)); }
   }
+  el.innerHTML = '<div class="stat-row"><span class="stat-label">Status</span><span class="stat-val red">Not available</span></div>';
 }
 
 // ── Tabs ────────────────────────────────────────────────────────────────────
@@ -554,11 +632,17 @@ function showToast(msg) {
 async function previewPlan() {
   const q = document.getElementById('query-input').value.trim();
   if (!q) { showToast('Please enter a query first.'); return; }
+  hideUnavailable();
   const pp = document.getElementById('plan-preview');
   pp.style.display = 'block';
   pp.innerHTML = '<h4>Plan Preview</h4><p style="color:var(--muted);font-size:.8rem">Fetching plan…</p>';
   try {
     const r = await fetch(`${API}/api/v1/plan?query=${encodeURIComponent(q)}`);
+    if (!r.ok) {
+      let detail = r.statusText;
+      try { detail = (await r.json()).detail || detail; } catch {}
+      throw new Error(`HTTP ${r.status}: ${detail}`);
+    }
     const d = await r.json();
     const steps = (d.execution_plan || []).map((s,i) =>
       `<div class="plan-step"><span style="color:var(--muted);margin-right:.5rem">${i+1}.</span>${s}</div>`
@@ -577,26 +661,64 @@ async function previewPlan() {
       ${d.reason_for_skips ? `<p style="font-size:.7rem;color:var(--muted);margin-top:.4rem;font-style:italic">${d.reason_for_skips}</p>` : ''}
     `;
   } catch (e) {
-    pp.innerHTML = `<h4>Plan Preview</h4><p style="color:var(--red);font-size:.8rem">Failed to fetch plan: ${e.message}</p>`;
+    const isNetworkError = e instanceof TypeError;
+    const hint = isNetworkError
+      ? `Could not reach ${API}/api/v1/plan — is the server running, and is this page being loaded from that same server (not opened as a local file)?`
+      : e.message;
+    pp.innerHTML = `<h4>Plan Preview</h4><p style="color:var(--red);font-size:.8rem">Failed to fetch plan: ${hint}</p>`;
+    // A plan fetch failure means the backend is unreachable right now, which
+    // makes any previously-rendered results (from an earlier, unrelated
+    // successful query) stale and unverifiable — hide them rather than let
+    // them sit on screen next to this error.
+    showUnavailable(hint);
+    apiOnline = false;
+    setControlsEnabled(false);
   }
+}
+
+// ── Image attachment ──────────────────────────────────────────────────────
+let selectedImage = null;
+
+function onImageSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const maxBytes = 8 * 1024 * 1024;
+  if (file.size > maxBytes) {
+    showToast('Image too large (max 8MB).');
+    event.target.value = '';
+    return;
+  }
+  selectedImage = file;
+  document.getElementById('image-preview-thumb').src = URL.createObjectURL(file);
+  document.getElementById('image-preview-name').textContent = `${file.name} (${(file.size/1024).toFixed(0)} KB)`;
+  document.getElementById('image-preview-row').style.display = 'flex';
+}
+
+function clearImage() {
+  selectedImage = null;
+  document.getElementById('image-input').value = '';
+  document.getElementById('image-preview-row').style.display = 'none';
 }
 
 // ── Analyze ─────────────────────────────────────────────────────────────────
 async function analyze() {
   const q = document.getElementById('query-input').value.trim();
   if (!q) { showToast('Please enter a query first.'); return; }
+  if (!apiOnline) {
+    showUnavailable('Backend not reachable — please wait for "API Online" before analyzing.');
+    return;
+  }
 
-  // Setup UI state
   document.getElementById('analyze-btn').disabled = true;
   document.getElementById('plan-btn').disabled = true;
   document.getElementById('results').style.display = 'none';
+  hideUnavailable();
   const spinner = document.getElementById('spinner');
   spinner.style.display = 'flex';
   document.getElementById('plan-preview').style.display = 'none';
 
   const labels = [
-    'Loading Kaggle dataset…',
-    'Running forensic analysis…',
+    'Running forensic analysis on dataset…',
     'Applying Benford\'s Law…',
     'Scanning threshold clusters…',
     'Convening the Committee…',
@@ -605,34 +727,66 @@ async function analyze() {
   ];
   let li = 0;
   const spinnerLabel = document.getElementById('spinner-label');
+  spinnerLabel.textContent = labels[0];
   const labelInterval = setInterval(() => {
-    li = (li+1) % labels.length;
+    li = (li + 1) % labels.length;
     spinnerLabel.textContent = labels[li];
-  }, 3000);
+  }, 4000);
+
+  // Timeout warning after 30s
+  const warnTimeout = setTimeout(() => {
+    spinnerLabel.textContent = 'Still working… (large dataset takes ~30s on first run)';
+  }, 30000);
 
   try {
-    const r = await fetch(`${API}/api/v1/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: q })
-    });
+    let r;
+    if (selectedImage) {
+      spinnerLabel.textContent = 'Analyzing attached image…';
+      const form = new FormData();
+      form.append('query', q);
+      form.append('image', selectedImage);
+      r = await fetch(`${API}/api/v1/analyze-with-image`, { method: 'POST', body: form });
+    } else {
+      r = await fetch(`${API}/api/v1/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q })
+      });
+    }
     clearInterval(labelInterval);
+    clearTimeout(warnTimeout);
 
     if (!r.ok) {
-      const err = await r.json();
-      throw new Error(err.detail || r.statusText);
+      let detail = r.statusText;
+      try { detail = (await r.json()).detail || detail; } catch {}
+      throw new Error(detail);
     }
 
     const data = await r.json();
     renderResults(data);
+    clearImage();
 
   } catch (e) {
     clearInterval(labelInterval);
-    showToast(`Error: ${e.message}`);
+    clearTimeout(warnTimeout);
+    const isNetworkError = e instanceof TypeError;
+    const detail = isNetworkError
+      ? `Could not reach ${API}/api/v1/analyze — the backend may be down or unreachable.`
+      : e.message;
+    showToast(`Error: ${detail.slice(0, 200)}`);
+    console.error('Analyze error:', e);
+    // Never leave a full results panel on screen next to a failed request —
+    // show one unambiguous "unavailable" state instead of a partial/stale one.
+    showUnavailable(`Analysis unavailable — ${detail}`);
+    if (isNetworkError) {
+      apiOnline = false;
+    }
   } finally {
     spinner.style.display = 'none';
-    document.getElementById('analyze-btn').disabled = false;
-    document.getElementById('plan-btn').disabled = false;
+    // Re-enable controls based on real backend status, not unconditionally —
+    // otherwise a request that failed because the API is down would leave
+    // the Analyze button clickable again despite the backend being offline.
+    setControlsEnabled(apiOnline);
   }
 }
 
@@ -661,12 +815,24 @@ function renderResults(data) {
     `Intent: ${summary.parsed_intent || 'N/A'} | Pattern: ${summary.target_pattern || 'none'} | Entities: ${(summary.detected_entities||[]).join(', ')||'None'}`;
 
   // ── Execution Plan tab ─────────────────────────────────────────────────────
+  // The ML/EDA badges must reflect what the plan actually *ran*, not the raw
+  // requires_ml/requires_eda flags from query parsing — those flags describe
+  // the query's intent before planning narrows the tool set down (e.g. a
+  // structuring pattern_detection query has requires_ml=true from parsing,
+  // but its actual plan explicitly skips ml_isolation_forest). Deriving the
+  // badge from parsed flags rather than the executed plan showed a red "ML"
+  // badge on queries that never touched the ML model.
+  const execSteps = summary.execution_plan || [];
+  const stepsUse = (...needles) => execSteps.some(s => needles.some(n => s.includes(n)));
+  const usesML = stepsUse('ml_isolation_forest', 'ml_model');
+  const usesEDA = stepsUse('eda_tool');
+
   const intentBadges = `
     <span class="plan-badge">Intent: ${summary.parsed_intent||'N/A'}</span>
     <span class="plan-badge">Pattern: ${summary.target_pattern||'none'}</span>
     ${(summary.detected_entities||[]).map(e => `<span class="plan-badge" style="background:rgba(210,153,34,.12);border-color:rgba(210,153,34,.3);color:var(--gold)">Entity: ${e}</span>`).join('')}
-    ${summary.requires_ml ? '<span class="plan-badge" style="background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)">ML</span>' : ''}
-    ${summary.requires_eda ? '<span class="plan-badge" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green)">EDA</span>' : ''}
+    ${usesML ? '<span class="plan-badge" style="background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)">ML</span>' : ''}
+    ${usesEDA ? '<span class="plan-badge" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green)">EDA</span>' : ''}
   `;
   document.getElementById('plan-intent').innerHTML = intentBadges;
 
@@ -703,7 +869,10 @@ function renderResults(data) {
 
   // ── Answer tab ──────────────────────────────────────────────────────────
   const answer = data.plain_text_answer || data.explanation || data.aggregation_table || data.risk_memo || 'Analysis complete. See other tabs for detailed output.';
-  document.getElementById('answer-box').textContent = answer;
+  const imageBlock = data.image_url
+    ? `\n\n${'─'.repeat(50)}\n📎 ATTACHED IMAGE ANALYSIS\n${'─'.repeat(50)}\n${data.image_analysis || ''}\n(stored at ${data.image_url})`
+    : '';
+  document.getElementById('answer-box').textContent = answer + imageBlock;
 
   // ── Raw JSON tab ─────────────────────────────────────────────────────────
   document.getElementById('raw-box').textContent = JSON.stringify(data, null, 2);
@@ -721,7 +890,7 @@ function renderResults(data) {
 // ── Init ─────────────────────────────────────────────────────────────────────
 checkHealth();
 loadDatasetStats();
-setInterval(checkHealth, 10000);
+setInterval(checkHealth, 30000); // poll every 30s, not 10s
 </script>
 </body>
 </html>

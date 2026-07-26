@@ -161,6 +161,18 @@ class AMLOrchestrator:
         target_pattern = parsed_query.get('target_pattern', 'structuring')
 
         features_df = self.fe_tool.compute_structuring_features(self._transactions_df)
+        if len(features_df) > 0 and 'structuring_regularity_score' in features_df.columns:
+            # A customer with only 2-4 transactions can score a "perfect"
+            # regularity purely by chance (little data for the coefficient-
+            # of-variation calc to actually vary), which would otherwise let
+            # a statistically meaningless account outrank genuine repeat
+            # structuring behaviour. Require a minimum sample size before a
+            # customer is eligible to be the top candidate.
+            MIN_TXNS_FOR_PATTERN = 5
+            candidates = features_df[features_df['transaction_count'] >= MIN_TXNS_FOR_PATTERN]
+            if candidates.empty:
+                candidates = features_df
+            features_df = candidates.sort_values(by='structuring_regularity_score', ascending=False)
         top_customer = (
             features_df.index[0]
             if len(features_df) > 0
@@ -338,6 +350,9 @@ class AMLOrchestrator:
 
         eda_res = self.eda_tool.run(self._transactions_df, self._customers_df)
         all_features = self.fe_tool.compute_all_features(self._transactions_df)
+        
+        if len(all_features) > 0 and 'transaction_count' in all_features.columns:
+            all_features = all_features.sort_values(by='transaction_count', ascending=False)
 
         if len(all_features) == 0:
             return self.formatter.format_full_result(
@@ -354,7 +369,13 @@ class AMLOrchestrator:
         net_res = self.network_tool.run(
             self._transactions_df, self._customers_df, focus_customer=top_customer
         )
+        # Bulk feature computation zeroes rapid_cash_out_ratio for performance
+        # (see feature_engineering.py); recompute it exactly for the one
+        # customer that was actually selected.
         features_dict = all_features.loc[top_customer].to_dict()
+        features_dict['rapid_cash_out_ratio'] = self.fe_tool.rapid_cash_out_ratio(
+            self._transactions_df, top_customer
+        )
         ml_res = self.ml_model.predict_single(features_dict)
 
         risk = self.risk_class.classify_customer(

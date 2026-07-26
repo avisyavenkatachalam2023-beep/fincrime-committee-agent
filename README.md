@@ -97,21 +97,23 @@ The system replicates a real bank's Financial Crime Committee: a forensic-accoun
 | Graph | networkx, python-louvain |
 | Stats/Forensics | scipy (chi-square) |
 | Visualization | matplotlib |
-| UI | Streamlit |
-| LLM | Google Gemini API (gemini-2.0-flash) |
+| UI | FastAPI + a single-page HTML/JS dashboard (`app/index.html`), served by FastAPI itself |
+| LLM | Groq API — `llama-3.3-70b-versatile` for query understanding & committee reasoning; optional Groq vision model for the image-attachment feature |
 
 ## 6. Setup Instructions
 ```bash
 git clone <repo>
 cd aml-crime-committee-agent
 pip install -r requirements.txt
-cp .env.example .env  # add your GEMINI_API_KEY
-python data/download_data.py
-uvicorn app.main:app --reload
+cp .env.example .env  # add your GROQ_API_KEY (and optionally KAGGLE_TOKEN, PORT)
+python data/download_data.py   # downloads SAML-D from Kaggle; falls back to synthetic data if unreachable
+uvicorn app.main:app --reload --port 8000
+# or: python app/main.py   (reads the port from .env's PORT, default 8000)
 ```
+Then open `http://localhost:8000` (or whichever port you chose) in a browser — the dashboard and the API are served from the same origin, so no separate frontend server, and no frontend port configuration, is needed: `app/index.html` calls the API via `window.location.origin`, which always resolves to whatever host/port actually served the page. There is nothing to keep in sync between backend and frontend.
 
 ## 7. Usage Instructions
-The system exposes a REST API via FastAPI. Once running locally, you can send queries to the endpoint.
+The system exposes a REST API via FastAPI, plus a browser dashboard at `/`.
 You can view the interactive Swagger API documentation at `http://localhost:8000/docs`.
 
 **Example `curl` request:**
@@ -120,6 +122,14 @@ curl -X POST "http://localhost:8000/api/v1/analyze" \
      -H "Content-Type: application/json" \
      -d '{"query": "Find structuring patterns in the last 30 days"}'
 ```
+
+**Attaching an image (e.g. a transaction screenshot or KYC document):**
+```bash
+curl -X POST "http://localhost:8000/api/v1/analyze-with-image" \
+     -F "query=Is customer ID 4521 suspicious?" \
+     -F "image=@/path/to/screenshot.png"
+```
+The dashboard exposes the same capability via the 📎 Attach button next to the query box.
 
 **Example queries to try:**
 1. Find structuring patterns in the last 30 days
@@ -133,9 +143,11 @@ curl -X POST "http://localhost:8000/api/v1/analyze" \
 1. **Forensic Accounting**: Real statistical analysis (Benford's Law, round-number clustering) over generic ML.
 2. **Committee Debate**: A multi-agent deliberation framework that provides distinct compliance perspectives before a Chair consensus.
 3. **Evolved-Pattern Detection**: Capable of detecting deliberate structuring variation that evades naive threshold rules.
+4. **Multimodal input**: Analysts can attach a screenshot or scanned document alongside a query; a vision-capable model extracts relevant details (account numbers, amounts, red flags) and folds them into the same committee pipeline.
+5. **Built to run on the real Kaggle dataset, not just a toy sample**: feature engineering and network analysis are vectorised (pandas groupby, sampled/unweighted betweenness centrality) so the pipeline stays responsive on tens of thousands of accounts rather than only the small synthetic fixture.
 
 ## 9. Disclosures
-Built with Google Gemini API (gemini-2.0-flash) for Query Understanding and Committee Agent reasoning. Agentic coding assistant used for code generation.
+Built with the Groq API (`llama-3.3-70b-versatile`) for query understanding and committee-agent reasoning. Agentic coding assistant used for code generation.
 
 ## 10. Risk Score Weights and Thresholds
 - **Weights**: Benford 0.30, Threshold Clustering 0.25, ML Anomaly 0.25, Network Centrality 0.20

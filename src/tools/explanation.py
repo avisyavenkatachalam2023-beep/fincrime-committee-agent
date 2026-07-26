@@ -6,7 +6,7 @@ Agent.
 
 Generates investigation-grade narrative explanations that tie the original
 analyst query to specific detected signals and quantitative evidence.  Uses
-Google Gemini when available, with a deterministic template-based fallback
+Groq (llama-3.3-70b-versatile) when available, with a deterministic template-based fallback
 for offline / API-unavailable scenarios.
 """
 
@@ -20,23 +20,22 @@ from typing import Optional, Any
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Gemini client initialisation (graceful degradation)
+# Groq client initialisation (graceful degradation)
 # ---------------------------------------------------------------------------
 try:
-    import google.generativeai as genai  # type: ignore
+    from groq import Groq
     from dotenv import load_dotenv
 
     load_dotenv()
-    _api_key = os.environ.get("GEMINI_API_KEY", "")
+    _api_key = os.environ.get("GROQ_API_KEY", "")
     if _api_key:
-        genai.configure(api_key=_api_key)
-        _GEMINI_AVAILABLE = True
+        _LLM_AVAILABLE = True
     else:
-        _GEMINI_AVAILABLE = False
-        logger.warning("GEMINI_API_KEY not found in environment — using template fallback.")
+        _LLM_AVAILABLE = False
+        logger.warning("GROQ_API_KEY not found in environment — using template fallback.")
 except ImportError:
-    _GEMINI_AVAILABLE = False
-    logger.warning("google-generativeai not installed — using template fallback.")
+    _LLM_AVAILABLE = False
+    logger.warning("groq not installed — using template fallback.")
 
 
 class ExplanationTool:
@@ -47,31 +46,31 @@ class ExplanationTool:
     regulatory requirements for auditable SAR narratives.
 
     Behaviour:
-    - If Gemini is available, a structured prompt is sent to the model and the
+    - If the LLM is available, a structured prompt is sent to the model and the
       LLM-generated explanation is returned.
-    - If Gemini is unavailable or fails, a deterministic template fills in all
+    - If the LLM is unavailable or fails, a deterministic template fills in all
       available numeric signals.
     """
 
-    # Gemini model name — use the latest flash model for speed
-    GEMINI_MODEL = "gemini-2.0-flash"
+    # LLM model name
+    LLM_MODEL = "llama-3.3-70b-versatile"
 
     # Minimum MAD score above which Benford deviation is flagged in text
     BENFORD_FLAG_THRESHOLD = 0.015
 
     def __init__(self) -> None:
-        """Initialise the ExplanationTool and Gemini client if available."""
-        self._gemini_available = _GEMINI_AVAILABLE
-        if self._gemini_available:
+        """Initialise the ExplanationTool and LLM client if available."""
+        self._llm_available = _LLM_AVAILABLE
+        if self._llm_available:
             try:
-                self._model = genai.GenerativeModel(self.GEMINI_MODEL)
-                logger.info("ExplanationTool: Gemini model '%s' initialised.", self.GEMINI_MODEL)
+                self._client = Groq(api_key=_api_key)
+                logger.info("ExplanationTool: LLM model '%s' initialised.", self.LLM_MODEL)
             except Exception as exc:
-                logger.warning("Gemini model init failed (%s); falling back to template.", exc)
-                self._gemini_available = False
-                self._model = None
+                logger.warning("LLM model init failed (%s); falling back to template.", exc)
+                self._llm_available = False
+                self._client = None
         else:
-            self._model = None
+            self._client = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -124,12 +123,12 @@ class ExplanationTool:
             features=features,
         )
 
-        if self._gemini_available and self._model is not None:
+        if self._llm_available and self._client is not None:
             try:
-                return self._explain_with_gemini(context)
+                return self._explain_with_llm(context)
             except Exception as exc:
                 logger.warning(
-                    "Gemini explanation failed for %s (%s); using template.", customer_id, exc
+                    "LLM explanation failed for %s (%s); using template.", customer_id, exc
                 )
 
         return self._explain_with_template(customer_id, context["signals"])
@@ -175,11 +174,11 @@ class ExplanationTool:
         )
 
     # ------------------------------------------------------------------
-    # Gemini-based explanation
+    # LLM-based explanation
     # ------------------------------------------------------------------
 
-    def _explain_with_gemini(self, context: dict) -> str:
-        """Generate explanation using Google Gemini LLM.
+    def _explain_with_llm(self, context: dict) -> str:
+        """Generate explanation using the Groq LLM.
 
         Constructs a detailed prompt containing all signal data and instructs
         the model to produce an investigation-grade narrative.
@@ -216,8 +215,14 @@ INSTRUCTIONS:
 
 Write the investigation narrative now:"""
 
-        response = self._model.generate_content(prompt)
-        return response.text.strip()
+        response = self._client.chat.completions.create(
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            model=self.LLM_MODEL,
+            temperature=0.2,
+        )
+        return response.choices[0].message.content.strip()
 
     # ------------------------------------------------------------------
     # Template-based explanation
@@ -356,7 +361,7 @@ Write the investigation narrative now:"""
             features: Feature engineering output for the customer.
 
         Returns:
-            Context dictionary for use in Gemini prompt or template.
+            Context dictionary for use in Groq prompt or template.
         """
         signals: dict[str, Any] = {
             "pattern": pattern,

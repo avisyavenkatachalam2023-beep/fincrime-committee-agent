@@ -5,7 +5,7 @@ Query Understanding Tool for the AML Financial Crime Committee Agent.
 
 Responsibilities:
   - Parse a natural-language user query into a structured intent/filter/entity JSON
-  - Primary path  : Gemini 2.0 Flash (gemini-2.0-flash) with JSON-mode system prompt
+  - Primary path  : Groq (llama-3.3-70b-versatile) with JSON-mode system prompt
   - Fallback path : regex/keyword-based rule extractor
 
 Canonical output schema (Section 8.1):
@@ -29,7 +29,7 @@ import re
 from typing import Optional
 
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 # ---------------------------------------------------------------------------
 # Module-level setup
@@ -56,7 +56,7 @@ INTENTS: list[str] = [
 
 PATTERNS: list[str] = ["structuring", "smurfing", "layering", "none"]
 
-_GEMINI_SYSTEM_PROMPT = """\
+_QUERY_PARSER_SYSTEM_PROMPT = """\
 You are a financial crime query parser. Extract structured information from the user's query.
 Return ONLY valid JSON with these exact fields:
 {
@@ -88,7 +88,7 @@ requires_ml = true for pattern_detection and broad_exploration
 """
 
 # ---------------------------------------------------------------------------
-# Helper: safe JSON extraction from a raw Gemini text response
+# Helper: safe JSON extraction from a raw LLM text response
 # ---------------------------------------------------------------------------
 
 
@@ -162,8 +162,8 @@ def _none_if_null(value) -> Optional[str]:
 class QueryUnderstandingTool:
     """Parse a natural-language AML query into a structured intent/filter JSON.
 
-    Primary path  : Gemini 2.0 Flash (``gemini-2.0-flash``) via the
-                    google-generativeai SDK with a JSON-mode system prompt.
+    Primary path  : Groq (``llama-3.3-70b-versatile``) via the
+                    groq SDK with a JSON-mode system prompt.
     Fallback path : Deterministic regex/keyword rule extractor that handles
                     all mandatory test cases and common query forms.
 
@@ -173,29 +173,27 @@ class QueryUnderstandingTool:
         result = tool.parse("Find structuring patterns in the last 30 days")
     """
 
-    _DEFAULT_MODEL = "gemini-2.0-flash"
+    _DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
     def __init__(self) -> None:
-        """Initialise the Gemini client using GEMINI_API_KEY from .env."""
-        api_key = os.getenv("GEMINI_API_KEY")
+        """Initialise the Groq client using GROQ_API_KEY from .env."""
+        api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             logger.warning(
-                "GEMINI_API_KEY not found in environment. "
-                "Gemini path will be unavailable; rule-based fallback will be used."
+                "GROQ_API_KEY not found in environment. "
+                "Groq path will be unavailable; rule-based fallback will be used."
             )
-            self._model = None
+            self._client = None
+            self._model_name = None
         else:
             try:
-                genai.configure(api_key=api_key)
-                model_name = os.getenv("GEMINI_MODEL", self._DEFAULT_MODEL)
-                self._model = genai.GenerativeModel(
-                    model_name=model_name,
-                    system_instruction=_GEMINI_SYSTEM_PROMPT,
-                )
-                logger.info("Gemini model '%s' initialised successfully.", model_name)
+                self._client = Groq(api_key=api_key)
+                self._model_name = os.getenv("GROQ_MODEL", self._DEFAULT_MODEL)
+                logger.info("Groq model '%s' initialised successfully.", self._model_name)
             except Exception as exc:
-                logger.error("Failed to initialise Gemini model: %s", exc)
-                self._model = None
+                logger.error("Failed to initialise Groq model: %s", exc)
+                self._client = None
+                self._model_name = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -204,8 +202,8 @@ class QueryUnderstandingTool:
     def parse(self, query: str) -> dict:
         """Parse the query and return the full structured intent dict.
 
-        Tries the Gemini API first; falls back to the rule-based extractor
-        if Gemini is unavailable or returns an invalid response.
+        Tries the Groq API first; falls back to the rule-based extractor
+        if Groq is unavailable or returns an invalid response.
 
         Args:
             query: Raw natural-language query string from the user.
@@ -218,16 +216,16 @@ class QueryUnderstandingTool:
             logger.warning("Empty query received; returning default 'broad_exploration' parse.")
             return self._default_result()
 
-        # Primary: Gemini
-        if self._model is not None:
+        # Primary: Groq
+        if self._client is not None:
             try:
-                result = self._parse_with_gemini(query)
+                result = self._parse_with_llm(query)
                 if result and self._validate(result):
-                    logger.info("Query parsed via Gemini. intent=%s", result.get("intent"))
+                    logger.info("Query parsed via LLM. intent=%s", result.get("intent"))
                     return result
-                logger.warning("Gemini returned invalid/incomplete JSON; switching to rules.")
+                logger.warning("LLM returned invalid/incomplete JSON; switching to rules.")
             except Exception as exc:
-                logger.warning("Gemini parse failed (%s); switching to rule-based fallback.", exc)
+                logger.warning("LLM parse failed (%s); switching to rule-based fallback.", exc)
 
         # Fallback: rules
         result = self._parse_with_rules(query)
@@ -235,35 +233,37 @@ class QueryUnderstandingTool:
         return result
 
     # ------------------------------------------------------------------
-    # Private: Gemini path
+    # Private: LLM path
     # ------------------------------------------------------------------
 
-    def _parse_with_gemini(self, query: str) -> dict:
-        """Send the query to Gemini and parse its JSON response.
+    def _parse_with_llm(self, query: str) -> dict:
+        """Send the query to Groq and parse its JSON response.
 
         Args:
             query: Raw user query string.
 
         Returns:
-            Parsed and normalised dict from Gemini's response, or empty dict
+            Parsed and normalised dict from LLM's response, or empty dict
             on parse failure.
 
         Raises:
-            Exception: Propagated from the generativeai SDK on API errors.
+            Exception: Propagated from the groq SDK on API errors.
         """
         user_message = f"Parse the following AML query:\n\n{query}"
-        response = self._model.generate_content(
-            user_message,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.0,
-                candidate_count=1,
-            ),
+        response = self._client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": _QUERY_PARSER_SYSTEM_PROMPT},
+                {"role": "user", "content": user_message}
+            ],
+            model=self._model_name,
+            response_format={"type": "json_object"},
+            temperature=0.0,
         )
 
-        raw_text: str = response.text if response.text else ""
+        raw_text: str = response.choices[0].message.content if response.choices[0].message.content else ""
         parsed = _extract_json_from_text(raw_text)
         if parsed is None:
-            logger.debug("Gemini raw response could not be JSON-decoded: %r", raw_text[:400])
+            logger.debug("LLM raw response could not be JSON-decoded: %r", raw_text[:400])
             return {}
 
         return self._normalise(parsed)
@@ -510,7 +510,7 @@ class QueryUnderstandingTool:
         return True
 
     def _normalise(self, parsed: dict) -> dict:
-        """Normalise field values returned by Gemini to canonical types.
+        """Normalise field values returned by LLM to canonical types.
 
         - intent        : strip and lower, fallback to broad_exploration
         - target_pattern: strip and lower, fallback to none
@@ -519,7 +519,7 @@ class QueryUnderstandingTool:
         - requires_eda / requires_ml: ensure booleans
 
         Args:
-            parsed: Raw dict from Gemini.
+            parsed: Raw dict from LLM.
 
         Returns:
             Normalised dict.

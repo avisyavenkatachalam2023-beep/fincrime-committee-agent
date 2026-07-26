@@ -2,7 +2,7 @@
 chair_agent.py
 --------------
 The Chair Agent synthesises specialist votes, applies documented tie-break
-rules, generates a coherent narrative via Gemini, and produces formatted
+rules, generates a coherent narrative via Groq, and produces formatted
 Committee Meeting Minutes.
 """
 
@@ -15,14 +15,14 @@ from datetime import date
 from typing import Optional
 
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-PRIMARY_MODEL = "gemini-2.0-flash"
-FALLBACK_MODEL = "gemini-1.5-flash"
+PRIMARY_MODEL = "llama-3.3-70b-versatile"
+FALLBACK_MODEL = "llama-3.1-8b-instant"
 
 # ---------------------------------------------------------------------------
 # Vote ordering
@@ -75,56 +75,44 @@ class ChairAgent:
         """
         Initialise the Chair Agent.
 
-        Attempts to configure Gemini for narrative synthesis.  Falls back to a
+        Attempts to configure Groq for narrative synthesis.  Falls back to a
         structured template if the API is unavailable.
         """
-        self._model: Optional[genai.GenerativeModel] = None
-        self._gemini_available: bool = False
-        self._init_gemini()
+        self._client = None
+        self._model_name = None
+        self._llm_available: bool = False
+        self._init_llm()
 
     # ------------------------------------------------------------------
-    # Gemini initialisation
+    # LLM initialisation
     # ------------------------------------------------------------------
 
-    def _init_gemini(self) -> None:
+    def _init_llm(self) -> None:
         """
-        Load the Gemini API key from the environment and configure the client
+        Load the Groq API key from the environment and configure the client
         for the Chair's synthesis narrative generation.
         """
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             logger.warning(
-                "[Chair] GEMINI_API_KEY not found — template synthesis will be used."
+                "[Chair] GROQ_API_KEY not found — template synthesis will be used."
             )
             return
 
-        genai.configure(api_key=api_key)
+        try:
+            self._client = Groq(api_key=api_key)
+            self._model_name = PRIMARY_MODEL
+            self._llm_available = True
+            logger.info("[Chair] Groq client ready using %s.", self._model_name)
+        except Exception as exc:
+            logger.warning(
+                "[Chair] Could not initialise Groq client: %s", exc
+            )
+            self._client = None
+            self._llm_available = False
 
-        generation_config = genai.GenerationConfig(
-            temperature=0.3,
-            max_output_tokens=512,
-        )
-
-        for model_name in (PRIMARY_MODEL, FALLBACK_MODEL):
-            try:
-                self._model = genai.GenerativeModel(
-                    model_name=model_name,
-                    system_instruction=_CHAIR_SYSTEM_PROMPT,
-                    generation_config=generation_config,
-                )
-                probe = self._model.generate_content("ping")
-                _ = probe.text
-                self._gemini_available = True
-                logger.info("[Chair] Gemini model '%s' ready for synthesis.", model_name)
-                break
-            except Exception as exc:  # noqa: BLE001
-                logger.warning(
-                    "[Chair] Could not initialise model '%s': %s", model_name, exc
-                )
-                self._model = None
-
-        if not self._gemini_available:
-            logger.warning("[Chair] All Gemini models unavailable — using template.")
+        if not self._llm_available:
+            logger.warning("[Chair] LLM unavailable — using template.")
 
     # ------------------------------------------------------------------
     # Public interface
@@ -251,7 +239,7 @@ class ChairAgent:
         Generate a coherent synthesis paragraph describing the committee's
         collective assessment.
 
-        Attempts Gemini first; falls back to a structured template.
+        Attempts Groq API first; falls back to a structured template.
 
         Parameters
         ----------
@@ -267,17 +255,25 @@ class ChairAgent:
         str
             Multi-sentence synthesis paragraph.
         """
-        if self._gemini_available and self._model is not None:
+        if self._llm_available and self._client is not None:
             try:
                 prompt = self._build_synthesis_prompt(
                     case_file, agent_votes, final_decision
                 )
-                response = self._model.generate_content(prompt)
-                synthesis = response.text.strip()
+                response = self._client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": _CHAIR_SYSTEM_PROMPT},
+                        {"role": "user", "content": prompt}
+                    ],
+                    model=self._model_name,
+                    temperature=0.3,
+                    max_tokens=512,
+                )
+                synthesis = response.choices[0].message.content.strip()
                 if synthesis:
                     return synthesis
             except Exception as exc:  # noqa: BLE001
-                logger.error("[Chair] Gemini synthesis failed (%s); using template.", exc)
+                logger.error("[Chair] LLM synthesis failed (%s); using template.", exc)
 
         return self._template_synthesis(case_file, agent_votes, final_decision)
 
@@ -285,7 +281,7 @@ class ChairAgent:
         self, case_file: dict, agent_votes: list[dict], final_decision: str
     ) -> str:
         """
-        Construct the Gemini prompt for synthesis narrative generation.
+        Construct the prompt for synthesis narrative generation.
 
         Parameters
         ----------
@@ -330,7 +326,7 @@ class ChairAgent:
         self, case_file: dict, agent_votes: list[dict], final_decision: str
     ) -> str:
         """
-        Generate a structured template synthesis when Gemini is unavailable.
+        Generate a structured template synthesis when the LLM is unavailable.
 
         Parameters
         ----------
