@@ -8,3 +8,4 @@ app/static/uploads/
 *.png
 !app/static/img/*.png
 .DS_Store
+~$*
