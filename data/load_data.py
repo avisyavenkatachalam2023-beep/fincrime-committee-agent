@@ -383,6 +383,39 @@ def _find_csv(directory: Path, candidates: list[str]) -> Optional[Path]:
 
 
 # ---------------------------------------------------------------------------
+# Entity-ID matching
+# ---------------------------------------------------------------------------
+
+def match_entity_id(series: pd.Series, entity_id) -> pd.Series:
+    """Boolean mask matching a transactions column against an entity ID,
+    robust to dtype mismatches between the two.
+
+    ``sender_account``/``receiver_account`` are int64 in the raw Kaggle
+    SAML-D data but string (e.g. ``"CUS-09AD7886"``) in the synthetic
+    fallback dataset. Query parsing (query_understanding.py) always
+    normalises extracted entity IDs to plain Python strings, so a naive
+    ``series == entity_id`` silently matches zero rows against the int64
+    column for every single-entity query — not an empty account, a type
+    mismatch masquerading as one.
+
+    Args:
+        series: A transactions DataFrame column, e.g. ``df["sender_account"]``.
+        entity_id: The entity identifier to match, in whatever type it
+            arrived as (typically a string from query parsing).
+
+    Returns:
+        Boolean Series usable as a DataFrame mask.
+    """
+    if pd.api.types.is_numeric_dtype(series):
+        try:
+            numeric_id = pd.to_numeric(entity_id)
+        except (TypeError, ValueError):
+            return pd.Series(False, index=series.index)
+        return series == numeric_id
+    return series.astype(str) == str(entity_id)
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 

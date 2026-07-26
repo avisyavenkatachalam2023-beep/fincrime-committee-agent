@@ -36,6 +36,7 @@ _cache: dict = {
     "customers": None,
     "jurisdictions": None,
     "dataset_info": None,
+    "custom_dataset_name": None,
 }
 
 # ── How many rows to load (None = full Kaggle SAML-D dataset, ~9.5M rows) ────
@@ -55,12 +56,37 @@ def _load_data_module():
     return ld
 
 
+def _update_dataset_info(df: pd.DataFrame, source: str, note: str = "") -> None:
+    """(Re)compute the summary stats shown in the UI's Dataset Stats panel and
+    returned by /api/v1/dataset-info. Shared by startup loading, dataset
+    upload, and dataset reset so all three paths report figures the same way.
+    """
+    susp = int(df["is_suspicious"].sum()) if "is_suspicious" in df.columns else 0
+    typo = df["typology"].value_counts().to_dict() if "typology" in df.columns else {}
+    _cache["dataset_info"] = {
+        "total_transactions": len(df),
+        "suspicious_count": susp,
+        "suspicious_rate_pct": round(susp / max(len(df), 1) * 100, 2),
+        "typology_breakdown": typo,
+        "date_range": {
+            "min": str(df["timestamp"].min()) if "timestamp" in df.columns else "N/A",
+            "max": str(df["timestamp"].max()) if "timestamp" in df.columns else "N/A",
+        },
+        "source": source,
+        "is_custom": bool(_cache.get("custom_dataset_name")),
+        "note": note or f"Loaded {len(df):,} rows.",
+    }
+
+
 def _prime_cache():
-    """Load data once into memory at startup."""
+    """Load the default dataset (Kaggle raw, falling back to synthetic) into
+    memory. Called once at startup, and again by /api/v1/reset-dataset to
+    undo an uploaded dataset."""
     global _cache
     print("[startup] Loading dataset into memory — this happens ONCE…")
     ld = _load_data_module()
     data_dir = os.path.join(_PROJECT_ROOT, "data")
+    _cache["custom_dataset_name"] = None
 
     # Detect if Kaggle raw file exists
     raw_path = os.path.join(data_dir, "raw", "SAML-D.csv")
@@ -81,21 +107,10 @@ def _prime_cache():
     _cache["customers"] = ld.load_customers(data_dir)
     _cache["jurisdictions"] = ld.load_jurisdictions(data_dir)
 
-    # Pre-compute dataset stats
-    susp = int(df["is_suspicious"].sum()) if "is_suspicious" in df.columns else 0
-    typo = df["typology"].value_counts().to_dict() if "typology" in df.columns else {}
-    _cache["dataset_info"] = {
-        "total_transactions": len(df),
-        "suspicious_count": susp,
-        "suspicious_rate_pct": round(susp / max(len(df), 1) * 100, 2),
-        "typology_breakdown": typo,
-        "date_range": {
-            "min": str(df["timestamp"].min()) if "timestamp" in df.columns else "N/A",
-            "max": str(df["timestamp"].max()) if "timestamp" in df.columns else "N/A",
-        },
-        "source": source,
-        "note": f"Loaded {len(df):,} rows. Set LOCAL_NROWS=None in main.py for full dataset.",
-    }
+    _update_dataset_info(
+        df, source,
+        note=f"Loaded {len(df):,} rows. Set LOCAL_NROWS=None in main.py for full dataset.",
+    )
     print(f"[startup] Done — {len(df):,} transactions loaded from {source}.")
 
 
@@ -137,6 +152,7 @@ app.mount("/charts", StaticFiles(directory=_CHARTS_DIR), name="charts")
 
 ALLOWED_IMAGE_TYPES = {"image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"}
 MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8 MB
+MAX_DATASET_BYTES = 250 * 1024 * 1024  # 250 MB
 
 
 def _chart_url(path: str) -> str:
@@ -258,6 +274,74 @@ def health_check():
 def dataset_info():
     if _cache["dataset_info"] is None:
         raise HTTPException(status_code=503, detail="Data not loaded yet. Please wait.")
+    return _safe(_cache["dataset_info"])
+
+
+@app.post("/api/v1/upload-dataset")
+async def upload_dataset(file: UploadFile = File(...)):
+    """Replace the in-memory transactions dataset with a user-uploaded CSV.
+    Every query after this call (across all users of this server, since the
+    cache is process-global like the rest of the app) runs against the
+    uploaded data until /api/v1/reset-dataset is called or the server
+    restarts.
+    """
+    if not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only .csv files are supported.")
+
+    raw_bytes = await file.read()
+    if len(raw_bytes) > MAX_DATASET_BYTES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large (max {MAX_DATASET_BYTES // (1024*1024)} MB).",
+        )
+
+    import io
+    try:
+        df = pd.read_csv(io.BytesIO(raw_bytes), low_memory=False)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Could not parse CSV: {exc}")
+
+    if df.empty:
+        raise HTTPException(status_code=400, detail="Uploaded CSV has no rows.")
+
+    ld = _load_data_module()
+    df = ld._normalise_columns(df, ld.TXN_ALIASES)
+    df = ld._postprocess_saml_d(df)
+    df = ld._add_missing_cols(df, ld.TXN_CANONICAL_COLS)
+    df = ld._coerce_transactions(df)
+
+    # Every downstream tool assumes usable amount/timestamp columns — without
+    # this check a badly-shaped CSV would silently normalise to all-NaN and
+    # every query would just return empty results with no clear reason why.
+    missing = []
+    if "amount" not in df.columns or df["amount"].notna().sum() == 0:
+        missing.append("amount")
+    if "timestamp" not in df.columns or df["timestamp"].notna().sum() == 0:
+        missing.append("timestamp (or Date/Time)")
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Uploaded CSV is missing usable column(s): {', '.join(missing)}. "
+                f"Expected columns (or recognised aliases of): {', '.join(ld.TXN_CANONICAL_COLS)}"
+            ),
+        )
+
+    _cache["transactions"] = df
+    _cache["custom_dataset_name"] = file.filename
+    _update_dataset_info(
+        df, source=f"Uploaded: {file.filename}",
+        note=f"Loaded {len(df):,} rows from an uploaded CSV. Customer/jurisdiction reference data unchanged.",
+    )
+    print(f"[upload] Replaced transactions dataset with '{file.filename}' — {len(df):,} rows.")
+    return _safe(_cache["dataset_info"])
+
+
+@app.post("/api/v1/reset-dataset")
+def reset_dataset():
+    """Discard an uploaded dataset and reload the default Kaggle/synthetic
+    dataset from disk (same logic as startup)."""
+    _prime_cache()
     return _safe(_cache["dataset_info"])
 
 

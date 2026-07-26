@@ -8,11 +8,18 @@ detectors and risk classifiers in the AML Financial Crime Committee Agent.
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from datetime import timedelta
 from typing import Optional
 
 import numpy as np
 import pandas as pd
+
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+from data.load_data import match_entity_id
 
 logger = logging.getLogger(__name__)
 
@@ -296,8 +303,8 @@ class FeatureEngineeringTool:
         Returns:
             Float in [0, 1].  Returns 0.0 if no inbound transactions exist.
         """
-        inbound = txns[txns["receiver_account"] == customer_id].copy()
-        outbound = txns[txns["sender_account"] == customer_id].copy()
+        inbound = txns[match_entity_id(txns["receiver_account"], customer_id)].copy()
+        outbound = txns[match_entity_id(txns["sender_account"], customer_id)].copy()
 
         if inbound.empty or outbound.empty:
             return 0.0
@@ -406,7 +413,7 @@ class FeatureEngineeringTool:
         Returns:
             Filtered DataFrame.
         """
-        df = txns[txns["sender_account"] == customer_id].copy()
+        df = txns[match_entity_id(txns["sender_account"], customer_id)].copy()
         if "timestamp" in df.columns and not pd.api.types.is_datetime64_any_dtype(df["timestamp"]):
             df["timestamp"] = pd.to_datetime(df["timestamp"])
         return df

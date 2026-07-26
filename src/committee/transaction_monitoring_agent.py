@@ -105,6 +105,7 @@ class TransactionMonitoringAgent(BaseCommitteeAgent):
 
         benford_deviation = float(benford.get("deviation_score", 0.0))
         p_value = float(benford.get("p_value", 1.0))
+        benford_insufficient = bool(benford.get("insufficient_sample"))
 
         # threshold_clustering.analyze_customer() nests these under
         # "round_numbers"/"composite_clustering_score", not top-level
@@ -112,6 +113,29 @@ class TransactionMonitoringAgent(BaseCommitteeAgent):
         # silently defaulted both signals to 0.0 for every case.
         round_number_score = float(clustering.get("round_numbers", {}).get("round_number_ratio", 0.0))
         spike_score = float(clustering.get("composite_clustering_score", 0.0))
+
+        # Below MIN_SAMPLE_SIZE, benford.py forces deviation_score=0.0 and
+        # p_value=1.0 as neutral placeholders, NOT a real "conforms cleanly"
+        # result — citing them as if computed previously produced text like
+        # "Benford deviation of 0.000 (p=1.0000) indicates anomalous
+        # activity", which is both uncomputed and, even taken at face value,
+        # backwards (p=1.0 means indistinguishable from the expected
+        # distribution, the opposite of anomalous).
+        if benford_insufficient:
+            benford_note = (
+                f"Benford analysis was not computed (insufficient transaction "
+                f"volume, N={benford.get('sample_size', '?')})."
+            )
+        elif benford_deviation > _HIGH_BENFORD_DEVIATION:
+            benford_note = (
+                f"Benford deviation score of {benford_deviation:.3f} (p={p_value:.4f}) "
+                "shows the amount distribution deviates from the expected pattern."
+            )
+        else:
+            benford_note = (
+                f"Benford deviation score of {benford_deviation:.3f} (p={p_value:.4f}) "
+                "is within the expected range, showing no distributional anomaly."
+            )
 
         triggered_signals: list[str] = []
 
@@ -155,18 +179,16 @@ class TransactionMonitoringAgent(BaseCommitteeAgent):
             reasoning = (
                 f"{signal_count} transaction signal(s) warrant compliance review: "
                 f"{', '.join(triggered_signals)}. "
-                f"Benford deviation score of {benford_deviation:.3f} "
-                f"(p={p_value:.4f}) and velocity of {velocity:.2f} txns/day "
-                "indicate anomalous but not conclusively suspicious activity."
+                f"{benford_note} Velocity is {velocity:.2f} txns/day. "
+                "Not conclusively suspicious, but warrants a closer look."
             )
             confidence = 0.50 + signal_count * 0.07
         else:
             vote = "MONITOR"
             reasoning = (
                 f"No transaction monitoring thresholds breached. "
-                f"Velocity ({velocity:.2f} txns/day), Benford deviation "
-                f"({benford_deviation:.3f}), and round-number score "
-                f"({round_number_score:.2f}) are all within acceptable ranges. "
+                f"Velocity ({velocity:.2f} txns/day) and round-number score "
+                f"({round_number_score:.2f}) are within acceptable ranges. {benford_note} "
                 "Continue routine monitoring."
             )
             confidence = 0.75

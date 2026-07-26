@@ -62,6 +62,7 @@ class RiskClassifier:
         clustering_score: float = 0.0,
         ml_score: float = 0.0,
         network_score: float = 0.0,
+        benford_reliable: bool = True,
     ) -> dict[str, Any]:
         """Compute a composite risk score from individual signal scores.
 
@@ -70,6 +71,14 @@ class RiskClassifier:
             clustering_score: Threshold clustering composite score in [0, 1].
             ml_score: ML Isolation Forest anomaly score in [0, 1].
             network_score: Network betweenness centrality score in [0, 1].
+            benford_reliable: False when the entity had too few transactions
+                for a statistically meaningful Benford analysis (see
+                BenfordAnalyzer.MIN_SAMPLE_SIZE). In that case Benford's
+                weight is redistributed entirely onto threshold_clustering
+                instead of silently averaging in a meaningless near-zero
+                score — the composite falls back to the round-number /
+                sub-threshold clustering signal alone for the forensic-
+                accounting component.
 
         Returns:
             Dictionary with keys:
@@ -83,11 +92,19 @@ class RiskClassifier:
         m = max(0.0, min(1.0, float(ml_score)))
         n = max(0.0, min(1.0, float(network_score)))
 
+        if benford_reliable:
+            weights = self.WEIGHTS
+        else:
+            weights = dict(self.WEIGHTS)
+            weights["threshold_clustering"] += weights["benford"]
+            weights["benford"] = 0.0
+            b = 0.0
+
         raw_composite = (
-            self.WEIGHTS["benford"] * b
-            + self.WEIGHTS["threshold_clustering"] * c
-            + self.WEIGHTS["ml_anomaly"] * m
-            + self.WEIGHTS["network_centrality"] * n
+            weights["benford"] * b
+            + weights["threshold_clustering"] * c
+            + weights["ml_anomaly"] * m
+            + weights["network_centrality"] * n
         )
 
         composite_score = round(float(raw_composite * 100), 2)
@@ -97,23 +114,23 @@ class RiskClassifier:
         score_components = {
             "benford": {
                 "raw_score": round(b, 4),
-                "weight": self.WEIGHTS["benford"],
-                "contribution": round(self.WEIGHTS["benford"] * b * 100, 2),
+                "weight": weights["benford"],
+                "contribution": round(weights["benford"] * b * 100, 2),
             },
             "threshold_clustering": {
                 "raw_score": round(c, 4),
-                "weight": self.WEIGHTS["threshold_clustering"],
-                "contribution": round(self.WEIGHTS["threshold_clustering"] * c * 100, 2),
+                "weight": weights["threshold_clustering"],
+                "contribution": round(weights["threshold_clustering"] * c * 100, 2),
             },
             "ml_anomaly": {
                 "raw_score": round(m, 4),
-                "weight": self.WEIGHTS["ml_anomaly"],
-                "contribution": round(self.WEIGHTS["ml_anomaly"] * m * 100, 2),
+                "weight": weights["ml_anomaly"],
+                "contribution": round(weights["ml_anomaly"] * m * 100, 2),
             },
             "network_centrality": {
                 "raw_score": round(n, 4),
-                "weight": self.WEIGHTS["network_centrality"],
-                "contribution": round(self.WEIGHTS["network_centrality"] * n * 100, 2),
+                "weight": weights["network_centrality"],
+                "contribution": round(weights["network_centrality"] * n * 100, 2),
             },
         }
 
@@ -161,9 +178,12 @@ class RiskClassifier:
 
         # --- Benford ---
         b_score = 0.0
+        benford_reliable = True
         if benford_results:
-            b_score = float(benford_results.get("deviation_score", 0.0))
-            signals_present.append("benford")
+            benford_reliable = not benford_results.get("insufficient_sample", False)
+            if benford_reliable:
+                b_score = float(benford_results.get("deviation_score", 0.0))
+                signals_present.append("benford")
         raw_scores["benford"] = b_score
 
         # --- Threshold clustering ---
@@ -194,6 +214,7 @@ class RiskClassifier:
             clustering_score=c_score,
             ml_score=m_score,
             network_score=n_score,
+            benford_reliable=benford_reliable,
         )
 
         # Penalty: if no signals present, composite must be zero

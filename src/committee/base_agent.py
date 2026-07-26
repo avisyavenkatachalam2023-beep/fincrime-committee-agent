@@ -33,6 +33,93 @@ VOTE_THRESHOLDS = {
 PRIMARY_MODEL = "llama-3.3-70b-versatile"
 FALLBACK_MODEL = "llama-3.1-8b-instant"
 
+# ---------------------------------------------------------------------------
+# Numeric-claim verification
+# ---------------------------------------------------------------------------
+# An LLM can narrate plausible-sounding statistics it was never actually
+# given (e.g. citing a Benford p-value when Benford wasn't computed for lack
+# of data). Every number an agent's generated text cites is checked against
+# the real signal values it was handed; anything unmatched triggers a
+# corrective retry, then a hard rejection (caller falls back to the
+# deterministic rule-based path) rather than trusting an invented figure.
+
+# Numbers that legitimately appear in ordinary reasoning prose without being
+# drawn from the case file's computed signals: small integers (day-count
+# windows like "30-day", "5 business days", list positions), the risk-tier
+# cut points from the scoring scheme (see risk_classification.py), and
+# common confidence-style fractions.
+_ALLOWED_STRUCTURAL_NUMBERS = {float(n) for n in range(0, 32)} | {
+    33.0, 60.0, 100.0, 0.1, 0.15, 0.25, 0.5, 0.6, 0.7, 0.75, 0.9, 0.95,
+}
+
+
+def _extract_numeric_claims(text: str) -> list[float]:
+    """Extract every numeric literal a generated narrative cites."""
+    out: list[float] = []
+    for tok in re.findall(r"-?\d[\d,]*\.?\d*", text or ""):
+        tok = tok.strip(".").replace(",", "")
+        if not tok or tok == "-":
+            continue
+        try:
+            out.append(float(tok))
+        except ValueError:
+            continue
+    return out
+
+
+def _flatten_numeric_values(obj) -> set[float]:
+    """Collect every real numeric leaf value out of a nested dict/list
+    (e.g. the full case file), for cross-checking narrative claims."""
+    values: set[float] = set()
+
+    def walk(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, (list, tuple, set)):
+            for v in o:
+                walk(v)
+        elif isinstance(o, bool):
+            return
+        elif isinstance(o, (int, float)):
+            values.add(round(float(o), 6))
+
+    walk(obj)
+    return values
+
+
+def find_unverifiable_number(
+    narrative_text: str, case_file: dict, extra_real_numbers: Optional[set] = None
+) -> Optional[float]:
+    """Return the first number cited in *narrative_text* that does not
+    approximately match any real value in *case_file*, or None if every
+    cited number checks out.
+
+    Used by both specialist agents and the Chair to catch a generated
+    narrative citing a statistic that was never actually computed.
+
+    Args:
+        narrative_text: The generated text to check.
+        case_file: Structured case file whose numeric leaf values are
+            treated as ground truth.
+        extra_real_numbers: Additional legitimate numbers not present as
+            typed values in case_file — e.g. numbers embedded in specialist
+            agents' free-text reasoning, which the Chair is entitled to
+            quote even though they only exist as text, not JSON numbers.
+    """
+    real_values = _flatten_numeric_values(case_file) | (extra_real_numbers or set())
+    for num in _extract_numeric_claims(narrative_text):
+        if num in _ALLOWED_STRUCTURAL_NUMBERS:
+            continue
+        if any(abs(num - r) <= max(0.015, abs(r) * 0.02) for r in real_values):
+            continue
+        # Tolerate the narrative rounding a real value differently than the
+        # source data does (e.g. a true 0.8854 cited as "0.89").
+        if any(abs(round(num, 1) - round(r, 1)) < 1e-6 for r in real_values):
+            continue
+        return num
+    return None
+
 
 class BaseCommitteeAgent(ABC):
     """
@@ -172,34 +259,66 @@ class BaseCommitteeAgent(ABC):
         prompt = (
             "Analyse the following AML case file and respond with a JSON object "
             "containing your vote, reasoning, confidence, and key_signals.\n\n"
+            "Only cite numeric values explicitly present in the case file below. "
+            "Never invent, estimate, or approximate a statistic. If a section is "
+            "marked N/A or NOT COMPUTED, say so explicitly rather than citing a "
+            "number for it.\n\n"
             f"{brief}"
         )
 
-        try:
-            response = self._client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": self.system_prompt},
-                    {"role": "user", "content": prompt}
-                ],
-                model=self._model_name,
-                response_format={"type": "json_object"},
-                temperature=0.2,
-                max_tokens=1024,
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": prompt},
+        ]
+
+        last_bad_number: Optional[float] = None
+        for attempt in range(2):
+            try:
+                response = self._client.chat.completions.create(
+                    messages=messages,
+                    model=self._model_name,
+                    response_format={"type": "json_object"},
+                    temperature=0.2,
+                    max_tokens=1024,
+                )
+                raw_text = response.choices[0].message.content.strip()
+            except Exception as exc:
+                raise RuntimeError(f"Groq API error: {exc}") from exc
+
+            # Strip markdown code fences if present
+            clean_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
+            clean_text = re.sub(r"\s*```$", "", clean_text)
+
+            try:
+                parsed = json.loads(clean_text)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Non-JSON response from Groq: {clean_text[:300]}") from exc
+
+            result = self._validate_and_normalise(parsed)
+
+            claim_text = result["reasoning"] + " " + " ".join(result["key_signals"])
+            bad_number = find_unverifiable_number(claim_text, case_file)
+            if bad_number is None:
+                return result
+
+            last_bad_number = bad_number
+            logger.warning(
+                "[%s] LLM cited unverifiable number %s not present in the case "
+                "file (attempt %d/2).", self.agent_name, bad_number, attempt + 1,
             )
-            raw_text = response.choices[0].message.content.strip()
-        except Exception as exc:
-            raise RuntimeError(f"Groq API error: {exc}") from exc
+            messages.append({"role": "assistant", "content": raw_text})
+            messages.append({"role": "user", "content": (
+                f"Your response cited the number {bad_number}, which does not "
+                "appear anywhere in the case file above. Respond again with "
+                "corrected JSON, citing only numbers explicitly present in the "
+                "case file (or state a value is not computed/N/A instead of "
+                "citing a number for it)."
+            )})
 
-        # Strip markdown code fences if present
-        raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
-        raw_text = re.sub(r"\s*```$", "", raw_text)
-
-        try:
-            parsed = json.loads(raw_text)
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"Non-JSON response from Groq: {raw_text[:300]}") from exc
-
-        return self._validate_and_normalise(parsed)
+        raise ValueError(
+            f"LLM response still cited unverifiable number {last_bad_number} "
+            "after a corrective retry; rejecting in favour of the rule-based fallback."
+        )
 
     def _validate_and_normalise(self, parsed: dict) -> dict:
         """
@@ -335,6 +454,49 @@ class BaseCommitteeAgent(ABC):
         network = case_file.get("network_results", {})
         profile = case_file.get("customer_profile", {})
 
+        # Benford is only meaningful above BenfordAnalyzer.MIN_SAMPLE_SIZE —
+        # below that, deviation_score/p_value are forced to 0.0/1.0 as
+        # neutral placeholders (see benford.py), NOT real statistics. Showing
+        # those numbers unlabelled here previously let both the LLM and the
+        # rule-based fallback narrate a "clean"/"anomalous" Benford result
+        # that was never actually computed. State the not-computed status
+        # explicitly instead of a bare 0.0/1.0 the reader has to interpret.
+        if benford.get("insufficient_sample"):
+            benford_lines = [
+                "--- BENFORD'S LAW ANALYSIS ---",
+                f"  Status: NOT COMPUTED — {benford.get('sample_warning', 'insufficient transaction volume for a statistically meaningful result.')}",
+            ]
+        elif benford:
+            benford_lines = [
+                "--- BENFORD'S LAW ANALYSIS ---",
+                f"  Deviation Score : {benford.get('deviation_score', 'N/A')}",
+                f"  MAD Score       : {benford.get('mad_score', 'N/A')}",
+                f"  Chi-Square      : {benford.get('chi_square', 'N/A')}",
+                f"  P-Value         : {benford.get('p_value', 'N/A')}",
+            ]
+        else:
+            benford_lines = [
+                "--- BENFORD'S LAW ANALYSIS ---",
+                "  Status: NOT COMPUTED for this query.",
+            ]
+
+        # threshold_clustering.analyze_customer() nests these under
+        # sub_threshold.spike_score / round_numbers.round_number_ratio /
+        # composite_clustering_score — there is no top-level
+        # sub_threshold_band_count, round_number_score, or spike_score key.
+        # Reading those non-existent keys previously fed "N/A" for all three
+        # clustering fields into every agent's prompt, every time.
+        clustering_lines = (
+            [
+                "--- CLUSTERING ANALYSIS ---",
+                f"  Composite Clustering Score : {clustering.get('composite_clustering_score', 'N/A')}",
+                f"  Sub-threshold Spike Score  : {clustering.get('sub_threshold', {}).get('spike_score', 'N/A')}",
+                f"  Round Number Ratio         : {clustering.get('round_numbers', {}).get('round_number_ratio', 'N/A')}",
+            ]
+            if clustering
+            else ["--- CLUSTERING ANALYSIS ---", "  Status: NOT COMPUTED for this query."]
+        )
+
         brief_lines = [
             "=" * 60,
             "AML CASE FILE — COMMITTEE REVIEW",
@@ -353,16 +515,9 @@ class BaseCommitteeAgent(ABC):
             f"  Structuring Regularity Score: {features.get('structuring_regularity_score', 'N/A')}",
             f"  Rolling Sum 30d (USD)       : {features.get('rolling_sum_30d', 'N/A')}",
             "",
-            "--- BENFORD'S LAW ANALYSIS ---",
-            f"  Deviation Score : {benford.get('deviation_score', 'N/A')}",
-            f"  MAD Score       : {benford.get('mad_score', 'N/A')}",
-            f"  Chi-Square      : {benford.get('chi_square', 'N/A')}",
-            f"  P-Value         : {benford.get('p_value', 'N/A')}",
+            *benford_lines,
             "",
-            "--- CLUSTERING ANALYSIS ---",
-            f"  Sub-threshold Band Count : {clustering.get('sub_threshold_band_count', 'N/A')}",
-            f"  Round Number Score       : {clustering.get('round_number_score', 'N/A')}",
-            f"  Spike Score              : {clustering.get('spike_score', 'N/A')}",
+            *clustering_lines,
             "",
             "--- ML ANOMALY DETECTION ---",
             f"  Anomaly Score : {ml.get('ml_anomaly_score', 'N/A')}",

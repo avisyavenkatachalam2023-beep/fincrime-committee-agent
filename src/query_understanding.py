@@ -13,7 +13,7 @@ Canonical output schema (Section 8.1):
   "intent"        : str,   # one of INTENTS
   "filters"       : {"date_range": str|None, "country": str|None,
                       "segment": str|None, "transaction_type": str|None},
-  "entities"      : list,  # e.g. ["customer_4521"]
+  "entities"      : list,  # e.g. ["4521"] — raw ID, no prefix
   "target_pattern": str,   # "structuring" | "smurfing" | "layering" | "none"
   "requires_eda"  : bool,
   "requires_ml"   : bool,
@@ -67,11 +67,13 @@ Return ONLY valid JSON with these exact fields:
     "segment": "<segment name or null>",
     "transaction_type": "<type or null>"
   },
-  "entities": ["<customer_ID or transaction_ID, e.g. customer_4521>"],
+  "entities": ["<the account or transaction ID exactly as it identifies a real record, with no prefix added>"],
   "target_pattern": "<structuring | smurfing | layering | none>",
   "requires_eda": <true | false>,
   "requires_ml": <true | false>
 }
+
+IMPORTANT for "entities": real account IDs in this dataset are raw numeric strings (e.g. "1615764138"), not prefixed. If the user says "customer 4521" or "customer ID 1615764138", extract just the number/ID itself (e.g. "4521" or "1615764138") — do NOT prepend "customer_" or "transaction_" to it, since that prefix does not match any real account identifier and would cause the lookup to fail.
 
 Rules:
 - pattern_detection: user wants to find a specific AML pattern (structuring/smurfing/layering)
@@ -282,7 +284,12 @@ class QueryUnderstandingTool:
           2. 'Which customers made 10+ transactions under $10,000?'
              -> intent=aggregation_query, target_pattern=none
           3. 'Is customer ID 4521 suspicious?'
-             -> intent=single_entity_lookup, entities=['customer_4521']
+             -> intent=single_entity_lookup, entities=['4521']
+
+        Real SAML-D account IDs are raw numeric strings with no prefix
+        (e.g. '1615764138') — entities are extracted as the bare ID, never
+        prefixed with 'customer_'/'transaction_', so they match directly
+        against the sender_account/receiver_account columns.
 
         Args:
             query: Raw user query string.
@@ -295,9 +302,9 @@ class QueryUnderstandingTool:
         # ---- 1. Detect entities (customer / transaction IDs) -----------
         entities: list[str] = []
         for m in re.finditer(r"customer[\s_\-]*(?:id[\s:]*)?(\d+)", q):
-            entities.append(f"customer_{m.group(1)}")
+            entities.append(m.group(1))
         for m in re.finditer(r"transaction[\s_\-]*(?:id[\s:]*)?(\d+)", q):
-            entities.append(f"transaction_{m.group(1)}")
+            entities.append(m.group(1))
         entities = list(dict.fromkeys(entities))  # deduplicate, preserve order
 
         # ---- 2. Detect target pattern ----------------------------------

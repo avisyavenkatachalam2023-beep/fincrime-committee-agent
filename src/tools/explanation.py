@@ -212,6 +212,7 @@ INSTRUCTIONS:
 4. Structure as: (a) Pattern summary, (b) Key evidence, (c) Risk assessment, (d) Recommended action.
 5. Maximum 250 words.
 6. Write in third person (e.g. "Account ACC-001 exhibits...").
+7. If "benford_insufficient_sample" is true, do NOT describe the Benford result as conforming or clean. State plainly that the transaction volume was too low for a statistically meaningful Benford analysis, cite the sample size, and note that risk scoring relies on the threshold-clustering signal instead for that component.
 
 Write the investigation narrative now:"""
 
@@ -246,13 +247,19 @@ Write the investigation narrative now:"""
         red_flags: list[str] = []
 
         # Benford
-        benford_mad = signals.get("benford_mad_score")
-        benford_dev = signals.get("benford_deviation_score")
-        if benford_mad is not None and benford_mad > self.BENFORD_FLAG_THRESHOLD:
+        if signals.get("benford_insufficient_sample"):
             red_flags.append(
-                f"Benford MAD score of {benford_mad:.4f} (threshold: {self.BENFORD_FLAG_THRESHOLD}) "
-                f"with deviation score {benford_dev:.4f} — digit distribution is non-conforming"
+                signals.get("benford_sample_warning")
+                or "Insufficient transaction volume for a statistically meaningful Benford analysis."
             )
+        else:
+            benford_mad = signals.get("benford_mad_score")
+            benford_dev = signals.get("benford_deviation_score")
+            if benford_mad is not None and benford_mad > self.BENFORD_FLAG_THRESHOLD:
+                red_flags.append(
+                    f"Benford MAD score of {benford_mad:.4f} (threshold: {self.BENFORD_FLAG_THRESHOLD}) "
+                    f"with deviation score {benford_dev:.4f}: digit distribution is non-conforming"
+                )
 
         # Clustering
         spike = signals.get("clustering_spike_score")
@@ -314,7 +321,7 @@ Write the investigation narrative now:"""
                 "Continued monitoring is recommended."
             )
 
-        flags_text = "; ".join(f"({i+1}) {f}" for i, f in enumerate(red_flags))
+        flags_text = "; ".join(f"({i+1}) {f.rstrip('.')}" for i, f in enumerate(red_flags))
         pattern = signals.get("pattern", "UNKNOWN")
 
         return (
@@ -374,6 +381,8 @@ Write the investigation narrative now:"""
             signals["benford_deviation_score"] = benford_results.get("deviation_score")
             signals["benford_p_value"] = benford_results.get("p_value")
             signals["benford_sample_size"] = benford_results.get("sample_size")
+            signals["benford_insufficient_sample"] = benford_results.get("insufficient_sample", False)
+            signals["benford_sample_warning"] = benford_results.get("sample_warning")
 
         if clustering_results:
             sub = clustering_results.get("sub_threshold", {})

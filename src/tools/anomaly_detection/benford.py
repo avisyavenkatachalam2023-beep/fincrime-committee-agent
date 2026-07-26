@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -22,6 +23,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
+
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+from data.load_data import match_entity_id
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +50,13 @@ BENFORD_EXPECTED: dict[int, float] = {
 MAD_CLOSE_CONFORMITY = 0.006
 MAD_ACCEPTABLE = 0.012
 MAD_MARGINAL = 0.015
+
+# Minimum transaction count for a Benford's Law analysis to be statistically
+# meaningful. Below this, the observed leading-digit distribution is too
+# sensitive to a handful of data points (e.g. 6 similarly-sized transactions
+# can produce a false 100% spike on one digit) to support any conclusion —
+# analyze_customer() refuses to render a chart or score below this threshold.
+MIN_SAMPLE_SIZE = 50
 
 
 class BenfordAnalyzer:
@@ -162,7 +175,7 @@ class BenfordAnalyzer:
         """
         positive_amounts = amounts[amounts > 0].dropna()
         n = len(positive_amounts)
-        if n < 5:
+        if n < MIN_SAMPLE_SIZE:
             return 0.0
 
         observed = self.compute_digit_distribution(positive_amounts)
@@ -196,27 +209,50 @@ class BenfordAnalyzer:
             Dictionary with keys:
             customer_id, digit_distribution, benford_expected,
             mad_score, chi_square, p_value, deviation_score,
-            chart_path, interpretation, sample_size.
+            chart_path, interpretation, sample_size, insufficient_sample,
+            sample_warning.
+
+            When sample_size is below MIN_SAMPLE_SIZE, no chart is generated
+            (chart_path is ''), deviation_score is forced to 0.0, and
+            insufficient_sample is True — callers should fall back to the
+            threshold-clustering signal alone for this entity rather than
+            treating the (statistically meaningless) Benford result as a
+            real "conforms to Benford's Law" finding.
         """
         cust_txns = transactions_df[
-            transactions_df["sender_account"] == customer_id
+            match_entity_id(transactions_df["sender_account"], customer_id)
         ].copy()
         amounts = cust_txns["amount"].dropna()
         n = len(amounts[amounts > 0])
 
         digit_dist = self.compute_digit_distribution(amounts)
-        mad = self.mad_score(digit_dist)
-        chi2, p_value = (0.0, 1.0) if n < 5 else self.chi_square_score(digit_dist, n)
-        dev_score = self.deviation_score(amounts)
+        insufficient_sample = n < MIN_SAMPLE_SIZE
 
-        chart_path = str(self.charts_dir / f"benford_{customer_id}.png")
-        self.plot_benford_chart(digit_dist, customer_id, chart_path)
-
-        interpretation = self._interpret(mad, p_value, dev_score)
+        if insufficient_sample:
+            mad = 0.0
+            chi2, p_value = 0.0, 1.0
+            dev_score = 0.0
+            chart_path = ""
+            sample_warning = (
+                f"Insufficient transaction volume (N={n}) for statistically "
+                f"meaningful Benford analysis. Deviation score not computed; "
+                f"a minimum of {MIN_SAMPLE_SIZE} transactions is required."
+            )
+            interpretation = sample_warning
+        else:
+            mad = self.mad_score(digit_dist)
+            chi2, p_value = self.chi_square_score(digit_dist, n)
+            dev_score = self.deviation_score(amounts)
+            chart_path = str(self.charts_dir / f"benford_{customer_id}.png")
+            self.plot_benford_chart(digit_dist, customer_id, chart_path, sample_size=n)
+            sample_warning = None
+            interpretation = self._interpret(mad, p_value, dev_score)
 
         return {
             "customer_id": customer_id,
             "sample_size": n,
+            "insufficient_sample": insufficient_sample,
+            "sample_warning": sample_warning,
             "digit_distribution": digit_dist,
             "benford_expected": BENFORD_EXPECTED,
             "mad_score": round(mad, 6),
@@ -251,8 +287,8 @@ class BenfordAnalyzer:
                     transactions_df["sender_account"] == cid, "amount"
                 ].dropna()
                 n = int((amounts > 0).sum())
-                if n < 5:
-                    continue  # Too few transactions for reliable analysis
+                if n < MIN_SAMPLE_SIZE:
+                    continue  # Too few transactions for a statistically meaningful result
                 digit_dist = self.compute_digit_distribution(amounts)
                 mad = self.mad_score(digit_dist)
                 chi2, p_value = self.chi_square_score(digit_dist, n)
@@ -286,7 +322,8 @@ class BenfordAnalyzer:
                 ].dropna()
                 dist = self.compute_digit_distribution(amounts)
                 self.plot_benford_chart(
-                    dist, cid, str(self.charts_dir / f"benford_{cid}.png")
+                    dist, cid, str(self.charts_dir / f"benford_{cid}.png"),
+                    sample_size=int(row["sample_size"]),
                 )
             except Exception as exc:
                 logger.warning("Chart failed for %s: %s", cid, exc)
@@ -298,17 +335,26 @@ class BenfordAnalyzer:
     # ------------------------------------------------------------------
 
     def plot_benford_chart(
-        self, observed_dist: dict[int, float], customer_id: str, save_path: str
+        self,
+        observed_dist: dict[int, float],
+        customer_id: str,
+        save_path: str,
+        sample_size: int,
     ) -> str:
         """Save a bar chart comparing observed digit frequencies to Benford's expected.
 
         Blue bars represent observed frequencies; orange bars show the Benford
-        expected values.
+        expected values. The transaction count the "Observed" bars were
+        computed from is always disclosed in the subtitle, since the chart is
+        meaningless (and can look deceptively confident) without knowing N —
+        callers must not invoke this for samples below MIN_SAMPLE_SIZE.
 
         Args:
             observed_dist: Observed digit frequency dictionary.
             customer_id: Used in the chart title.
             save_path: Absolute path where the PNG is saved.
+            sample_size: Number of transactions the observed distribution was
+                computed from. Always shown on the chart.
 
         Returns:
             The save_path string.
@@ -328,12 +374,13 @@ class BenfordAnalyzer:
         ax.set_xticklabels([str(d) for d in digits])
         ax.set_xlabel("Leading Digit", fontsize=11)
         ax.set_ylabel("Relative Frequency", fontsize=11)
-        ax.set_title(f"Benford's Law Analysis – {customer_id}", fontsize=13, fontweight="bold")
+        fig.suptitle(f"Benford's Law Analysis: {customer_id}", fontsize=13, fontweight="bold", y=0.98)
+        ax.set_title(f"Based on N={sample_size:,} transactions", fontsize=9.5, color="#555555", style="italic", pad=10)
         ax.legend(fontsize=10)
         ax.spines[["top", "right"]].set_visible(False)
         ax.set_ylim(0, max(max(observed_vals), max(expected_vals)) * 1.25)
 
-        plt.tight_layout()
+        plt.tight_layout(rect=[0, 0, 1, 0.94])
         # Ensure parent directory exists
         Path(save_path).parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(save_path, dpi=120, bbox_inches="tight")

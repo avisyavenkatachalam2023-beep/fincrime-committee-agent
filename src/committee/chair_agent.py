@@ -17,6 +17,14 @@ from typing import Optional
 from dotenv import load_dotenv
 from groq import Groq
 
+try:
+    from src.committee.base_agent import (
+        find_unverifiable_number,
+        _extract_numeric_claims,
+    )
+except ImportError:
+    from .base_agent import find_unverifiable_number, _extract_numeric_claims
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
@@ -42,6 +50,19 @@ _ESCALATION_ACTIONS = {
     ),
 }
 
+# ---------------------------------------------------------------------------
+# Reconciliation between the quantitative composite risk score/tier
+# (RiskClassifier's weighted aggregate of Benford/clustering/ML/network
+# signals) and the qualitative committee decision (each specialist agent's
+# own domain-specific judgment, which can catch things the composite score
+# dilutes away — e.g. a direct connection to a flagged account, or a KYC
+# income mismatch). These are two intentionally independent assessments;
+# when they disagree, that must be stated explicitly rather than left to
+# look like an unexplained contradiction between a low score and a high
+# escalation action (or vice versa).
+# ---------------------------------------------------------------------------
+_TIER_BASELINE_DECISION = {"LOW": "MONITOR", "MEDIUM": "REVIEW", "HIGH": "REPORT"}
+
 # Chair synthesis system prompt
 _CHAIR_SYSTEM_PROMPT = """You are the Chair of an AML Financial Crime Committee.
 You have just received votes from four specialist agents and must synthesise their
@@ -50,6 +71,10 @@ findings into a coherent 3-5 sentence paragraph that:
 2. Explains the rationale for the final committee decision
 3. Notes any dissenting opinions or areas of uncertainty
 4. Uses formal, regulatory-grade language appropriate for compliance records
+
+Only cite numeric values explicitly present in the case file or in the specialists'
+own reasoning below. Never invent, estimate, or approximate a statistic. If a
+signal was not computed, say so explicitly instead of citing a number for it.
 
 Respond ONLY with a plain text paragraph (no JSON, no markdown, no bullet points)."""
 
@@ -139,9 +164,13 @@ class ChairAgent:
         votes = [str(v.get("vote", "MONITOR")).upper() for v in agent_votes]
         final_decision = self._apply_voting_rules(votes)
         escalation_action = self._get_escalation_action(final_decision)
+        tier_decision_note = self._tier_decision_note(
+            case_file.get("risk_tier"), final_decision
+        )
         synthesis = self._generate_synthesis(case_file, agent_votes, final_decision)
         meeting_minutes = self._generate_meeting_minutes(
-            case_file, agent_votes, final_decision, synthesis, escalation_action
+            case_file, agent_votes, final_decision, synthesis, escalation_action,
+            tier_decision_note,
         )
 
         case_ref = self._make_case_reference()
@@ -162,7 +191,55 @@ class ChairAgent:
             "vote_breakdown": vote_breakdown,
             "escalation_action": escalation_action,
             "case_reference": case_ref,
+            "tier_decision_note": tier_decision_note,
         }
+
+    def _tier_decision_note(
+        self, risk_tier: Optional[str], final_decision: str
+    ) -> Optional[str]:
+        """Explain any mismatch between the composite risk tier and the
+        committee's final decision.
+
+        The composite risk tier (LOW/MEDIUM/HIGH) is a quantitative,
+        weighted aggregate of forensic signals. The committee decision
+        (MONITOR/REVIEW/REPORT) is a qualitative judgment from four
+        specialist agents examining different evidence, and can legitimately
+        diverge from the composite score — e.g. a low aggregate score can
+        still sit next to a direct connection to a flagged account, which
+        one specialist correctly escalates on its own. That divergence is
+        a real, useful finding, not a bug — but it must be stated, or a low
+        score next to a high escalation action reads as an unexplained
+        contradiction.
+
+        Args:
+            risk_tier: 'LOW', 'MEDIUM', 'HIGH', or None if no composite
+                score was computed for this case.
+            final_decision: The committee's resolved decision.
+
+        Returns:
+            An explanatory note string if the tier and decision disagree,
+            else None.
+        """
+        if not risk_tier:
+            return None
+        baseline = _TIER_BASELINE_DECISION.get(risk_tier.upper())
+        if baseline is None or baseline == final_decision:
+            return None
+
+        if _VOTE_LEVELS.get(final_decision, 0) > _VOTE_LEVELS.get(baseline, 0):
+            return (
+                f"The composite statistical risk score is {risk_tier} tier, which alone "
+                f"would suggest {baseline}, but the committee escalated to {final_decision} "
+                "based on specialist-level findings not fully captured by the aggregate "
+                "score. See the individual agent statements above for the specific concern "
+                "driving this decision."
+            )
+        return (
+            f"The composite statistical risk score is {risk_tier} tier, which alone would "
+            f"suggest {baseline}, but the committee's {final_decision} decision is less "
+            "severe: specialists reviewed the elevated aggregate score and did not find "
+            "case-specific evidence warranting further escalation."
+        )
 
     # ------------------------------------------------------------------
     # Voting logic
@@ -257,25 +334,73 @@ class ChairAgent:
         """
         if self._llm_available and self._client is not None:
             try:
-                prompt = self._build_synthesis_prompt(
+                synthesis = self._generate_synthesis_via_llm(
                     case_file, agent_votes, final_decision
                 )
-                response = self._client.chat.completions.create(
-                    messages=[
-                        {"role": "system", "content": _CHAIR_SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt}
-                    ],
-                    model=self._model_name,
-                    temperature=0.3,
-                    max_tokens=512,
-                )
-                synthesis = response.choices[0].message.content.strip()
                 if synthesis:
                     return synthesis
             except Exception as exc:  # noqa: BLE001
                 logger.error("[Chair] LLM synthesis failed (%s); using template.", exc)
 
         return self._template_synthesis(case_file, agent_votes, final_decision)
+
+    def _generate_synthesis_via_llm(
+        self, case_file: dict, agent_votes: list[dict], final_decision: str
+    ) -> str:
+        """Call Groq for the synthesis paragraph, verifying every numeric
+        claim against the case file and the specialists' own reasoning text
+        before accepting it — with one corrective retry, then a hard
+        rejection (caller falls back to the deterministic template) rather
+        than trusting an invented statistic.
+        """
+        prompt = self._build_synthesis_prompt(case_file, agent_votes, final_decision)
+        # Numbers already legitimately quoted in a specialist's own reasoning
+        # are fair for the Chair to repeat, even though they only exist as
+        # free text there (not as a typed value in case_file).
+        vote_text_numbers: set = set()
+        for v in agent_votes:
+            vote_text_numbers |= set(_extract_numeric_claims(v.get("reasoning", "")))
+
+        messages = [
+            {"role": "system", "content": _CHAIR_SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ]
+
+        last_bad_number: Optional[float] = None
+        for attempt in range(2):
+            response = self._client.chat.completions.create(
+                messages=messages,
+                model=self._model_name,
+                temperature=0.3,
+                max_tokens=512,
+            )
+            synthesis = (response.choices[0].message.content or "").strip()
+            if not synthesis:
+                return ""
+
+            bad_number = find_unverifiable_number(synthesis, case_file, vote_text_numbers)
+            if bad_number is None:
+                return synthesis
+
+            last_bad_number = bad_number
+            logger.warning(
+                "[Chair] LLM synthesis cited unverifiable number %s not present "
+                "in the case file or specialist reasoning (attempt %d/2).",
+                bad_number, attempt + 1,
+            )
+            messages.append({"role": "assistant", "content": synthesis})
+            messages.append({"role": "user", "content": (
+                f"Your synthesis cited the number {bad_number}, which does not "
+                "appear anywhere in the case file or the specialists' own "
+                "reasoning above. Write the synthesis again, citing only "
+                "numbers explicitly present in that data."
+            )})
+
+        logger.error(
+            "[Chair] LLM synthesis still cited unverifiable number %s after a "
+            "corrective retry; falling back to template.", last_bad_number,
+        )
+        return ""
 
     def _build_synthesis_prompt(
         self, case_file: dict, agent_votes: list[dict], final_decision: str
@@ -391,6 +516,7 @@ class ChairAgent:
         final_decision: str,
         synthesis: str,
         escalation_action: str,
+        tier_decision_note: Optional[str] = None,
     ) -> str:
         """
         Generate formatted Committee Meeting Minutes as a structured text block.
@@ -401,6 +527,8 @@ class ChairAgent:
         * Call to order
         * Individual agent statements
         * Chair synthesis
+        * Score/decision reconciliation note (if the composite tier and the
+          committee decision disagree)
         * Final decision and escalation action
         * Close / signature
 
@@ -416,6 +544,9 @@ class ChairAgent:
             Chair synthesis paragraph.
         escalation_action : str
             Escalation action string.
+        tier_decision_note : str, optional
+            Explanatory note when the composite risk tier and final_decision
+            disagree (see _tier_decision_note).
 
         Returns
         -------
@@ -480,6 +611,13 @@ class ChairAgent:
             lines.append(
                 f"  • {v.get('agent', 'Unknown'):35s} → {v.get('vote', 'N/A')}"
             )
+
+        if tier_decision_note:
+            lines += [
+                "",
+                "[SCORE / DECISION RECONCILIATION]",
+                tier_decision_note,
+            ]
 
         lines += [
             "",

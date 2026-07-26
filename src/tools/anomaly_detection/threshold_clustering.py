@@ -13,6 +13,8 @@ Regulatory thresholds monitored:
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -21,6 +23,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+from data.load_data import match_entity_id
 
 logger = logging.getLogger(__name__)
 
@@ -203,7 +210,7 @@ class ThresholdClusteringAnalyzer:
             chart_path (str).
         """
         cust_txns = transactions_df[
-            transactions_df["sender_account"] == customer_id
+            match_entity_id(transactions_df["sender_account"], customer_id)
         ].copy()
         amounts = cust_txns["amount"].dropna()
 

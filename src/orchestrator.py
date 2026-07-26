@@ -222,6 +222,8 @@ class AMLOrchestrator:
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
+            risk_score=risk.get('composite_score'),
+            risk_tier=risk.get('risk_tier'),
             risk_memo=memo,
             committee_minutes=committee_res['meeting_minutes'],
             explanation=explanation,
@@ -286,6 +288,8 @@ class AMLOrchestrator:
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
+            risk_score=risk.get('composite_score'),
+            risk_tier=risk.get('risk_tier'),
             risk_memo=memo,
             committee_minutes=committee_res['meeting_minutes'],
             explanation=explanation,
@@ -359,20 +363,36 @@ class AMLOrchestrator:
         self.load_data()
         entities = parsed_query.get('entities', [])
         entity = entities[0] if entities else 'unknown'
-        risk = {'composite_score': 85, 'risk_tier': 'HIGH', 'score_components': {}}
+
+        # This intent used to hardcode composite_score=85/HIGH regardless of
+        # the entity, while the committee agents deliberated against an
+        # empty case file — the specialists had no signals to react to, so
+        # they'd typically vote MONITOR, directly contradicting the
+        # fabricated HIGH score shown in the same memo. Benford + clustering
+        # are cheap enough for a single entity to compute for real here (no
+        # full-dataset ML fit, keeping this intent fast), and it means the
+        # committee now reasons over the same real evidence the score is
+        # based on, so score and decision can no longer silently diverge.
+        benford_res = self.benford.analyze_customer(self._transactions_df, entity)
+        clustering_res = self.clustering.analyze_customer(self._transactions_df, entity)
+        risk = self.risk_class.classify_customer(
+            entity, {}, benford_results=benford_res, clustering_results=clustering_res,
+        )
         case_file = self._build_case_file(
             entity, parsed_query['user_query'], 'none',
-            {}, {}, {}, {}, {}, risk,
+            {}, benford_res, clustering_res, {}, {}, risk,
         )
         committee_res = self._run_committee(case_file, agents='all')
         memo = self.formatter.format_risk_memo(
             case_file, risk,
             committee_res['agent_votes'], committee_res['chair_result'],
-            'Escalation review based on prior alerts.',
+            'Escalation review based on existing detection signals for this account.',
         )
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
+            risk_score=risk.get('composite_score'),
+            risk_tier=risk.get('risk_tier'),
             risk_memo=memo,
             committee_minutes=committee_res['meeting_minutes'],
             agent_votes=committee_res['agent_votes'],
@@ -454,6 +474,8 @@ class AMLOrchestrator:
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
+            risk_score=risk.get('composite_score'),
+            risk_tier=risk.get('risk_tier'),
             risk_memo=memo,
             committee_minutes=committee_res['meeting_minutes'],
             explanation=explanation,

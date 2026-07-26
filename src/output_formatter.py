@@ -2,6 +2,8 @@ import json
 from datetime import date
 import random
 
+from src.committee.transaction_monitoring_agent import _HIGH_STRUCTURING_REGULARITY
+
 class OutputFormatter:
     def format_execution_summary(self, execution_summary: dict) -> str:
         # Returns pretty-printed JSON string of the execution summary
@@ -14,8 +16,11 @@ class OutputFormatter:
         case_id = f"CASE-{date.today().year}-{random.randint(1000, 9999)}"
         
         red_flags = []
-        if case_file.get('benford_results', {}).get('deviation_score', 0) > 0.3:
-            red_flags.append(f"- Benford's Law deviation: {case_file['benford_results']['deviation_score']:.2f}")
+        benford_results = case_file.get('benford_results', {}) or {}
+        if benford_results.get('insufficient_sample'):
+            red_flags.append(f"- {benford_results.get('sample_warning', 'Insufficient transaction volume for Benford analysis.')} Risk scoring falls back to the threshold-clustering signal alone for this component.")
+        elif benford_results.get('deviation_score', 0) > 0.3:
+            red_flags.append(f"- Benford's Law deviation: {benford_results['deviation_score']:.2f}")
         # threshold_clustering.analyze_customer() has no top-level "spike_score"
         # or "sub_threshold_band_count" key (nested under sub_threshold/
         # round_numbers instead) — this condition previously never fired, and
@@ -25,6 +30,14 @@ class OutputFormatter:
         if case_file.get('clustering_results', {}).get('composite_clustering_score', 0) > 0.5:
             sub_threshold_count = case_file.get('features', {}).get('sub_threshold_count', 0)
             red_flags.append(f"- Sub-threshold clustering: {sub_threshold_count} transactions just under reporting threshold")
+        # Same threshold the Transaction Monitoring Analyst's rule-based
+        # fallback uses to trigger its "structuring_regularity" signal —
+        # this is a genuinely computed feature (near-identical amounts and
+        # intervals), but was previously invisible here even when it was
+        # the actual signal driving the committee's vote.
+        structuring_regularity = case_file.get('features', {}).get('structuring_regularity_score', 0)
+        if structuring_regularity > _HIGH_STRUCTURING_REGULARITY:
+            red_flags.append(f"- Structuring regularity: {structuring_regularity:.2f} (near-identical amounts/intervals across transactions)")
         if case_file.get('network_results', {}).get('is_hub', False):
             red_flags.append(f"- Network centrality: Identified as a hub in a transaction network")
         for flag in (chair_result.get('key_signals') or []):
@@ -39,6 +52,8 @@ class OutputFormatter:
         for vote in agent_votes:
             deliberation_text += f"   - {vote['agent']}: {vote['vote']} — {vote['reasoning']}\n"
         deliberation_text += f"   - Chair Decision: {chair_result['final_decision']} — {chair_result['synthesis']}"
+        if chair_result.get('tier_decision_note'):
+            deliberation_text += f"\n   - Score/Decision Note: {chair_result['tier_decision_note']}"
 
         memo = f"""RISK MEMORANDUM
 Case Reference: {case_id}
@@ -87,6 +102,13 @@ Sign-off: Autonomous AML Agent v1.0
         return {
             'execution_summary_json': kwargs.get('execution_summary_json', ''),
             'execution_summary': kwargs.get('execution_summary', {}),
+            # Single source of truth for the composite risk score/tier, read
+            # by every panel (banner, Answer, Risk Memo, Committee). None
+            # when this query type never computed a risk assessment (e.g.
+            # aggregation_query, comparative_query) — the UI shows "N/A" for
+            # that, consistent with risk_memo also being empty in that case.
+            'risk_score': kwargs.get('risk_score'),
+            'risk_tier': kwargs.get('risk_tier'),
             'risk_memo': kwargs.get('risk_memo', ''),
             'committee_minutes': kwargs.get('committee_minutes', ''),
             'explanation': kwargs.get('explanation', ''),

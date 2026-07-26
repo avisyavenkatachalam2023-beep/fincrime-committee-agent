@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Financial Crime Committee — AML Intelligence Platform</title>
+  <title>Financial Crime Committee: AML Intelligence Platform</title>
   <link rel="icon" type="image/png" href="/static/img/logo-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,24 +12,28 @@
     /* ── Reset & Base ─────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:       #080c10;
-      --bg2:      #0d1117;
-      --bg3:      #161b22;
-      --bg4:      #1c2128;
-      --border:   #30363d;
-      --accent:   #1f6feb;
-      --accent2:  #388bfd;
-      --gold:     #d29922;
-      --green:    #3fb950;
-      --red:      #f85149;
-      --orange:   #d18616;
-      --text:     #e6edf3;
-      --muted:    #8b949e;
+      --bg:       #f6f5fb;
+      --bg2:      #ffffff;
+      --bg3:      #f4f2fb;
+      --bg4:      #ece9f8;
+      --border:   #e3e0f0;
+      --accent:   #6d5ef7;
+      --accent2:  #8b7cf9;
+      --gold:     #9d6b00;
+      --green:    #008651;
+      --red:      #d5383d;
+      --orange:   #b45e10;
+      --text:     #201c3a;
+      --muted:    #746f92;
       --mono:     'JetBrains Mono', monospace;
+      --shadow-sm: 0 1px 2px rgba(32,28,58,.04), 0 1px 3px rgba(32,28,58,.06);
+      --shadow-md: 0 2px 8px rgba(32,28,58,.06), 0 8px 24px rgba(32,28,58,.06);
     }
     html { font-size: 15px; }
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(circle, rgba(109,94,247,.09) 1px, transparent 1px) 0 0/22px 22px,
+        var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
@@ -39,15 +43,16 @@
 
     /* ── Scrollbar ────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
     /* ── Header ───────────────────────────────────────────────────────── */
     .topbar {
-      background: linear-gradient(90deg, #0a0f1a 0%, #0d1e35 100%);
+      background: var(--bg2);
       border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
       padding: 0 2rem;
-      height: 56px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -74,23 +79,23 @@
 
     /* ── Sidebar ─────────────────────────────────────────────────────── */
     .sidebar {
-      width: 260px; flex-shrink: 0;
+      width: 270px; flex-shrink: 0;
       background: var(--bg2);
       border-right: 1px solid var(--border);
       display: flex; flex-direction: column;
-      height: calc(100vh - 56px);
+      height: calc(100vh - 60px);
       overflow-y: auto;
-      position: sticky; top: 56px;
+      position: sticky; top: 60px;
     }
-    .sidebar-section { padding: 1rem; border-bottom: 1px solid var(--border); }
-    .sidebar-section h3 { font-size: .65rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: .08em; color: var(--muted); margin-bottom: .6rem; }
+    .sidebar-section { padding: 1.1rem; border-bottom: 1px solid var(--border); }
+    .sidebar-section h3 { font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted); margin-bottom: .7rem; }
     .query-chip {
       display: block; width: 100%;
-      background: transparent;
+      background: var(--bg);
       border: 1px solid transparent;
-      border-radius: 6px;
-      padding: .45rem .7rem;
+      border-radius: 8px;
+      padding: .5rem .75rem;
       text-align: left;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
@@ -98,10 +103,10 @@
       color: var(--muted);
       transition: all .15s;
       line-height: 1.4;
-      margin-bottom: .3rem;
+      margin-bottom: .35rem;
     }
     .query-chip:hover { background: var(--bg3); border-color: var(--border); color: var(--text); }
-    .query-chip.active { background: rgba(31,111,235,.15); border-color: var(--accent); color: var(--accent2); }
+    .query-chip.active { background: rgba(109,94,247,.12); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
     /* dataset stats */
     .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
@@ -116,7 +121,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 56px);
+      height: calc(100vh - 60px);
       overflow-y: auto;
       padding: 1.5rem 2rem;
       gap: 1.25rem;
@@ -124,32 +129,33 @@
 
     /* ── Query Bar ───────────────────────────────────────────────────── */
     .query-bar {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-    }
-    .query-bar label { font-size: .72rem; font-weight: 600; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .07em; display: block; margin-bottom: .5rem; }
-    .input-row { display: flex; gap: .75rem; }
-    #query-input {
-      flex: 1;
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: .6rem 1rem;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      padding: 1.1rem 1.3rem;
+    }
+    .query-bar label { font-size: .72rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .07em; display: block; margin-bottom: .55rem; }
+    .input-row { display: flex; gap: .6rem; }
+    #query-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: .65rem 1rem;
       color: var(--text);
       font-family: 'Inter', sans-serif;
       font-size: .9rem;
       outline: none;
-      transition: border-color .15s;
+      transition: border-color .15s, box-shadow .15s;
     }
-    #query-input:focus { border-color: var(--accent2); }
+    #query-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(109,94,247,.12); }
     #query-input::placeholder { color: var(--muted); }
 
     .btn {
-      padding: .6rem 1.3rem;
-      border-radius: 7px;
+      padding: .62rem 1.3rem;
+      border-radius: 9px;
       border: none;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
@@ -157,29 +163,30 @@
       font-size: .85rem;
       transition: all .15s;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent2); }
-    .btn-primary:disabled { background: var(--bg4); color: var(--muted); cursor: not-allowed; }
-    .btn-ghost { background: var(--bg4); color: var(--muted); border: 1px solid var(--border); }
-    .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+    .btn-primary { background: linear-gradient(135deg, #7c6bfb 0%, #6d5ef7 100%); color: #fff; box-shadow: 0 1px 2px rgba(109,94,247,.25), 0 4px 10px rgba(109,94,247,.22); }
+    .btn-primary:hover { background: linear-gradient(135deg, #8b7cf9 0%, #7c6bfb 100%); }
+    .btn-primary:disabled { background: var(--bg4); color: var(--muted); cursor: not-allowed; box-shadow: none; }
+    .btn-ghost { background: var(--bg2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--accent2); }
 
     /* ── Execution Plan preview ──────────────────────────────────────── */
     #plan-preview {
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .8rem 1rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      padding: .9rem 1.1rem;
       display: none;
     }
-    #plan-preview h4 { font-size: .7rem; font-weight: 600; color: var(--muted);
+    #plan-preview h4 { font-size: .7rem; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: .07em; margin-bottom: .5rem; }
     .plan-badge {
       display: inline-block;
-      background: rgba(31,111,235,.15);
-      border: 1px solid rgba(31,111,235,.3);
-      color: var(--accent2);
+      background: rgba(109,94,247,.1);
+      border: 1px solid rgba(109,94,247,.25);
+      color: var(--accent);
       border-radius: 20px;
-      padding: 2px 10px;
+      padding: 3px 11px;
       font-size: .7rem;
       font-weight: 600;
       margin-right: .35rem;
@@ -190,10 +197,10 @@
       font-size: .72rem;
       color: var(--text);
       background: var(--bg3);
-      border-left: 2px solid var(--accent);
-      padding: .2rem .6rem;
-      margin-bottom: .2rem;
-      border-radius: 0 4px 4px 0;
+      border-left: 3px solid var(--accent);
+      padding: .3rem .6rem;
+      margin-bottom: .25rem;
+      border-radius: 0 6px 6px 0;
     }
     .plan-skip {
       font-family: var(--mono);
@@ -208,16 +215,17 @@
 
     /* Risk tier banner */
     .risk-banner {
-      border-radius: 10px;
-      padding: 1rem 1.4rem;
+      border-radius: 14px;
+      padding: 1.1rem 1.5rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.1rem;
       border: 1px solid transparent;
+      box-shadow: var(--shadow-sm);
     }
-    .risk-banner.LOW  { background: rgba(63,185,80,.08); border-color: rgba(63,185,80,.3); }
-    .risk-banner.MEDIUM { background: rgba(209,134,22,.08); border-color: rgba(209,134,22,.3); }
-    .risk-banner.HIGH  { background: rgba(248,81,73,.08); border-color: rgba(248,81,73,.3); }
+    .risk-banner.LOW  { background: rgba(26,160,107,.07); border-color: rgba(26,160,107,.25); }
+    .risk-banner.MEDIUM { background: rgba(224,138,60,.08); border-color: rgba(224,138,60,.28); }
+    .risk-banner.HIGH  { background: rgba(229,72,77,.07); border-color: rgba(229,72,77,.25); }
     .risk-score {
       font-size: 2.5rem;
       font-weight: 800;
@@ -232,9 +240,9 @@
     .risk-meta p { font-size: .8rem; color: var(--muted); }
 
     /* Tabs */
-    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .tabs { display: flex; gap: .1rem; border-bottom: 1px solid var(--border); padding: 0 .4rem; }
     .tab-btn {
-      padding: .55rem 1.1rem;
+      padding: .7rem 1rem;
       background: transparent;
       border: none;
       border-bottom: 2px solid transparent;
@@ -245,22 +253,24 @@
       cursor: pointer;
       transition: all .15s;
       margin-bottom: -1px;
+      border-radius: 6px 6px 0 0;
     }
-    .tab-btn:hover { color: var(--text); }
-    .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+    .tab-btn:hover { color: var(--text); background: var(--bg3); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 
-    .tab-content { display: none; padding: 1rem 0; }
+    .tab-content { display: none; padding: 1.1rem 0; }
     .tab-content.active { display: block; }
 
     /* Panel card */
     .card {
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
       overflow: hidden;
     }
     .card-header {
-      padding: .75rem 1.1rem;
+      padding: .8rem 1.15rem;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -268,13 +278,13 @@
       background: var(--bg3);
     }
     .card-header h3 { font-size: .8rem; font-weight: 600; color: var(--text); }
-    .card-body { padding: 1rem 1.1rem; }
+    .card-body { padding: 1.05rem 1.15rem; }
 
     /* Mono text box */
     .mono-box {
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 7px;
+      border-radius: 10px;
       padding: 1rem;
       font-family: var(--mono);
       font-size: .75rem;
@@ -286,39 +296,40 @@
     }
 
     /* Vote cards */
-    .votes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: .75rem; }
+    .votes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: .8rem; }
     .vote-card {
-      background: var(--bg3);
+      background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .85rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      padding: .9rem;
     }
     .vote-card .agent-name { font-size: .72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .06em; margin-bottom: .4rem; color: var(--muted); }
+      letter-spacing: .06em; margin-bottom: .45rem; color: var(--muted); }
     .vote-badge {
       display: inline-block;
-      padding: 2px 10px;
+      padding: 3px 11px;
       border-radius: 20px;
       font-size: .7rem;
       font-weight: 700;
-      margin-bottom: .5rem;
+      margin-bottom: .55rem;
     }
-    .MONITOR { background: rgba(63,185,80,.15); color: var(--green); }
-    .REVIEW  { background: rgba(209,134,22,.15); color: var(--orange); }
-    .REPORT  { background: rgba(248,81,73,.15);  color: var(--red); }
+    .MONITOR { background: rgba(26,160,107,.13); color: var(--green); }
+    .REVIEW  { background: rgba(224,138,60,.14); color: var(--orange); }
+    .REPORT  { background: rgba(229,72,77,.13);  color: var(--red); }
     .vote-reasoning { font-size: .75rem; color: var(--muted); line-height: 1.5; }
 
     /* Exec plan */
     .exec-step {
       display: flex; align-items: flex-start; gap: .6rem;
-      padding: .4rem .6rem;
+      padding: .5rem .65rem;
       background: var(--bg3);
-      border-left: 2px solid var(--accent);
-      border-radius: 0 5px 5px 0;
-      margin-bottom: .3rem;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: .35rem;
     }
     .exec-step .num { font-family: var(--mono); font-size: .7rem; color: var(--muted); min-width: 1.5rem; }
-    .exec-step .cmd { font-family: var(--mono); font-size: .75rem; color: var(--accent2); }
+    .exec-step .cmd { font-family: var(--mono); font-size: .75rem; color: var(--accent); }
     .skip-step {
       font-family: var(--mono); font-size: .7rem; color: var(--muted);
       text-decoration: line-through; padding: .2rem .6rem;
@@ -329,7 +340,7 @@
     .spinner {
       width: 32px; height: 32px;
       border: 3px solid var(--border);
-      border-top-color: var(--accent2);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin .7s linear infinite;
     }
@@ -339,15 +350,16 @@
     /* toast */
     #toast {
       position: fixed; bottom: 1.5rem; right: 1.5rem;
-      background: var(--red); color: #fff;
-      padding: .65rem 1.1rem; border-radius: 8px;
+      background: var(--text); color: #fff;
+      padding: .7rem 1.15rem; border-radius: 10px;
       font-size: .82rem; font-weight: 500;
       display: none; z-index: 999;
       max-width: 380px;
+      box-shadow: var(--shadow-md);
     }
 
     /* ── JSON viewer ─────────────────────────────────────────────────── */
-    .json-key { color: var(--accent2); }
+    .json-key { color: var(--accent); }
     .json-str { color: var(--green); }
     .json-num { color: var(--gold); }
     .json-bool { color: var(--orange); }
@@ -378,14 +390,14 @@
 
   <!-- Sidebar -->
   <nav class="sidebar">
-    <div class="sidebar-section" id="stands-out-section" style="background:linear-gradient(180deg, rgba(31,111,235,.08), transparent)">
-      <h3 style="color:var(--accent2)">✨ Why This Stands Out</h3>
+    <div class="sidebar-section" id="stands-out-section" style="background:linear-gradient(180deg, rgba(109,94,247,.08), transparent)">
+      <h3 style="color:var(--accent)">Why This Stands Out</h3>
       <ul style="list-style:none; display:flex; flex-direction:column; gap:.55rem; margin-top:.3rem">
-        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Query-adaptive planning</strong> — the agent parses intent/filters/entities and builds a fresh execution plan per query; it skips EDA and ML entirely when a query doesn't need them (see <em>Preview Plan</em>).</li>
-        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Forensic accounting</strong> — Benford's Law + threshold-proximity clustering catch structuring patterns deliberately mutated to evade flat-$9,999 rules.</li>
-        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Multi-agent committee</strong> — Transaction Monitoring, KYC/UBO, Sanctions/PEP, and Network Analyst agents vote independently; a Chair Agent synthesizes a real Risk Memo, not a single black-box score.</li>
-        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Runs on the real dataset</strong> — vectorized end-to-end (pandas groupby, sampled betweenness centrality) to stay responsive on the full 9.5M-row / 855k-account Kaggle SAML-D dataset, not just a toy sample.</li>
-        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Multimodal input</strong> — attach a transaction screenshot or KYC document; a vision model extracts details and folds them into the same committee pipeline.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent)">Query-adaptive planning:</strong> the agent parses intent/filters/entities and builds a fresh execution plan per query; it skips EDA and ML entirely when a query doesn't need them (see <em>Preview Plan</em>).</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent)">Forensic accounting:</strong> Benford's Law and threshold-proximity clustering catch structuring patterns deliberately mutated to evade flat-$9,999 rules.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent)">Multi-agent committee:</strong> Transaction Monitoring, KYC/UBO, Sanctions/PEP, and Network Analyst agents vote independently; a Chair Agent synthesizes a real Risk Memo, not a single black-box score.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent)">Runs on the real dataset:</strong> vectorized end-to-end (pandas groupby, sampled betweenness centrality) to stay responsive on the full 9.5M-row / 855k-account Kaggle SAML-D dataset, not just a toy sample.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent)">Multimodal input:</strong> attach a transaction screenshot or KYC document; a vision model extracts details and folds them into the same committee pipeline.</li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -407,7 +419,7 @@
     </div>
     <div class="sidebar-section">
       <h3>System</h3>
-      <div class="stat-row"><span class="stat-label">Model</span><span class="stat-val" style="color:var(--muted);font-size:.7rem">Groq — Llama 3.3 70B</span></div>
+      <div class="stat-row"><span class="stat-label">Model</span><span class="stat-val" style="color:var(--muted);font-size:.7rem">Groq: Llama 3.3 70B</span></div>
       <div class="stat-row"><span class="stat-label">API</span><span class="stat-val green">FastAPI v1</span></div>
       <div class="stat-row"><span class="stat-label">Version</span><span class="stat-val" style="color:var(--muted)">1.0.0</span></div>
     </div>
@@ -424,14 +436,20 @@
           placeholder="e.g. Find structuring patterns in the last 30 days…"
           onkeydown="if(event.key==='Enter') analyze()" />
         <input id="image-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" onchange="onImageSelected(event)" />
-        <button class="btn btn-ghost" title="Attach an image (transaction screenshot, KYC document, wire receipt…)" onclick="document.getElementById('image-input').click()" id="attach-btn">📎 Attach</button>
+        <button class="btn btn-ghost" title="Attach an image (transaction screenshot, KYC document, wire receipt…)" onclick="document.getElementById('image-input').click()" id="attach-btn">Attach</button>
+        <input id="dataset-input" type="file" accept=".csv,text/csv" style="display:none" onchange="onDatasetSelected(event)" />
+        <button class="btn btn-ghost" title="Upload a CSV of transactions to replace the loaded dataset" onclick="document.getElementById('dataset-input').click()" id="dataset-btn">Upload Dataset</button>
         <button class="btn btn-ghost" onclick="previewPlan()" id="plan-btn" disabled>Preview Plan</button>
-        <button class="btn btn-primary" onclick="analyze()" id="analyze-btn" disabled>Analyze ↵</button>
+        <button class="btn btn-primary" onclick="analyze()" id="analyze-btn" disabled>Analyze</button>
       </div>
       <div id="image-preview-row" style="display:none; align-items:center; gap:.6rem; margin-top:.7rem">
         <img id="image-preview-thumb" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" />
         <span id="image-preview-name" style="font-size:.75rem;color:var(--muted)"></span>
-        <button class="btn btn-ghost" style="padding:.2rem .6rem;font-size:.7rem" onclick="clearImage()">✕ Remove</button>
+        <button class="btn btn-ghost" style="padding:.2rem .6rem;font-size:.7rem" onclick="clearImage()">Remove</button>
+      </div>
+      <div id="dataset-upload-row" style="display:none; align-items:center; gap:.6rem; margin-top:.7rem">
+        <span id="dataset-upload-status" style="font-size:.75rem;color:var(--muted)"></span>
+        <button class="btn btn-ghost" id="dataset-revert-btn" style="padding:.2rem .6rem;font-size:.7rem;display:none" onclick="resetDataset()">Revert to default dataset</button>
       </div>
     </div>
 
@@ -450,12 +468,11 @@
     <!-- Analysis unavailable — shown instead of (never alongside) results whenever
          any API call fails, so a dead backend can never appear to have produced
          a real answer. -->
-    <div class="card" id="analysis-unavailable" style="display:none; border-color: rgba(248,81,73,.4)">
-      <div class="card-body" style="display:flex; align-items:center; gap:.85rem">
-        <span style="font-size:1.4rem">⚠️</span>
+    <div class="card" id="analysis-unavailable" style="display:none; border-left: 3px solid var(--red)">
+      <div class="card-body">
         <div>
           <div style="font-weight:700; color:var(--red)">Analysis unavailable</div>
-          <div id="analysis-unavailable-detail" style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Backend not reachable — please retry.</div>
+          <div id="analysis-unavailable-detail" style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Backend not reachable. Please retry.</div>
         </div>
       </div>
     </div>
@@ -466,30 +483,32 @@
       <!-- Risk banner -->
       <div class="risk-banner" id="risk-banner">
         <div>
-          <div class="risk-score" id="risk-score">—</div>
-          <div style="text-align:center;font-size:.65rem;color:var(--muted);letter-spacing:.05em">RISK SCORE / 100</div>
+          <div class="risk-score" id="risk-score">N/A</div>
+          <div style="text-align:center;font-size:.65rem;color:var(--muted);letter-spacing:.05em">COMPOSITE SCORE / 100</div>
+          <div id="risk-tier-label" style="text-align:center;font-size:.68rem;font-weight:700;margin-top:.15rem"></div>
         </div>
         <div class="risk-meta">
           <h2 id="risk-label">Analysis Complete</h2>
           <p id="risk-sub">Financial Crime Committee has reached a decision.</p>
+          <p id="risk-note" style="display:none;font-size:.75rem;color:var(--muted);font-style:italic;margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border)"></p>
         </div>
       </div>
 
       <!-- Tabs -->
       <div class="card">
         <div class="tabs" style="overflow-x:auto">
-          <button class="tab-btn active" onclick="switchTab(this,'tab-answer')">💬 Answer</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-memo')">📋 Risk Memo</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-top')">🎯 Top Accounts</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-charts')">📈 Charts</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-committee')">🏛️ Committee</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-plan')">📊 Execution Plan</button>
+          <button class="tab-btn active" onclick="switchTab(this,'tab-answer')">Answer</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-memo')">Risk Memo</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-top')">Top Accounts</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-charts')">Charts</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-committee')">Committee</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-plan')">Execution Plan</button>
         </div>
         <div class="card-body">
 
           <!-- Tab: Answer -->
           <div class="tab-content active" id="tab-answer">
-            <div class="mono-box" id="answer-box">—</div>
+            <div class="mono-box" id="answer-box">N/A</div>
           </div>
 
           <!-- Tab: Risk Memo -->
@@ -501,7 +520,7 @@
           <div class="tab-content" id="tab-top">
             <p style="font-size:.75rem;color:var(--muted);margin-bottom:.75rem">
               Ranked by composite risk score (Benford's Law + threshold clustering + ML anomaly, scored cheaply for
-              each candidate) — not just the single account deep-dived elsewhere in this report.
+              each candidate), not just the single account deep-dived elsewhere in this report.
             </p>
             <div id="top-suspicious-box"></div>
           </div>
@@ -516,7 +535,7 @@
             <div class="votes-grid" id="votes-grid"></div>
             <div style="margin-top:1rem">
               <div class="card-header" style="border-radius:6px 6px 0 0; margin-bottom:0">
-                <h3>⚖️ Chair Agent — Meeting Minutes</h3>
+                <h3>Chair Agent: Meeting Minutes</h3>
               </div>
               <div id="minutes-box" style="border:1px solid var(--border); border-top:0; border-radius:0 0 8px 8px; padding:1rem; background:var(--bg2)">No committee review for this query type.</div>
             </div>
@@ -552,10 +571,10 @@ const API = window.location.origin;
 const DECISION_INFO = {
   MONITOR: { headline: 'No action needed', tone: 'LOW' },
   REVIEW:  { headline: 'Needs a closer look from compliance', tone: 'MEDIUM' },
-  REPORT:  { headline: 'High risk — recommend filing a report (SAR)', tone: 'HIGH' },
+  REPORT:  { headline: 'High risk: recommend filing a report (SAR)', tone: 'HIGH' },
   LOW:     { headline: 'No action needed', tone: 'LOW' },
   MEDIUM:  { headline: 'Needs a closer look from compliance', tone: 'MEDIUM' },
-  HIGH:    { headline: 'High risk — recommend filing a report (SAR)', tone: 'HIGH' },
+  HIGH:    { headline: 'High risk: recommend filing a report (SAR)', tone: 'HIGH' },
 };
 
 const INTENT_LABELS = {
@@ -570,9 +589,9 @@ const INTENT_LABELS = {
 };
 
 const PATTERN_LABELS = {
-  structuring: 'structuring — splitting deposits to dodge reporting thresholds',
-  smurfing:    'smurfing — many small transfers from multiple accounts',
-  layering:    'layering — moving funds through a chain of accounts',
+  structuring: 'structuring: splitting deposits to dodge reporting thresholds',
+  smurfing:    'smurfing: many small transfers from multiple accounts',
+  layering:    'layering: moving funds through a chain of accounts',
 };
 
 // Plain-English translation for one execution-plan step string, e.g.
@@ -649,15 +668,6 @@ function escapeHtml(s) {
 // output_formatter.py always emits the memo as numbered "N. SECTION TITLE"
 // blocks in a fixed order — parse that structure into cards instead of one
 // unbroken wall of monospace text.
-const MEMO_SECTION_ICONS = {
-  'EXECUTIVE SUMMARY': '📝',
-  'BACKGROUND': 'ℹ️',
-  'RED FLAGS IDENTIFIED': '🚩',
-  'COMMITTEE DELIBERATION SUMMARY': '🏛️',
-  'QUANTITATIVE RISK SCORE': '📊',
-  'RECOMMENDATION': '✅',
-};
-
 function renderRiskMemo(memoText) {
   if (!memoText || !memoText.trim()) {
     return '<p style="color:var(--muted);font-size:.85rem">No risk memo generated for this query type.</p>';
@@ -687,7 +697,6 @@ function renderRiskMemo(memoText) {
     : '';
 
   const sectionsHtml = sections.map(sec => {
-    const icon = MEMO_SECTION_ICONS[sec.title] || '📄';
     const bodyText = sec.body.join('\n').trim();
     const isRecommendation = sec.title === 'RECOMMENDATION';
     const isRiskScore = sec.title === 'QUANTITATIVE RISK SCORE';
@@ -706,9 +715,9 @@ function renderRiskMemo(memoText) {
       bodyHtml = `<p style="white-space:pre-wrap;line-height:1.65;margin:0;font-size:.85rem">${escapeHtml(bodyText)}</p>`;
     }
     return `
-      <div class="card" style="margin-bottom:.75rem; ${isRecommendation ? 'border-color: rgba(63,185,80,.4)' : ''}">
-        <div class="card-header" style="${isRecommendation ? 'background:rgba(63,185,80,.1)' : ''}">
-          <h3>${icon} ${escapeHtml(sec.title)}</h3>
+      <div class="card" style="margin-bottom:.75rem; ${isRecommendation ? 'border-color: rgba(26,160,107,.4)' : ''}">
+        <div class="card-header" style="${isRecommendation ? 'background:rgba(26,160,107,.1)' : ''}">
+          <h3>${escapeHtml(sec.title)}</h3>
         </div>
         <div class="card-body">${bodyHtml}</div>
       </div>`;
@@ -745,10 +754,6 @@ function renderMinutes(minutesText) {
     return `<div class="mono-box">${escapeHtml(minutesText)}</div>`;
   }
 
-  const MINUTES_ICONS = {
-    'CALL TO ORDER': '🔔', 'CHAIR SYNTHESIS': '⚖️', 'VOTING RECORD': '🗳️',
-    'FINAL DECISION': '✅', 'CLOSE': '🔒',
-  };
   const skipTitle = t => /ANALYST/i.test(t);
 
   const preHtml = preamble.join('\n').trim()
@@ -757,12 +762,11 @@ function renderMinutes(minutesText) {
 
   const sectionsHtml = sections.filter(sec => !skipTitle(sec.title)).map(sec => {
     const isFinal = sec.title === 'FINAL DECISION';
-    const icon = MINUTES_ICONS[sec.title] || '📄';
     const bodyText = sec.body.join('\n').trim();
     return `
-      <div class="card" style="margin-bottom:.6rem; ${isFinal ? 'border-color: rgba(31,111,235,.4)' : ''}">
-        <div class="card-header" style="${isFinal ? 'background:rgba(31,111,235,.1)' : ''}">
-          <h3>${icon} ${escapeHtml(sec.title.replace(/_/g, ' '))}</h3>
+      <div class="card" style="margin-bottom:.6rem; ${isFinal ? 'border-color: rgba(109,94,247,.4)' : ''}">
+        <div class="card-header" style="${isFinal ? 'background:rgba(109,94,247,.1)' : ''}">
+          <h3>${escapeHtml(sec.title.replace(/_/g, ' '))}</h3>
         </div>
         <div class="card-body"><p style="white-space:pre-wrap;line-height:1.6;margin:0;font-size:.82rem">${escapeHtml(bodyText)}</p></div>
       </div>`;
@@ -788,7 +792,7 @@ function renderTopSuspicious(list) {
         <td style="padding:.55rem .7rem;font-family:var(--mono)">${escapeHtml(item.customer_id)}</td>
         <td style="padding:.55rem .7rem;font-family:var(--mono);font-weight:700">${Math.round(item.risk_score)}/100</td>
         <td style="padding:.55rem .7rem"><span style="color:${tierColor};font-weight:700">${tier}</span></td>
-        <td style="padding:.55rem .7rem;color:var(--muted);font-size:.78rem">${escapeHtml(item.key_metric || '—')}</td>
+        <td style="padding:.55rem .7rem;color:var(--muted);font-size:.78rem">${escapeHtml(item.key_metric || 'N/A')}</td>
       </tr>`;
   }).join('');
   return `
@@ -812,7 +816,7 @@ function renderTopSuspicious(list) {
 
 // ── Charts ────────────────────────────────────────────────────────────────────
 const CHART_LABELS = {
-  benford:             "Benford's Law — Digit Distribution",
+  benford:             "Benford's Law: Digit Distribution",
   clustering:          'Threshold Clustering Analysis',
   amount_distribution: 'Transaction Amount Distribution',
   typology:            'Typology Breakdown',
@@ -844,7 +848,7 @@ function showUnavailable(detail) {
   // doesn't clobber a message a caller just wrote.
   document.getElementById('results').style.display = 'none';
   document.getElementById('analysis-unavailable-detail').textContent =
-    detail || 'Backend not reachable — please retry.';
+    detail || 'Backend not reachable. Please retry.';
   document.getElementById('analysis-unavailable').style.display = 'block';
 }
 
@@ -868,7 +872,7 @@ async function checkHealth() {
       apiOnline = true;
       dot.style.background = 'var(--green)';
       dot.style.boxShadow = '0 0 6px var(--green)';
-      txt.textContent = `API Online — ${(data.rows||0).toLocaleString()} rows loaded`;
+      txt.textContent = `API Online: ${(data.rows||0).toLocaleString()} rows loaded`;
       setControlsEnabled(true);
     } else if (data.status === 'ok') {
       // Server is up but still loading the dataset — not a failure, but a
@@ -886,19 +890,30 @@ async function checkHealth() {
     const dot = document.getElementById('status-dot');
     dot.style.background = 'var(--red)';
     dot.style.boxShadow = '0 0 6px var(--red)';
-    document.getElementById('status-text').textContent = 'API Offline — run: uvicorn app.main:app --port 8000';
+    document.getElementById('status-text').textContent = 'API Offline. Run: uvicorn app.main:app --port 8000';
     setControlsEnabled(false);
     // If the backend just died mid-session, any previously-rendered results
     // (or a previously-successful plan preview) are now unverifiable — don't
     // leave them on screen looking current.
     if (wasOnline) {
       document.getElementById('plan-preview').style.display = 'none';
-      showUnavailable('Backend not reachable — the last connection to the API was lost.');
+      showUnavailable('Backend not reachable. The last connection to the API was lost.');
     }
   }
 }
 
 // ── Dataset stats ────────────────────────────────────────────────────────────
+function renderDatasetStats(d) {
+  const el = document.getElementById('dataset-stats');
+  el.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Source</span><span class="stat-val gold">${d.source||'N/A'}</span></div>
+    <div class="stat-row"><span class="stat-label">Loaded Txns</span><span class="stat-val">${(d.total_transactions||0).toLocaleString()}</span></div>
+    <div class="stat-row"><span class="stat-label">Suspicious</span><span class="stat-val red">${(d.suspicious_count||0).toLocaleString()}</span></div>
+    <div class="stat-row"><span class="stat-label">Susp. Rate</span><span class="stat-val orange">${d.suspicious_rate_pct||0}%</span></div>
+  `;
+  document.getElementById('dataset-revert-btn').style.display = d.is_custom ? 'inline-block' : 'none';
+}
+
 async function loadDatasetStats() {
   const el = document.getElementById('dataset-stats');
   el.innerHTML = '<div class="stat-row"><span class="stat-label">Status</span><span class="stat-val" style="color:var(--orange)">Loading…</span></div>';
@@ -907,13 +922,7 @@ async function loadDatasetStats() {
     try {
       const r = await fetch(`${API}/api/v1/dataset-info`);
       if (!r.ok) { await new Promise(res => setTimeout(res, 3000)); continue; }
-      const d = await r.json();
-      el.innerHTML = `
-        <div class="stat-row"><span class="stat-label">Source</span><span class="stat-val gold">${d.source||'N/A'}</span></div>
-        <div class="stat-row"><span class="stat-label">Loaded Txns</span><span class="stat-val">${(d.total_transactions||0).toLocaleString()}</span></div>
-        <div class="stat-row"><span class="stat-label">Suspicious</span><span class="stat-val red">${(d.suspicious_count||0).toLocaleString()}</span></div>
-        <div class="stat-row"><span class="stat-label">Susp. Rate</span><span class="stat-val orange">${d.suspicious_rate_pct||0}%</span></div>
-      `;
+      renderDatasetStats(await r.json());
       return;
     } catch { await new Promise(res => setTimeout(res, 3000)); }
   }
@@ -977,7 +986,7 @@ async function previewPlan() {
   } catch (e) {
     const isNetworkError = e instanceof TypeError;
     const hint = isNetworkError
-      ? `Could not reach ${API}/api/v1/plan — is the server running, and is this page being loaded from that same server (not opened as a local file)?`
+      ? `Could not reach ${API}/api/v1/plan. Is the server running, and is this page being loaded from that same server (not opened as a local file)?`
       : e.message;
     pp.innerHTML = `<h4>Plan Preview</h4><p style="color:var(--red);font-size:.8rem">Failed to fetch plan: ${hint}</p>`;
     // A plan fetch failure means the backend is unreachable right now, which
@@ -1014,12 +1023,92 @@ function clearImage() {
   document.getElementById('image-preview-row').style.display = 'none';
 }
 
+// ── Dataset upload ──────────────────────────────────────────────────────────
+function onDatasetSelected(event) {
+  const file = event.target.files[0];
+  event.target.value = ''; // allow re-selecting the same file later
+  if (!file) return;
+  const maxBytes = 250 * 1024 * 1024;
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    showToast('Please select a .csv file.');
+    return;
+  }
+  if (file.size > maxBytes) {
+    showToast('Dataset too large (max 250MB).');
+    return;
+  }
+  uploadDataset(file);
+}
+
+async function uploadDataset(file) {
+  const row = document.getElementById('dataset-upload-row');
+  const status = document.getElementById('dataset-upload-status');
+  row.style.display = 'flex';
+  status.style.color = 'var(--muted)';
+  status.textContent = `Uploading ${file.name} (${(file.size/1024/1024).toFixed(1)} MB)…`;
+  document.getElementById('dataset-btn').disabled = true;
+  setControlsEnabled(false);
+  hideUnavailable();
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch(`${API}/api/v1/upload-dataset`, { method: 'POST', body: fd });
+    if (!r.ok) {
+      let detail = r.statusText;
+      try { detail = (await r.json()).detail || detail; } catch {}
+      throw new Error(detail);
+    }
+    const d = await r.json();
+    status.style.color = 'var(--green)';
+    status.textContent = `Using uploaded dataset: ${file.name}, ${(d.total_transactions||0).toLocaleString()} rows`;
+    renderDatasetStats(d);
+    showToast(`Dataset switched. Now analyzing ${file.name}.`);
+  } catch (e) {
+    status.style.color = 'var(--red)';
+    status.textContent = `Upload failed: ${e.message}`;
+    showToast('Dataset upload failed. See message under the query box.');
+  } finally {
+    document.getElementById('dataset-btn').disabled = false;
+    setControlsEnabled(true);
+  }
+}
+
+async function resetDataset() {
+  const status = document.getElementById('dataset-upload-status');
+  status.style.color = 'var(--muted)';
+  status.textContent = 'Reverting to default dataset… this can take a minute for the full Kaggle dataset.';
+  document.getElementById('dataset-btn').disabled = true;
+  document.getElementById('dataset-revert-btn').disabled = true;
+  setControlsEnabled(false);
+
+  try {
+    const r = await fetch(`${API}/api/v1/reset-dataset`, { method: 'POST' });
+    if (!r.ok) {
+      let detail = r.statusText;
+      try { detail = (await r.json()).detail || detail; } catch {}
+      throw new Error(detail);
+    }
+    const d = await r.json();
+    document.getElementById('dataset-upload-row').style.display = 'none';
+    renderDatasetStats(d);
+    showToast('Reverted to the default dataset.');
+  } catch (e) {
+    status.style.color = 'var(--red)';
+    status.textContent = `Revert failed: ${e.message}`;
+  } finally {
+    document.getElementById('dataset-btn').disabled = false;
+    document.getElementById('dataset-revert-btn').disabled = false;
+    setControlsEnabled(true);
+  }
+}
+
 // ── Analyze ─────────────────────────────────────────────────────────────────
 async function analyze() {
   const q = document.getElementById('query-input').value.trim();
   if (!q) { showToast('Please enter a query first.'); return; }
   if (!apiOnline) {
-    showUnavailable('Backend not reachable — please wait for "API Online" before analyzing.');
+    showUnavailable('Backend not reachable. Please wait for "API Online" before analyzing.');
     return;
   }
 
@@ -1120,13 +1209,13 @@ async function analyze() {
     clearInterval(timerInterval);
     const isNetworkError = e instanceof TypeError;
     const detail = isNetworkError
-      ? `Could not reach ${API}/api/v1/analyze — the backend may be down or unreachable.`
+      ? `Could not reach ${API}/api/v1/analyze. The backend may be down or unreachable.`
       : e.message;
     showToast(`Error: ${detail.slice(0, 200)}`);
     console.error('Analyze error:', e);
     // Never leave a full results panel on screen next to a failed request —
     // show one unambiguous "unavailable" state instead of a partial/stale one.
-    showUnavailable(`Analysis unavailable — ${detail}`);
+    showUnavailable(`Analysis unavailable: ${detail}`);
     if (isNetworkError) {
       apiOnline = false;
     }
@@ -1140,19 +1229,31 @@ async function analyze() {
 }
 
 // ── Render results ───────────────────────────────────────────────────────────
+// Composite risk score/tier (data.risk_score / data.risk_tier) is the single
+// source of truth for the quantitative score, read consistently by the
+// banner, the Answer tab (via the explanation text), the Risk Memo, and the
+// Committee minutes — all four are threaded from the same backend value, so
+// they can no longer show different numbers for the same case. It is
+// intentionally a SEPARATE thing from the committee's decision
+// (MONITOR/REVIEW/REPORT, in data.chair_result.final_decision): the score is
+// a quantitative aggregate of forensic signals, the decision is a
+// qualitative judgment from four specialists who each look at different
+// evidence, so the two can legitimately disagree. When they do,
+// chair_result.tier_decision_note explains why.
+const TIER_COLORS = { LOW: 'var(--green)', MEDIUM: 'var(--orange)', HIGH: 'var(--red)' };
+
 function renderResults(data) {
   const summary = data.execution_summary || {};
-  const tier = (summary.risk_tier || 'LOW').toUpperCase();
-  const score = summary.risk_score != null ? summary.risk_score : null;
+  const score = data.risk_score != null ? data.risk_score : null;
+  const scoreTier = (data.risk_tier || '').toUpperCase();
 
   // Risk banner — plain-English summary of the decision and what kind of
   // analysis actually ran. Judges/compliance reviewers shouldn't need to
   // know what "single_entity_lookup" or "MONITOR" mean internally.
   const banner = document.getElementById('risk-banner');
-  let displayScore = score;
 
   const chair = data.chair_result || {};
-  const decision = chair.final_decision || tier || 'MONITOR';
+  const decision = chair.final_decision || 'MONITOR';
   const info = DECISION_INFO[decision] || { headline: decision, tone: 'LOW' };
 
   let subText = INTENT_LABELS[summary.parsed_intent] || 'Ran an analysis on the request';
@@ -1163,10 +1264,26 @@ function renderResults(data) {
     subText += ` (account: ${summary.detected_entities.join(', ')})`;
   }
 
+  // The banner's background/border color reflects the committee's decision
+  // severity (what action is needed). The score number's own color reflects
+  // its own tier independently, via inline style, so a LOW-tier score never
+  // renders in the MEDIUM/HIGH color just because the committee escalated
+  // for reasons the composite score doesn't capture.
   banner.className = `risk-banner ${info.tone}`;
-  document.getElementById('risk-score').textContent = displayScore != null ? `${Math.round(displayScore)}` : '—';
+  const scoreEl = document.getElementById('risk-score');
+  scoreEl.textContent = score != null ? `${Math.round(score)}` : 'N/A';
+  scoreEl.style.color = score != null ? (TIER_COLORS[scoreTier] || 'var(--text)') : 'var(--muted)';
+  document.getElementById('risk-tier-label').textContent = score != null ? scoreTier : '';
   document.getElementById('risk-label').textContent = info.headline;
   document.getElementById('risk-sub').textContent = subText;
+
+  const noteEl = document.getElementById('risk-note');
+  if (chair.tier_decision_note) {
+    noteEl.textContent = `Note: ${chair.tier_decision_note}`;
+    noteEl.style.display = 'block';
+  } else {
+    noteEl.style.display = 'none';
+  }
 
   // ── Execution Plan tab ─────────────────────────────────────────────────────
   // The ML/EDA badges must reflect what the plan actually *ran*, not the raw
@@ -1184,9 +1301,9 @@ function renderResults(data) {
   const intentBadges = `
     <span class="plan-badge">${escapeHtml(INTENT_LABELS[summary.parsed_intent] || summary.parsed_intent || 'N/A')}</span>
     ${summary.target_pattern && summary.target_pattern !== 'none' ? `<span class="plan-badge">Pattern checked: ${escapeHtml(summary.target_pattern)}</span>` : ''}
-    ${(summary.detected_entities||[]).map(e => `<span class="plan-badge" style="background:rgba(210,153,34,.12);border-color:rgba(210,153,34,.3);color:var(--gold)">Account: ${escapeHtml(e)}</span>`).join('')}
-    ${usesML ? '<span class="plan-badge" style="background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)">Uses machine learning</span>' : ''}
-    ${usesEDA ? '<span class="plan-badge" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green)">Full dataset scan</span>' : ''}
+    ${(summary.detected_entities||[]).map(e => `<span class="plan-badge" style="background:rgba(201,151,28,.12);border-color:rgba(201,151,28,.3);color:var(--gold)">Account: ${escapeHtml(e)}</span>`).join('')}
+    ${usesML ? '<span class="plan-badge" style="background:rgba(229,72,77,.1);border-color:rgba(229,72,77,.3);color:var(--red)">Uses machine learning</span>' : ''}
+    ${usesEDA ? '<span class="plan-badge" style="background:rgba(26,160,107,.1);border-color:rgba(26,160,107,.3);color:var(--green)">Full dataset scan</span>' : ''}
   `;
   document.getElementById('plan-intent').innerHTML = intentBadges;
 
@@ -1215,8 +1332,8 @@ function renderResults(data) {
       return `
       <div class="vote-card">
         <div class="agent-name">${v.agent||'Agent'}</div>
-        <span class="vote-badge ${vDecision}">${vDecision} — ${vInfo.headline}</span>
-        <div class="vote-reasoning">${v.reasoning||'—'}</div>
+        <span class="vote-badge ${vDecision}">${vDecision}: ${vInfo.headline}</span>
+        <div class="vote-reasoning">${v.reasoning||'N/A'}</div>
       </div>`;
     }).join('');
   } else {
@@ -1233,7 +1350,7 @@ function renderResults(data) {
   // ── Answer tab ──────────────────────────────────────────────────────────
   const answer = data.plain_text_answer || data.explanation || data.aggregation_table || data.risk_memo || 'Analysis complete. See other tabs for detailed output.';
   const imageBlock = data.image_url
-    ? `\n\n${'─'.repeat(50)}\n📎 ATTACHED IMAGE ANALYSIS\n${'─'.repeat(50)}\n${data.image_analysis || ''}\n(stored at ${data.image_url})`
+    ? `\n\n${'─'.repeat(50)}\nATTACHED IMAGE ANALYSIS\n${'─'.repeat(50)}\n${data.image_analysis || ''}\n(stored at ${data.image_url})`
     : '';
   document.getElementById('answer-box').textContent = answer + imageBlock;
 
