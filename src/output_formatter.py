@@ -85,5 +85,7 @@ Sign-off: Autonomous AML Agent v1.0
             'explanation': kwargs.get('explanation', ''),
             'plain_text_answer': kwargs.get('plain_text_answer', ''),
             'charts': kwargs.get('charts', {}),
-            'aggregation_table': kwargs.get('aggregation_table', '')
+            'aggregation_table': kwargs.get('aggregation_table', ''),
+            'agent_votes': kwargs.get('agent_votes', []),
+            'chair_result': kwargs.get('chair_result', {}),
         }

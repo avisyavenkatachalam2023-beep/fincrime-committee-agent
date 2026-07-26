@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Financial Crime Committee — AML Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #080c10;
+      --bg2:      #0d1117;
+      --bg3:      #161b22;
+      --bg4:      #1c2128;
+      --border:   #30363d;
+      --accent:   #1f6feb;
+      --accent2:  #388bfd;
+      --gold:     #d29922;
+      --green:    #3fb950;
+      --red:      #f85149;
+      --orange:   #d18616;
+      --text:     #e6edf3;
+      --muted:    #8b949e;
+      --mono:     'JetBrains Mono', monospace;
+    }
+    html { font-size: 15px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Header ───────────────────────────────────────────────────────── */
+    .topbar {
+      background: linear-gradient(90deg, #0a0f1a 0%, #0d1e35 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand { display: flex; align-items: center; gap: .7rem; }
+    .topbar-brand .icon { font-size: 1.4rem; }
+    .topbar-brand h1 { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: .02em; }
+    .topbar-brand small { color: var(--muted); font-size: .7rem; margin-left: .4rem; font-weight: 400; }
+    #status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    .status-badge { display: flex; align-items: center; gap: .5rem; font-size: .75rem; color: var(--muted); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── Main Layout ─────────────────────────────────────────────────── */
+    .layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Sidebar ─────────────────────────────────────────────────────── */
+    .sidebar {
+      width: 260px; flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      position: sticky; top: 56px;
+    }
+    .sidebar-section { padding: 1rem; border-bottom: 1px solid var(--border); }
+    .sidebar-section h3 { font-size: .65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted); margin-bottom: .6rem; }
+    .query-chip {
+      display: block; width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: .45rem .7rem;
+      text-align: left;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: .78rem;
+      color: var(--muted);
+      transition: all .15s;
+      line-height: 1.4;
+      margin-bottom: .3rem;
+    }
+    .query-chip:hover { background: var(--bg3); border-color: var(--border); color: var(--text); }
+    .query-chip.active { background: rgba(31,111,235,.15); border-color: var(--accent); color: var(--accent2); }
+
+    /* dataset stats */
+    .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+    .stat-label { font-size: .72rem; color: var(--muted); }
+    .stat-val { font-size: .78rem; font-weight: 600; font-family: var(--mono); color: var(--text); }
+    .stat-val.green { color: var(--green); }
+    .stat-val.red { color: var(--red); }
+    .stat-val.gold { color: var(--gold); }
+
+    /* ── Main Content ────────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      gap: 1.25rem;
+    }
+
+    /* ── Query Bar ───────────────────────────────────────────────────── */
+    .query-bar {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+    .query-bar label { font-size: .72rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .07em; display: block; margin-bottom: .5rem; }
+    .input-row { display: flex; gap: .75rem; }
+    #query-input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: .6rem 1rem;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    #query-input:focus { border-color: var(--accent2); }
+    #query-input::placeholder { color: var(--muted); }
+
+    .btn {
+      padding: .6rem 1.3rem;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: .85rem;
+      transition: all .15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:disabled { background: var(--bg4); color: var(--muted); cursor: not-allowed; }
+    .btn-ghost { background: var(--bg4); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+
+    /* ── Execution Plan preview ──────────────────────────────────────── */
+    #plan-preview {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .8rem 1rem;
+      display: none;
+    }
+    #plan-preview h4 { font-size: .7rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .07em; margin-bottom: .5rem; }
+    .plan-badge {
+      display: inline-block;
+      background: rgba(31,111,235,.15);
+      border: 1px solid rgba(31,111,235,.3);
+      color: var(--accent2);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: .7rem;
+      font-weight: 600;
+      margin-right: .35rem;
+      margin-bottom: .35rem;
+    }
+    .plan-step {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--text);
+      background: var(--bg3);
+      border-left: 2px solid var(--accent);
+      padding: .2rem .6rem;
+      margin-bottom: .2rem;
+      border-radius: 0 4px 4px 0;
+    }
+    .plan-skip {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      text-decoration: line-through;
+      padding: .2rem .6rem;
+    }
+
+    /* ── Result panels ───────────────────────────────────────────────── */
+    .results { display: none; flex-direction: column; gap: 1rem; }
+
+    /* Risk tier banner */
+    .risk-banner {
+      border-radius: 10px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid transparent;
+    }
+    .risk-banner.LOW  { background: rgba(63,185,80,.08); border-color: rgba(63,185,80,.3); }
+    .risk-banner.MEDIUM { background: rgba(209,134,22,.08); border-color: rgba(209,134,22,.3); }
+    .risk-banner.HIGH  { background: rgba(248,81,73,.08); border-color: rgba(248,81,73,.3); }
+    .risk-score {
+      font-size: 2.5rem;
+      font-weight: 800;
+      font-family: var(--mono);
+      min-width: 70px;
+      text-align: center;
+    }
+    .risk-banner.LOW  .risk-score { color: var(--green); }
+    .risk-banner.MEDIUM .risk-score { color: var(--orange); }
+    .risk-banner.HIGH  .risk-score { color: var(--red); }
+    .risk-meta h2 { font-size: 1rem; font-weight: 700; margin-bottom: .2rem; }
+    .risk-meta p { font-size: .8rem; color: var(--muted); }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .tab-btn {
+      padding: .55rem 1.1rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: all .15s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+    .tab-content { display: none; padding: 1rem 0; }
+    .tab-content.active { display: block; }
+
+    /* Panel card */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: .75rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg3);
+    }
+    .card-header h3 { font-size: .8rem; font-weight: 600; color: var(--text); }
+    .card-body { padding: 1rem 1.1rem; }
+
+    /* Mono text box */
+    .mono-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 1rem;
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--text);
+      white-space: pre-wrap;
+      overflow-y: auto;
+      max-height: 540px;
+      line-height: 1.7;
+    }
+
+    /* Vote cards */
+    .votes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: .75rem; }
+    .vote-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .85rem;
+    }
+    .vote-card .agent-name { font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: .4rem; color: var(--muted); }
+    .vote-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: .7rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+    .MONITOR { background: rgba(63,185,80,.15); color: var(--green); }
+    .REVIEW  { background: rgba(209,134,22,.15); color: var(--orange); }
+    .REPORT  { background: rgba(248,81,73,.15);  color: var(--red); }
+    .vote-reasoning { font-size: .75rem; color: var(--muted); line-height: 1.5; }
+
+    /* Exec plan */
+    .exec-step {
+      display: flex; align-items: flex-start; gap: .6rem;
+      padding: .4rem .6rem;
+      background: var(--bg3);
+      border-left: 2px solid var(--accent);
+      border-radius: 0 5px 5px 0;
+      margin-bottom: .3rem;
+    }
+    .exec-step .num { font-family: var(--mono); font-size: .7rem; color: var(--muted); min-width: 1.5rem; }
+    .exec-step .cmd { font-family: var(--mono); font-size: .75rem; color: var(--accent2); }
+    .skip-step {
+      font-family: var(--mono); font-size: .7rem; color: var(--muted);
+      text-decoration: line-through; padding: .2rem .6rem;
+    }
+
+    /* spinner */
+    .spinner-wrap { display: none; align-items: center; gap: 1rem; padding: 1.5rem; }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent2);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-label { font-size: .85rem; color: var(--muted); }
+
+    /* toast */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--red); color: #fff;
+      padding: .65rem 1.1rem; border-radius: 8px;
+      font-size: .82rem; font-weight: 500;
+      display: none; z-index: 999;
+      max-width: 380px;
+    }
+
+    /* ── JSON viewer ─────────────────────────────────────────────────── */
+    .json-key { color: var(--accent2); }
+    .json-str { color: var(--green); }
+    .json-num { color: var(--gold); }
+    .json-bool { color: var(--orange); }
+    .json-null { color: var(--muted); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="icon">🏦</span>
+    <h1>Financial Crime Committee <small>AML Intelligence Platform</small></h1>
+  </div>
+  <div class="status-badge">
+    <div id="status-dot"></div>
+    <span id="status-text">Connecting…</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <h3>Example Queries</h3>
+      <button class="query-chip" onclick="useQuery(this)">Find structuring patterns in the last 30 days</button>
+      <button class="query-chip" onclick="useQuery(this)">Which customers made 10+ transactions under $10,000?</button>
+      <button class="query-chip" onclick="useQuery(this)">Is customer ID 4521 suspicious?</button>
+      <button class="query-chip" onclick="useQuery(this)">Analyse this dataset for suspicious activity</button>
+      <button class="query-chip" onclick="useQuery(this)">Who is coordinating transactions with customer 4521?</button>
+      <button class="query-chip" onclick="useQuery(this)">Why was customer 4521 flagged?</button>
+      <button class="query-chip" onclick="useQuery(this)">What should compliance do about customer 4521?</button>
+      <button class="query-chip" onclick="useQuery(this)">Compare flagged vs non-flagged transaction sizes</button>
+    </div>
+    <div class="sidebar-section">
+      <h3>Dataset Stats</h3>
+      <div id="dataset-stats">
+        <div class="stat-row"><span class="stat-label">Status</span><span class="stat-val" style="color:var(--muted)">Loading…</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h3>System</h3>
+      <div class="stat-row"><span class="stat-label">Model</span><span class="stat-val" style="color:var(--muted);font-size:.7rem">Gemini 2.0 Flash</span></div>
+      <div class="stat-row"><span class="stat-label">API</span><span class="stat-val green">FastAPI v1</span></div>
+      <div class="stat-row"><span class="stat-label">Version</span><span class="stat-val" style="color:var(--muted)">1.0.0</span></div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Query Bar -->
+    <div class="query-bar">
+      <label>Enter your AML query</label>
+      <div class="input-row">
+        <input id="query-input" type="text"
+          placeholder="e.g. Find structuring patterns in the last 30 days…"
+          onkeydown="if(event.key==='Enter') analyze()" />
+        <button class="btn btn-ghost" onclick="previewPlan()" id="plan-btn">Preview Plan</button>
+        <button class="btn btn-primary" onclick="analyze()" id="analyze-btn">Analyze ↵</button>
+      </div>
+    </div>
+
+    <!-- Plan Preview -->
+    <div id="plan-preview"></div>
+
+    <!-- Spinner -->
+    <div class="spinner-wrap" id="spinner">
+      <div class="spinner"></div>
+      <span class="spinner-label" id="spinner-label">Running AML Orchestrator…</span>
+    </div>
+
+    <!-- Results -->
+    <div class="results" id="results">
+
+      <!-- Risk banner -->
+      <div class="risk-banner" id="risk-banner">
+        <div class="risk-score" id="risk-score">—</div>
+        <div class="risk-meta">
+          <h2 id="risk-label">Analysis Complete</h2>
+          <p id="risk-sub">Financial Crime Committee has reached a decision.</p>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="card">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'tab-plan')">📊 Execution Plan</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-memo')">📋 Risk Memo</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-committee')">🏛️ Committee</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-answer')">💬 Answer</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-raw')">{ } Raw JSON</button>
+        </div>
+        <div class="card-body">
+
+          <!-- Tab: Exec Plan -->
+          <div class="tab-content active" id="tab-plan">
+            <div id="plan-intent" style="margin-bottom:.75rem"></div>
+            <div id="plan-steps"></div>
+            <div id="plan-skips" style="margin-top:.5rem"></div>
+          </div>
+
+          <!-- Tab: Risk Memo -->
+          <div class="tab-content" id="tab-memo">
+            <div class="mono-box" id="memo-box">No risk memo generated for this query type.</div>
+          </div>
+
+          <!-- Tab: Committee -->
+          <div class="tab-content" id="tab-committee">
+            <div class="votes-grid" id="votes-grid"></div>
+            <div style="margin-top:1rem">
+              <div class="card-header" style="border-radius:6px 6px 0 0; margin-bottom:0">
+                <h3>⚖️ Chair Agent — Meeting Minutes</h3>
+              </div>
+              <div class="mono-box" id="minutes-box" style="border-top:0;border-radius:0 0 6px 6px">No committee review for this query type.</div>
+            </div>
+          </div>
+
+          <!-- Tab: Answer -->
+          <div class="tab-content" id="tab-answer">
+            <div class="mono-box" id="answer-box">—</div>
+          </div>
+
+          <!-- Tab: Raw JSON -->
+          <div class="tab-content" id="tab-raw">
+            <div class="mono-box" id="raw-box" style="max-height:600px"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /results -->
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+
+// ── Health check ────────────────────────────────────────────────────────────
+async function checkHealth() {
+  try {
+    const r = await fetch(`${API}/health`);
+    const data = await r.json();
+    if (data.status === 'ok') {
+      document.getElementById('status-dot').style.background = 'var(--green)';
+      document.getElementById('status-dot').style.boxShadow = '0 0 6px var(--green)';
+      document.getElementById('status-text').textContent = 'API Online';
+    }
+  } catch {
+    document.getElementById('status-dot').style.background = 'var(--red)';
+    document.getElementById('status-dot').style.boxShadow = '0 0 6px var(--red)';
+    document.getElementById('status-text').textContent = 'API Offline';
+  }
+}
+
+// ── Dataset stats ────────────────────────────────────────────────────────────
+async function loadDatasetStats() {
+  try {
+    const r = await fetch(`${API}/api/v1/dataset-info`);
+    const d = await r.json();
+    const el = document.getElementById('dataset-stats');
+    el.innerHTML = `
+      <div class="stat-row"><span class="stat-label">Source</span><span class="stat-val gold">${d.source || 'N/A'}</span></div>
+      <div class="stat-row"><span class="stat-label">Total Txns</span><span class="stat-val">${(d.total_transactions||0).toLocaleString()}</span></div>
+      <div class="stat-row"><span class="stat-label">Suspicious</span><span class="stat-val red">${(d.suspicious_count||0).toLocaleString()}</span></div>
+      <div class="stat-row"><span class="stat-label">Susp. Rate</span><span class="stat-val orange">${d.suspicious_rate_pct||0}%</span></div>
+    `;
+  } catch {
+    document.getElementById('dataset-stats').innerHTML =
+      '<div class="stat-row"><span class="stat-label">Status</span><span class="stat-val red">Error loading</span></div>';
+  }
+}
+
+// ── Tabs ────────────────────────────────────────────────────────────────────
+function switchTab(btn, id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Query chip ──────────────────────────────────────────────────────────────
+function useQuery(btn) {
+  document.querySelectorAll('.query-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('query-input').value = btn.textContent.trim();
+}
+
+// ── Toast ───────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 5000);
+}
+
+// ── Preview Plan ────────────────────────────────────────────────────────────
+async function previewPlan() {
+  const q = document.getElementById('query-input').value.trim();
+  if (!q) { showToast('Please enter a query first.'); return; }
+  const pp = document.getElementById('plan-preview');
+  pp.style.display = 'block';
+  pp.innerHTML = '<h4>Plan Preview</h4><p style="color:var(--muted);font-size:.8rem">Fetching plan…</p>';
+  try {
+    const r = await fetch(`${API}/api/v1/plan?query=${encodeURIComponent(q)}`);
+    const d = await r.json();
+    const steps = (d.execution_plan || []).map((s,i) =>
+      `<div class="plan-step"><span style="color:var(--muted);margin-right:.5rem">${i+1}.</span>${s}</div>`
+    ).join('');
+    const skips = (d.tools_skipped || []).map(s =>
+      `<div class="plan-skip">${s}</div>`
+    ).join('');
+    pp.innerHTML = `
+      <h4>Plan Preview</h4>
+      <div style="margin-bottom:.5rem">
+        <span class="plan-badge">Intent: ${d.parsed_intent||'N/A'}</span>
+        <span class="plan-badge">Pattern: ${d.target_pattern||'none'}</span>
+      </div>
+      <div>${steps}</div>
+      ${skips ? `<p style="font-size:.7rem;color:var(--muted);margin-top:.5rem;margin-bottom:.2rem">Skipped:</p>${skips}` : ''}
+      ${d.reason_for_skips ? `<p style="font-size:.7rem;color:var(--muted);margin-top:.4rem;font-style:italic">${d.reason_for_skips}</p>` : ''}
+    `;
+  } catch (e) {
+    pp.innerHTML = `<h4>Plan Preview</h4><p style="color:var(--red);font-size:.8rem">Failed to fetch plan: ${e.message}</p>`;
+  }
+}
+
+// ── Analyze ─────────────────────────────────────────────────────────────────
+async function analyze() {
+  const q = document.getElementById('query-input').value.trim();
+  if (!q) { showToast('Please enter a query first.'); return; }
+
+  // Setup UI state
+  document.getElementById('analyze-btn').disabled = true;
+  document.getElementById('plan-btn').disabled = true;
+  document.getElementById('results').style.display = 'none';
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = 'flex';
+  document.getElementById('plan-preview').style.display = 'none';
+
+  const labels = [
+    'Loading Kaggle dataset…',
+    'Running forensic analysis…',
+    'Applying Benford\'s Law…',
+    'Scanning threshold clusters…',
+    'Convening the Committee…',
+    'Chair synthesizing votes…',
+    'Preparing Risk Memo…',
+  ];
+  let li = 0;
+  const spinnerLabel = document.getElementById('spinner-label');
+  const labelInterval = setInterval(() => {
+    li = (li+1) % labels.length;
+    spinnerLabel.textContent = labels[li];
+  }, 3000);
+
+  try {
+    const r = await fetch(`${API}/api/v1/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q })
+    });
+    clearInterval(labelInterval);
+
+    if (!r.ok) {
+      const err = await r.json();
+      throw new Error(err.detail || r.statusText);
+    }
+
+    const data = await r.json();
+    renderResults(data);
+
+  } catch (e) {
+    clearInterval(labelInterval);
+    showToast(`Error: ${e.message}`);
+  } finally {
+    spinner.style.display = 'none';
+    document.getElementById('analyze-btn').disabled = false;
+    document.getElementById('plan-btn').disabled = false;
+  }
+}
+
+// ── Render results ───────────────────────────────────────────────────────────
+function renderResults(data) {
+  const summary = data.execution_summary || {};
+  const tier = (summary.risk_tier || 'LOW').toUpperCase();
+  const score = summary.risk_score != null ? summary.risk_score : null;
+
+  // Risk banner — only show if we have a risk score from committee
+  const banner = document.getElementById('risk-banner');
+  // Try to extract score from risk_memo text fallback
+  let displayScore = score;
+  let displayTier = tier;
+  
+  // Parse from execution summary or chair result
+  const chair = data.chair_result || {};
+  if (chair.final_decision) {
+    displayTier = chair.final_decision;
+  }
+
+  banner.className = `risk-banner ${displayTier}`;
+  document.getElementById('risk-score').textContent = displayScore != null ? Math.round(displayScore) : '—';
+  document.getElementById('risk-label').textContent = `Decision: ${displayTier}`;
+  document.getElementById('risk-sub').textContent =
+    `Intent: ${summary.parsed_intent || 'N/A'} | Pattern: ${summary.target_pattern || 'none'} | Entities: ${(summary.detected_entities||[]).join(', ')||'None'}`;
+
+  // ── Execution Plan tab ─────────────────────────────────────────────────────
+  const intentBadges = `
+    <span class="plan-badge">Intent: ${summary.parsed_intent||'N/A'}</span>
+    <span class="plan-badge">Pattern: ${summary.target_pattern||'none'}</span>
+    ${(summary.detected_entities||[]).map(e => `<span class="plan-badge" style="background:rgba(210,153,34,.12);border-color:rgba(210,153,34,.3);color:var(--gold)">Entity: ${e}</span>`).join('')}
+    ${summary.requires_ml ? '<span class="plan-badge" style="background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)">ML</span>' : ''}
+    ${summary.requires_eda ? '<span class="plan-badge" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green)">EDA</span>' : ''}
+  `;
+  document.getElementById('plan-intent').innerHTML = intentBadges;
+
+  const steps = (summary.execution_plan||[]).map((s,i) =>
+    `<div class="exec-step"><span class="num">${i+1}</span><span class="cmd">${s}</span></div>`
+  ).join('');
+  document.getElementById('plan-steps').innerHTML = steps || '<p style="color:var(--muted);font-size:.8rem">No plan available.</p>';
+
+  const skipsHtml = (summary.tools_skipped||[]).length
+    ? `<p style="font-size:.7rem;color:var(--muted);margin-bottom:.2rem">Skipped (not needed for this intent):</p>` +
+      (summary.tools_skipped||[]).map(s => `<div class="skip-step">${s}</div>`).join('') +
+      (summary.reason_for_skips ? `<p style="font-size:.7rem;color:var(--muted);margin-top:.4rem;font-style:italic;max-width:640px">${summary.reason_for_skips}</p>` : '')
+    : '';
+  document.getElementById('plan-skips').innerHTML = skipsHtml;
+
+  // ── Risk Memo tab ────────────────────────────────────────────────────────
+  document.getElementById('memo-box').textContent = data.risk_memo || 'No risk memo generated for this query type.';
+
+  // ── Committee tab ────────────────────────────────────────────────────────
+  const votes = data.agent_votes || chair.agent_votes || [];
+  const grid = document.getElementById('votes-grid');
+  if (votes.length) {
+    grid.innerHTML = votes.map(v => `
+      <div class="vote-card">
+        <div class="agent-name">${v.agent||'Agent'}</div>
+        <span class="vote-badge ${v.vote||'MONITOR'}">${v.vote||'MONITOR'}</span>
+        <div class="vote-reasoning">${v.reasoning||'—'}</div>
+      </div>
+    `).join('');
+  } else {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:.8rem">Committee review was not required for this query intent.</p>';
+  }
+  document.getElementById('minutes-box').textContent = data.committee_minutes || 'No committee review for this query type.';
+
+  // ── Answer tab ──────────────────────────────────────────────────────────
+  const answer = data.plain_text_answer || data.explanation || data.aggregation_table || data.risk_memo || 'Analysis complete. See other tabs for detailed output.';
+  document.getElementById('answer-box').textContent = answer;
+
+  // ── Raw JSON tab ─────────────────────────────────────────────────────────
+  document.getElementById('raw-box').textContent = JSON.stringify(data, null, 2);
+
+  // Show results
+  document.getElementById('results').style.display = 'flex';
+
+  // Switch to exec plan tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('.tab-btn').classList.add('active');
+  document.getElementById('tab-plan').classList.add('active');
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+checkHealth();
+loadDatasetStats();
+setInterval(checkHealth, 10000);
+</script>
+</body>
+</html>

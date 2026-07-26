@@ -203,6 +203,8 @@ class AMLOrchestrator:
             committee_minutes=committee_res['meeting_minutes'],
             explanation=explanation,
             charts={'benford': benford_res.get('chart_path', '')},
+            agent_votes=committee_res['agent_votes'],
+            chair_result=committee_res['chair_result'],
         )
 
     def _run_aggregation(self, parsed_query: dict, execution_summary: dict) -> dict:
@@ -264,6 +266,8 @@ class AMLOrchestrator:
             committee_minutes=committee_res['meeting_minutes'],
             explanation=explanation,
             charts={'benford': benford_res.get('chart_path', '')},
+            agent_votes=committee_res['agent_votes'],
+            chair_result=committee_res['chair_result'],
         )
 
     def _run_explain_flag(self, parsed_query: dict, execution_summary: dict) -> dict:
@@ -325,6 +329,8 @@ class AMLOrchestrator:
             execution_summary=execution_summary,
             risk_memo=memo,
             committee_minutes=committee_res['meeting_minutes'],
+            agent_votes=committee_res['agent_votes'],
+            chair_result=committee_res['chair_result'],
         )
 
     def _run_broad_exploration(self, parsed_query: dict, execution_summary: dict) -> dict:

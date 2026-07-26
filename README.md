@@ -107,11 +107,21 @@ cd aml-crime-committee-agent
 pip install -r requirements.txt
 cp .env.example .env  # add your GEMINI_API_KEY
 python data/download_data.py
-streamlit run app/streamlit_app.py
+uvicorn app.main:app --reload
 ```
 
 ## 7. Usage Instructions
-Launch the Streamlit app. Try out the 6 example queries on the left sidebar:
+The system exposes a REST API via FastAPI. Once running locally, you can send queries to the endpoint.
+You can view the interactive Swagger API documentation at `http://localhost:8000/docs`.
+
+**Example `curl` request:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/analyze" \
+     -H "Content-Type: application/json" \
+     -d '{"query": "Find structuring patterns in the last 30 days"}'
+```
+
+**Example queries to try:**
 1. Find structuring patterns in the last 30 days
 2. Which customers made 10+ transactions under $10,000?
 3. Is customer ID 4521 suspicious?
