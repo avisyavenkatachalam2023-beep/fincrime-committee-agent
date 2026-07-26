@@ -309,8 +309,13 @@ class NetworkAnalysisTool:
             customer_id, hub_score, is_hub, flagged_accounts, community_id, len(ego_nodes)
         )
 
-        chart_path = str(self.charts_dir / f"network_{customer_id}.png")
+        # Only return a chart_path if a chart was actually written — a
+        # requested entity that doesn't exist in this graph (e.g. an ID that
+        # doesn't match any account in the loaded dataset) must not produce
+        # a path to a PNG that was never generated.
+        chart_path = ""
         if customer_id in G:
+            chart_path = str(self.charts_dir / f"network_{customer_id}.png")
             ego_graph = G.subgraph(ego_nodes).copy()
             self.plot_network_graph(
                 ego_graph,

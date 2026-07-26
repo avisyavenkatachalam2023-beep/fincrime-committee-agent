@@ -126,8 +126,36 @@ _UPLOADS_DIR = os.path.join(_STATIC_DIR, "uploads")
 os.makedirs(_UPLOADS_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
 
+# The anomaly-detection/EDA/network tools save their PNG charts to
+# data/charts/ (see CHARTS_DIR in each tool module), which is a different
+# directory from app/static/ above — without this mount, every chart_path
+# returned by the orchestrator points at a filesystem path with no URL that
+# actually serves it, so charts silently could never be viewed in the UI.
+_CHARTS_DIR = os.path.join(_PROJECT_ROOT, "data", "charts")
+os.makedirs(_CHARTS_DIR, exist_ok=True)
+app.mount("/charts", StaticFiles(directory=_CHARTS_DIR), name="charts")
+
 ALLOWED_IMAGE_TYPES = {"image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"}
 MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8 MB
+
+
+def _chart_url(path: str) -> str:
+    """Convert an on-disk chart path (e.g. 'data/charts/benford_123.png',
+    possibly with Windows backslashes) into a URL servable via the /charts
+    static mount above."""
+    if not path:
+        return ""
+    basename = os.path.basename(str(path).replace("\\", "/"))
+    return f"/charts/{basename}"
+
+
+def _convert_chart_paths(result: dict) -> dict:
+    """Rewrite every entry in result['charts'] from a filesystem path to a
+    URL, in place, and drop entries whose chart was never generated."""
+    charts = result.get("charts")
+    if isinstance(charts, dict):
+        result["charts"] = {k: _chart_url(v) for k, v in charts.items() if v}
+    return result
 
 
 def _describe_image_with_groq(image_bytes: bytes, mime_type: str, user_query: str) -> str:
@@ -271,7 +299,8 @@ def _run_orchestrator(query: str) -> dict:
         orch._transactions_df = df
     orch.load_data = _cached_load
 
-    return orch.run(query)
+    result = orch.run(query)
+    return _convert_chart_paths(result)
 
 
 @app.post("/api/v1/analyze")

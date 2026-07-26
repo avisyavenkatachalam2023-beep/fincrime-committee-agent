@@ -429,7 +429,10 @@
     <!-- Spinner -->
     <div class="spinner-wrap" id="spinner">
       <div class="spinner"></div>
-      <span class="spinner-label" id="spinner-label">Running AML Orchestrator…</span>
+      <div>
+        <div class="spinner-label" id="spinner-label">Running AML Orchestrator…</div>
+        <div id="spinner-timer" style="font-size:.75rem;color:var(--muted);margin-top:.3rem;font-family:var(--mono)"></div>
+      </div>
     </div>
 
     <!-- Analysis unavailable — shown instead of (never alongside) results whenever
@@ -450,7 +453,10 @@
 
       <!-- Risk banner -->
       <div class="risk-banner" id="risk-banner">
-        <div class="risk-score" id="risk-score">—</div>
+        <div>
+          <div class="risk-score" id="risk-score">—</div>
+          <div style="text-align:center;font-size:.65rem;color:var(--muted);letter-spacing:.05em">RISK SCORE / 100</div>
+        </div>
         <div class="risk-meta">
           <h2 id="risk-label">Analysis Complete</h2>
           <p id="risk-sub">Financial Crime Committee has reached a decision.</p>
@@ -459,25 +465,38 @@
 
       <!-- Tabs -->
       <div class="card">
-        <div class="tabs">
-          <button class="tab-btn active" onclick="switchTab(this,'tab-plan')">📊 Execution Plan</button>
+        <div class="tabs" style="overflow-x:auto">
+          <button class="tab-btn active" onclick="switchTab(this,'tab-answer')">💬 Answer</button>
           <button class="tab-btn" onclick="switchTab(this,'tab-memo')">📋 Risk Memo</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-top')">🎯 Top Accounts</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-charts')">📈 Charts</button>
           <button class="tab-btn" onclick="switchTab(this,'tab-committee')">🏛️ Committee</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-answer')">💬 Answer</button>
-          <button class="tab-btn" onclick="switchTab(this,'tab-raw')">{ } Raw JSON</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-plan')">📊 Execution Plan</button>
         </div>
         <div class="card-body">
 
-          <!-- Tab: Exec Plan -->
-          <div class="tab-content active" id="tab-plan">
-            <div id="plan-intent" style="margin-bottom:.75rem"></div>
-            <div id="plan-steps"></div>
-            <div id="plan-skips" style="margin-top:.5rem"></div>
+          <!-- Tab: Answer -->
+          <div class="tab-content active" id="tab-answer">
+            <div class="mono-box" id="answer-box">—</div>
           </div>
 
           <!-- Tab: Risk Memo -->
           <div class="tab-content" id="tab-memo">
-            <div class="mono-box" id="memo-box">No risk memo generated for this query type.</div>
+            <div id="memo-box">No risk memo generated for this query type.</div>
+          </div>
+
+          <!-- Tab: Top Suspicious Accounts -->
+          <div class="tab-content" id="tab-top">
+            <p style="font-size:.75rem;color:var(--muted);margin-bottom:.75rem">
+              Ranked by composite risk score (Benford's Law + threshold clustering + ML anomaly, scored cheaply for
+              each candidate) — not just the single account deep-dived elsewhere in this report.
+            </p>
+            <div id="top-suspicious-box"></div>
+          </div>
+
+          <!-- Tab: Charts -->
+          <div class="tab-content" id="tab-charts">
+            <div id="charts-box"></div>
           </div>
 
           <!-- Tab: Committee -->
@@ -487,18 +506,15 @@
               <div class="card-header" style="border-radius:6px 6px 0 0; margin-bottom:0">
                 <h3>⚖️ Chair Agent — Meeting Minutes</h3>
               </div>
-              <div class="mono-box" id="minutes-box" style="border-top:0;border-radius:0 0 6px 6px">No committee review for this query type.</div>
+              <div id="minutes-box" style="border:1px solid var(--border); border-top:0; border-radius:0 0 8px 8px; padding:1rem; background:var(--bg2)">No committee review for this query type.</div>
             </div>
           </div>
 
-          <!-- Tab: Answer -->
-          <div class="tab-content" id="tab-answer">
-            <div class="mono-box" id="answer-box">—</div>
-          </div>
-
-          <!-- Tab: Raw JSON -->
-          <div class="tab-content" id="tab-raw">
-            <div class="mono-box" id="raw-box" style="max-height:600px"></div>
+          <!-- Tab: Exec Plan -->
+          <div class="tab-content" id="tab-plan">
+            <div id="plan-intent" style="margin-bottom:.75rem"></div>
+            <div id="plan-steps"></div>
+            <div id="plan-skips" style="margin-top:.5rem"></div>
           </div>
 
         </div>
@@ -515,6 +531,292 @@
 // Docker, or a deployed server) — index.html is served by the same FastAPI
 // app that exposes /api/v1/*, so there's never a cross-origin case in practice.
 const API = window.location.origin;
+
+// ── Plain-English vocabulary ─────────────────────────────────────────────────
+// Shared everywhere the UI needs to translate internal names (intents,
+// committee vote levels, tool/function-call strings) into wording a
+// non-technical reviewer can follow without a glossary.
+
+const DECISION_INFO = {
+  MONITOR: { headline: 'No action needed', tone: 'LOW' },
+  REVIEW:  { headline: 'Needs a closer look from compliance', tone: 'MEDIUM' },
+  REPORT:  { headline: 'High risk — recommend filing a report (SAR)', tone: 'HIGH' },
+  LOW:     { headline: 'No action needed', tone: 'LOW' },
+  MEDIUM:  { headline: 'Needs a closer look from compliance', tone: 'MEDIUM' },
+  HIGH:    { headline: 'High risk — recommend filing a report (SAR)', tone: 'HIGH' },
+};
+
+const INTENT_LABELS = {
+  pattern_detection:    'Searched for a specific money-laundering pattern',
+  aggregation_query:    'Counted / filtered transactions against a rule',
+  single_entity_lookup: 'Investigated a specific customer',
+  explain_flag:         'Explained why an account was flagged',
+  network_query:        'Mapped relationships between accounts',
+  comparative_query:    'Compared two groups of transactions',
+  escalation_query:     'Assessed what compliance action to take',
+  broad_exploration:    'Scanned the whole dataset for suspicious activity',
+};
+
+const PATTERN_LABELS = {
+  structuring: 'structuring — splitting deposits to dodge reporting thresholds',
+  smurfing:    'smurfing — many small transfers from multiple accounts',
+  layering:    'layering — moving funds through a chain of accounts',
+};
+
+// Plain-English translation for one execution-plan step string, e.g.
+// "anomaly_detection(benford, threshold_clustering, ml_isolation_forest)".
+// The technical string is still shown (in small print) alongside the
+// translation — this is a bank compliance tool, so an auditor should be able
+// to see exactly what ran, but shouldn't have to already know what it means.
+function describeStep(step) {
+  const m = step.match(/^([a-zA-Z_]+)\((.*)\)$/);
+  const fn = m ? m[1] : step;
+  const args = m ? m[2] : '';
+  const has = (...needles) => needles.some(n => args.includes(n));
+
+  const DESCRIPTIONS = {
+    load_filtered_data: () => has('date_range') ? 'Load the transactions in the requested date range'
+      : has('entity_neighborhood') ? 'Load transactions involving the requested account and its direct connections'
+      : 'Load the relevant transactions for this query',
+    load_entity_data: () => 'Load every transaction for the requested account',
+    retrieve_existing_flags: () => 'Look up any existing suspicious-activity flags for this account',
+    retrieve_existing_risk_data: () => "Look up the account's existing risk assessment",
+    feature_engineering: () => has('structuring') ? 'Calculate behavioural signals specific to structuring (split deposits)'
+      : has('smurfing') ? 'Calculate behavioural signals specific to smurfing (many small transfers)'
+      : has('layering') ? 'Calculate behavioural signals specific to layering (chained transfers)'
+      : 'Calculate behavioural signals (transaction frequency, amounts, timing) for the account(s) in scope',
+    anomaly_detection: () => {
+      const parts = [];
+      if (has('benford')) parts.push("Benford's Law check (do amounts follow the digit pattern real data usually does?)");
+      if (has('round_number', 'threshold_clustering')) parts.push('a check for round amounts or amounts clustered just under reporting limits');
+      if (has('ml_isolation_forest', 'ml_model')) parts.push('a machine-learning model that flags statistically unusual accounts');
+      if (has('velocity_clustering')) parts.push('a check for bursts of rapid transactions');
+      if (has('multi_account_grouping')) parts.push('a check for coordinated activity across multiple accounts');
+      if (has('chain_complexity')) parts.push('a check for complex multi-hop money-movement chains');
+      return `Run anomaly checks: ${parts.join('; ') || 'statistical checks for suspicious patterns'}`;
+    },
+    network_tool: () => has('transaction_chain') ? 'Trace the chain of accounts the money moved through'
+      : 'Map which accounts transact with which, and identify hub/coordinator accounts',
+    rule_engine: () => has('comparative') ? 'Compare statistics between flagged and non-flagged transactions'
+      : 'Apply the counting/threshold rule from the query',
+    eda_tool: () => 'Run exploratory analysis on the dataset (distributions, country/type breakdowns)',
+    risk_classification: () => 'Combine every signal above into one overall risk score out of 100',
+    committee: () => has('transaction_monitoring_only') ? 'Have the Transaction Monitoring specialist vote on the case'
+      : has('escalation_mode') ? 'Convene the full committee to decide on a compliance action'
+      : 'Convene the full committee (all four specialists) to vote on the case',
+    explanation: () => 'Write a plain-English explanation of the findings',
+    output_formatter: () => 'Assemble the final report (risk memo, committee minutes, answer)',
+  };
+  return DESCRIPTIONS[fn] ? DESCRIPTIONS[fn]() : step;
+}
+
+const SKIP_LABELS = {
+  full_eda: 'Full-dataset exploratory analysis',
+  full_dataset_feature_engineering: 'Behavioural feature calculation across the whole dataset',
+  feature_engineering: 'Behavioural feature calculation',
+  ml_isolation_forest: 'Machine-learning anomaly model',
+  benford: "Benford's Law check",
+  threshold_clustering: 'Round-number / threshold clustering check',
+  network_tool: 'Account relationship mapping',
+  kyc_agent: 'KYC/UBO specialist review',
+  sanctions_agent: 'Sanctions/PEP specialist review',
+  risk_classification: 'Composite risk scoring',
+  committee: 'Committee review',
+  explanation: 'Plain-English explanation generation',
+  anomaly_detection: 'Anomaly detection suite',
+};
+function describeSkip(name) { return SKIP_LABELS[name] || name; }
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s == null ? '' : s;
+  return div.innerHTML;
+}
+
+// ── Risk Memo formatting ─────────────────────────────────────────────────────
+// output_formatter.py always emits the memo as numbered "N. SECTION TITLE"
+// blocks in a fixed order — parse that structure into cards instead of one
+// unbroken wall of monospace text.
+const MEMO_SECTION_ICONS = {
+  'EXECUTIVE SUMMARY': '📝',
+  'BACKGROUND': 'ℹ️',
+  'RED FLAGS IDENTIFIED': '🚩',
+  'COMMITTEE DELIBERATION SUMMARY': '🏛️',
+  'QUANTITATIVE RISK SCORE': '📊',
+  'RECOMMENDATION': '✅',
+};
+
+function renderRiskMemo(memoText) {
+  if (!memoText || !memoText.trim()) {
+    return '<p style="color:var(--muted);font-size:.85rem">No risk memo generated for this query type.</p>';
+  }
+  const lines = memoText.split('\n');
+  const preamble = [];
+  const sections = [];
+  let current = null;
+  const headerRe = /^(\d+)\.\s+([A-Z][A-Z \/]+)\s*$/;
+  for (const line of lines) {
+    const m = line.match(headerRe);
+    if (m) {
+      current = { title: m[2].trim(), body: [] };
+      sections.push(current);
+    } else if (current) {
+      current.body.push(line);
+    } else {
+      preamble.push(line);
+    }
+  }
+  if (!sections.length) {
+    return `<div class="mono-box">${escapeHtml(memoText)}</div>`;
+  }
+
+  const preHtml = preamble.join('\n').trim()
+    ? `<div style="font-size:.75rem;color:var(--muted);font-family:var(--mono);white-space:pre-wrap;margin-bottom:.75rem">${escapeHtml(preamble.join('\n').trim())}</div>`
+    : '';
+
+  const sectionsHtml = sections.map(sec => {
+    const icon = MEMO_SECTION_ICONS[sec.title] || '📄';
+    const bodyText = sec.body.join('\n').trim();
+    const isRecommendation = sec.title === 'RECOMMENDATION';
+    const isRiskScore = sec.title === 'QUANTITATIVE RISK SCORE';
+    let bodyHtml;
+    if (sec.title === 'RED FLAGS IDENTIFIED') {
+      const flags = bodyText.split('\n').map(l => l.trim()).filter(l => l.startsWith('-'));
+      const noFlags = flags.length === 0 || flags.every(f => /no significant/i.test(f));
+      bodyHtml = flags.length
+        ? `<ul style="margin:0;padding-left:1.1rem">${flags.map(f =>
+            `<li style="margin-bottom:.35rem;color:${/no significant/i.test(f) ? 'var(--muted)' : 'var(--orange)'}">${escapeHtml(f.replace(/^-\s*/, ''))}</li>`
+          ).join('')}</ul>`
+        : `<p style="color:var(--muted);margin:0">${escapeHtml(bodyText)}</p>`;
+    } else if (isRiskScore) {
+      bodyHtml = `<div style="font-size:1.15rem;font-weight:700;font-family:var(--mono)">${escapeHtml(bodyText)}</div>`;
+    } else {
+      bodyHtml = `<p style="white-space:pre-wrap;line-height:1.65;margin:0;font-size:.85rem">${escapeHtml(bodyText)}</p>`;
+    }
+    return `
+      <div class="card" style="margin-bottom:.75rem; ${isRecommendation ? 'border-color: rgba(63,185,80,.4)' : ''}">
+        <div class="card-header" style="${isRecommendation ? 'background:rgba(63,185,80,.1)' : ''}">
+          <h3>${icon} ${escapeHtml(sec.title)}</h3>
+        </div>
+        <div class="card-body">${bodyHtml}</div>
+      </div>`;
+  }).join('');
+
+  return preHtml + sectionsHtml;
+}
+
+// ── Committee minutes formatting ─────────────────────────────────────────────
+// chair_agent.py emits "[SECTION NAME]" bracket headers. Per-specialist
+// sections are skipped here since they're already shown as vote cards above
+// this box — repeating them verbatim would just be noise.
+function renderMinutes(minutesText) {
+  if (!minutesText || !minutesText.trim()) {
+    return '<p style="color:var(--muted);font-size:.85rem">No committee review for this query type.</p>';
+  }
+  const lines = minutesText.split('\n');
+  const preamble = [];
+  const sections = [];
+  let current = null;
+  const headerRe = /^\[(.+)\]\s*$/;
+  for (const line of lines) {
+    const m = line.match(headerRe);
+    if (m) {
+      current = { title: m[1].trim(), body: [] };
+      sections.push(current);
+    } else if (current) {
+      current.body.push(line);
+    } else {
+      preamble.push(line);
+    }
+  }
+  if (!sections.length) {
+    return `<div class="mono-box">${escapeHtml(minutesText)}</div>`;
+  }
+
+  const MINUTES_ICONS = {
+    'CALL TO ORDER': '🔔', 'CHAIR SYNTHESIS': '⚖️', 'VOTING RECORD': '🗳️',
+    'FINAL DECISION': '✅', 'CLOSE': '🔒',
+  };
+  const skipTitle = t => /ANALYST/i.test(t);
+
+  const preHtml = preamble.join('\n').trim()
+    ? `<div style="font-size:.75rem;color:var(--muted);font-family:var(--mono);white-space:pre-wrap;margin-bottom:.75rem">${escapeHtml(preamble.join('\n').trim())}</div>`
+    : '';
+
+  const sectionsHtml = sections.filter(sec => !skipTitle(sec.title)).map(sec => {
+    const isFinal = sec.title === 'FINAL DECISION';
+    const icon = MINUTES_ICONS[sec.title] || '📄';
+    const bodyText = sec.body.join('\n').trim();
+    return `
+      <div class="card" style="margin-bottom:.6rem; ${isFinal ? 'border-color: rgba(31,111,235,.4)' : ''}">
+        <div class="card-header" style="${isFinal ? 'background:rgba(31,111,235,.1)' : ''}">
+          <h3>${icon} ${escapeHtml(sec.title.replace(/_/g, ' '))}</h3>
+        </div>
+        <div class="card-body"><p style="white-space:pre-wrap;line-height:1.6;margin:0;font-size:.82rem">${escapeHtml(bodyText)}</p></div>
+      </div>`;
+  }).join('');
+
+  return preHtml + sectionsHtml;
+}
+
+// ── Top suspicious accounts ──────────────────────────────────────────────────
+// Renders the ranked multi-account list from orchestrator.py's
+// _build_top_suspicious_list — distinct from the single deep-dived case
+// shown in the Risk Memo / Committee tabs.
+function renderTopSuspicious(list) {
+  if (!list || !list.length) {
+    return '<p style="color:var(--muted);font-size:.85rem">This query type analyses a single account or a raw count table (see the Answer tab) rather than a ranked list of accounts.</p>';
+  }
+  const rows = list.map((item, i) => {
+    const tier = (item.risk_tier || 'LOW').toUpperCase();
+    const tierColor = tier === 'HIGH' ? 'var(--red)' : tier === 'MEDIUM' ? 'var(--orange)' : 'var(--green)';
+    return `
+      <tr style="border-top:1px solid var(--border)">
+        <td style="padding:.55rem .7rem;color:var(--muted);font-family:var(--mono)">${i + 1}</td>
+        <td style="padding:.55rem .7rem;font-family:var(--mono)">${escapeHtml(item.customer_id)}</td>
+        <td style="padding:.55rem .7rem;font-family:var(--mono);font-weight:700">${Math.round(item.risk_score)}/100</td>
+        <td style="padding:.55rem .7rem"><span style="color:${tierColor};font-weight:700">${tier}</span></td>
+        <td style="padding:.55rem .7rem;color:var(--muted);font-size:.78rem">${escapeHtml(item.key_metric || '—')}</td>
+      </tr>`;
+  }).join('');
+  return `
+    <div class="card">
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <thead>
+            <tr style="background:var(--bg3);text-align:left">
+              <th style="padding:.55rem .7rem">#</th>
+              <th style="padding:.55rem .7rem">Account</th>
+              <th style="padding:.55rem .7rem">Risk Score</th>
+              <th style="padding:.55rem .7rem">Tier</th>
+              <th style="padding:.55rem .7rem">Why it's ranked here</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+const CHART_LABELS = {
+  benford:             "Benford's Law — Digit Distribution",
+  clustering:          'Threshold Clustering Analysis',
+  amount_distribution: 'Transaction Amount Distribution',
+  typology:            'Typology Breakdown',
+  network:             'Account Network Graph',
+};
+function renderCharts(charts) {
+  const entries = Object.entries(charts || {}).filter(([, v]) => v);
+  if (!entries.length) {
+    return '<p style="color:var(--muted);font-size:.85rem">No charts were generated for this query type.</p>';
+  }
+  return entries.map(([key, url]) => `
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-header"><h3>${escapeHtml(CHART_LABELS[key] || key)}</h3></div>
+      <div class="card-body"><img src="${escapeHtml(url)}" alt="${escapeHtml(key)}" style="max-width:100%;border-radius:6px;border:1px solid var(--border);display:block" /></div>
+    </div>`).join('');
+}
 
 // ── Shared "backend unreachable" state ──────────────────────────────────────
 // Every code path that talks to the API funnels failures through this pair
@@ -733,10 +1035,45 @@ async function analyze() {
     spinnerLabel.textContent = labels[li];
   }, 4000);
 
-  // Timeout warning after 30s
-  const warnTimeout = setTimeout(() => {
-    spinnerLabel.textContent = 'Still working… (large dataset takes ~30s on first run)';
-  }, 30000);
+  // Live elapsed-time counter plus a rough estimate, so a multi-minute wait
+  // on the full 9.5M-row dataset doesn't feel like the app has hung. The
+  // estimate is filled in a moment later (see the plan-lookup fetch below)
+  // once we know which intent this query maps to — different intents have
+  // very different real-world timings (a count query is ~instant; a network
+  // or broad-exploration query touches the full account graph and can take
+  // minutes).
+  let estimateText = '';
+  const startTime = Date.now();
+  const timerEl = document.getElementById('spinner-timer');
+  const tick = () => {
+    const secs = Math.floor((Date.now() - startTime) / 1000);
+    const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+    const ss = String(secs % 60).padStart(2, '0');
+    timerEl.textContent = `Elapsed: ${mm}:${ss}` + (estimateText ? `  •  ${estimateText}` : '');
+  };
+  tick();
+  const timerInterval = setInterval(tick, 1000);
+
+  // Best-effort, non-blocking: look up the parsed intent so the estimate
+  // above can be specific. Runs in parallel with the real analysis request
+  // below — if it's slow or fails, the analysis still proceeds normally.
+  // Based on measured timings against the full 9.5M-row Kaggle SAML-D
+  // dataset (855k unique accounts) — not the small synthetic fixture, which
+  // is much faster and would understate real wait times.
+  const ESTIMATES = {
+    aggregation_query:    'usually just a few seconds',
+    comparative_query:    'usually just a few seconds',
+    explain_flag:         'usually just a few seconds',
+    escalation_query:     'usually 5–15 seconds',
+    single_entity_lookup: 'usually 2–4 minutes on the full dataset (fits the anomaly model across all accounts)',
+    pattern_detection:    'usually 1–3 minutes on the full dataset',
+    network_query:        'usually 2–6 minutes on the full dataset (builds the account network)',
+    broad_exploration:    'usually 2–6 minutes on the full dataset (runs every tool)',
+  };
+  fetch(`${API}/api/v1/plan?query=${encodeURIComponent(q)}`)
+    .then(r => (r.ok ? r.json() : null))
+    .then(pd => { if (pd && ESTIMATES[pd.parsed_intent]) { estimateText = ESTIMATES[pd.parsed_intent]; tick(); } })
+    .catch(() => {});
 
   try {
     let r;
@@ -754,7 +1091,7 @@ async function analyze() {
       });
     }
     clearInterval(labelInterval);
-    clearTimeout(warnTimeout);
+    clearInterval(timerInterval);
 
     if (!r.ok) {
       let detail = r.statusText;
@@ -768,7 +1105,7 @@ async function analyze() {
 
   } catch (e) {
     clearInterval(labelInterval);
-    clearTimeout(warnTimeout);
+    clearInterval(timerInterval);
     const isNetworkError = e instanceof TypeError;
     const detail = isNetworkError
       ? `Could not reach ${API}/api/v1/analyze — the backend may be down or unreachable.`
@@ -796,23 +1133,28 @@ function renderResults(data) {
   const tier = (summary.risk_tier || 'LOW').toUpperCase();
   const score = summary.risk_score != null ? summary.risk_score : null;
 
-  // Risk banner — only show if we have a risk score from committee
+  // Risk banner — plain-English summary of the decision and what kind of
+  // analysis actually ran. Judges/compliance reviewers shouldn't need to
+  // know what "single_entity_lookup" or "MONITOR" mean internally.
   const banner = document.getElementById('risk-banner');
-  // Try to extract score from risk_memo text fallback
   let displayScore = score;
-  let displayTier = tier;
-  
-  // Parse from execution summary or chair result
+
   const chair = data.chair_result || {};
-  if (chair.final_decision) {
-    displayTier = chair.final_decision;
+  const decision = chair.final_decision || tier || 'MONITOR';
+  const info = DECISION_INFO[decision] || { headline: decision, tone: 'LOW' };
+
+  let subText = INTENT_LABELS[summary.parsed_intent] || 'Ran an analysis on the request';
+  if (summary.target_pattern && summary.target_pattern !== 'none' && PATTERN_LABELS[summary.target_pattern]) {
+    subText += `, specifically ${PATTERN_LABELS[summary.target_pattern]}`;
+  }
+  if ((summary.detected_entities || []).length) {
+    subText += ` (account: ${summary.detected_entities.join(', ')})`;
   }
 
-  banner.className = `risk-banner ${displayTier}`;
-  document.getElementById('risk-score').textContent = displayScore != null ? Math.round(displayScore) : '—';
-  document.getElementById('risk-label').textContent = `Decision: ${displayTier}`;
-  document.getElementById('risk-sub').textContent =
-    `Intent: ${summary.parsed_intent || 'N/A'} | Pattern: ${summary.target_pattern || 'none'} | Entities: ${(summary.detected_entities||[]).join(', ')||'None'}`;
+  banner.className = `risk-banner ${info.tone}`;
+  document.getElementById('risk-score').textContent = displayScore != null ? `${Math.round(displayScore)}` : '—';
+  document.getElementById('risk-label').textContent = info.headline;
+  document.getElementById('risk-sub').textContent = subText;
 
   // ── Execution Plan tab ─────────────────────────────────────────────────────
   // The ML/EDA badges must reflect what the plan actually *ran*, not the raw
@@ -828,44 +1170,53 @@ function renderResults(data) {
   const usesEDA = stepsUse('eda_tool');
 
   const intentBadges = `
-    <span class="plan-badge">Intent: ${summary.parsed_intent||'N/A'}</span>
-    <span class="plan-badge">Pattern: ${summary.target_pattern||'none'}</span>
-    ${(summary.detected_entities||[]).map(e => `<span class="plan-badge" style="background:rgba(210,153,34,.12);border-color:rgba(210,153,34,.3);color:var(--gold)">Entity: ${e}</span>`).join('')}
-    ${usesML ? '<span class="plan-badge" style="background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)">ML</span>' : ''}
-    ${usesEDA ? '<span class="plan-badge" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green)">EDA</span>' : ''}
+    <span class="plan-badge">${escapeHtml(INTENT_LABELS[summary.parsed_intent] || summary.parsed_intent || 'N/A')}</span>
+    ${summary.target_pattern && summary.target_pattern !== 'none' ? `<span class="plan-badge">Pattern checked: ${escapeHtml(summary.target_pattern)}</span>` : ''}
+    ${(summary.detected_entities||[]).map(e => `<span class="plan-badge" style="background:rgba(210,153,34,.12);border-color:rgba(210,153,34,.3);color:var(--gold)">Account: ${escapeHtml(e)}</span>`).join('')}
+    ${usesML ? '<span class="plan-badge" style="background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)">Uses machine learning</span>' : ''}
+    ${usesEDA ? '<span class="plan-badge" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green)">Full dataset scan</span>' : ''}
   `;
   document.getElementById('plan-intent').innerHTML = intentBadges;
 
   const steps = (summary.execution_plan||[]).map((s,i) =>
-    `<div class="exec-step"><span class="num">${i+1}</span><span class="cmd">${s}</span></div>`
+    `<div class="exec-step"><span class="num">${i+1}</span><div><div style="font-size:.82rem;color:var(--text)">${escapeHtml(describeStep(s))}</div><div class="cmd" style="font-size:.65rem;opacity:.55;margin-top:.15rem">${escapeHtml(s)}</div></div></div>`
   ).join('');
   document.getElementById('plan-steps').innerHTML = steps || '<p style="color:var(--muted);font-size:.8rem">No plan available.</p>';
 
   const skipsHtml = (summary.tools_skipped||[]).length
-    ? `<p style="font-size:.7rem;color:var(--muted);margin-bottom:.2rem">Skipped (not needed for this intent):</p>` +
-      (summary.tools_skipped||[]).map(s => `<div class="skip-step">${s}</div>`).join('') +
-      (summary.reason_for_skips ? `<p style="font-size:.7rem;color:var(--muted);margin-top:.4rem;font-style:italic;max-width:640px">${summary.reason_for_skips}</p>` : '')
+    ? `<p style="font-size:.7rem;color:var(--muted);margin-bottom:.2rem">Not needed for this query, so skipped to keep things fast:</p>` +
+      (summary.tools_skipped||[]).map(s => `<div class="skip-step">${escapeHtml(describeSkip(s))}</div>`).join('') +
+      (summary.reason_for_skips ? `<p style="font-size:.7rem;color:var(--muted);margin-top:.4rem;font-style:italic;max-width:640px">${escapeHtml(summary.reason_for_skips)}</p>` : '')
     : '';
   document.getElementById('plan-skips').innerHTML = skipsHtml;
 
   // ── Risk Memo tab ────────────────────────────────────────────────────────
-  document.getElementById('memo-box').textContent = data.risk_memo || 'No risk memo generated for this query type.';
+  document.getElementById('memo-box').innerHTML = renderRiskMemo(data.risk_memo);
 
   // ── Committee tab ────────────────────────────────────────────────────────
   const votes = data.agent_votes || chair.agent_votes || [];
   const grid = document.getElementById('votes-grid');
   if (votes.length) {
-    grid.innerHTML = votes.map(v => `
+    grid.innerHTML = votes.map(v => {
+      const vDecision = v.vote || 'MONITOR';
+      const vInfo = DECISION_INFO[vDecision] || { headline: vDecision };
+      return `
       <div class="vote-card">
         <div class="agent-name">${v.agent||'Agent'}</div>
-        <span class="vote-badge ${v.vote||'MONITOR'}">${v.vote||'MONITOR'}</span>
+        <span class="vote-badge ${vDecision}">${vDecision} — ${vInfo.headline}</span>
         <div class="vote-reasoning">${v.reasoning||'—'}</div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   } else {
     grid.innerHTML = '<p style="color:var(--muted);font-size:.8rem">Committee review was not required for this query intent.</p>';
   }
-  document.getElementById('minutes-box').textContent = data.committee_minutes || 'No committee review for this query type.';
+  document.getElementById('minutes-box').innerHTML = renderMinutes(data.committee_minutes);
+
+  // ── Top Suspicious Accounts tab ─────────────────────────────────────────
+  document.getElementById('top-suspicious-box').innerHTML = renderTopSuspicious(data.top_suspicious);
+
+  // ── Charts tab ───────────────────────────────────────────────────────────
+  document.getElementById('charts-box').innerHTML = renderCharts(data.charts);
 
   // ── Answer tab ──────────────────────────────────────────────────────────
   const answer = data.plain_text_answer || data.explanation || data.aggregation_table || data.risk_memo || 'Analysis complete. See other tabs for detailed output.';
@@ -874,9 +1225,6 @@ function renderResults(data) {
     : '';
   document.getElementById('answer-box').textContent = answer + imageBlock;
 
-  // ── Raw JSON tab ─────────────────────────────────────────────────────────
-  document.getElementById('raw-box').textContent = JSON.stringify(data, null, 2);
-
   // Show results
   document.getElementById('results').style.display = 'flex';
 
@@ -884,7 +1232,7 @@ function renderResults(data) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.querySelector('.tab-btn').classList.add('active');
-  document.getElementById('tab-plan').classList.add('active');
+  document.getElementById('tab-answer').classList.add('active');
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────

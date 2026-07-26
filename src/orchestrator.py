@@ -10,8 +10,11 @@ import os
 import sys
 import json
 import glob
+import logging
 import pandas as pd
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 # Ensure project root is always on sys.path regardless of how the module is invoked
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -208,6 +211,14 @@ class AMLOrchestrator:
             committee_res['agent_votes'], committee_res['chair_result'],
             explanation,
         )
+        top_suspicious = self._build_top_suspicious_list(
+            candidate_ids=list(features_df.index),
+            metric_label='Structuring regularity score',
+            metric_values=(
+                features_df['structuring_regularity_score'].to_dict()
+                if 'structuring_regularity_score' in features_df.columns else {}
+            ),
+        )
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
@@ -217,6 +228,7 @@ class AMLOrchestrator:
             charts={'benford': benford_res.get('chart_path', '')},
             agent_votes=committee_res['agent_votes'],
             chair_result=committee_res['chair_result'],
+            top_suspicious=top_suspicious,
         )
 
     def _run_aggregation(self, parsed_query: dict, execution_summary: dict) -> dict:
@@ -302,11 +314,33 @@ class AMLOrchestrator:
             self._transactions_df, self._customers_df, focus_customer=entity
         )
         text_res = self.formatter.format_network_result(net_res, execution_summary)
+
+        # The ego-network chart is only produced when a focus entity was
+        # requested — it lives under entity_analysis, not at the top level.
+        chart_path = net_res.get('entity_analysis', {}).get('chart_path', '')
+
+        # top_hubs is already a genuine ranked list (by betweenness
+        # centrality) — reuse the official network-centrality scoring
+        # formula from risk_classification.py so hub accounts get a
+        # comparable composite score without re-running Benford/clustering
+        # (those signals aren't relevant to a pure relationship query).
+        top_suspicious = []
+        for hub in net_res.get('top_hubs', [])[:10]:
+            bc = float(hub.get('betweenness_centrality', 0.0))
+            scoring = self.risk_class.score(network_score=min(bc * 2.0, 1.0))
+            top_suspicious.append({
+                'customer_id': str(hub.get('account_id', 'unknown')),
+                'risk_score': scoring['composite_score'],
+                'risk_tier': scoring['risk_tier'],
+                'key_metric': f"Betweenness centrality: {bc:.4f} (network hub)",
+            })
+
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
             plain_text_answer=text_res,
-            charts={'network': net_res.get('chart_path', '')},
+            charts={'network': chart_path},
+            top_suspicious=top_suspicious,
         )
 
     def _run_comparative(self, parsed_query: dict, execution_summary: dict) -> dict:
@@ -405,6 +439,18 @@ class AMLOrchestrator:
             'benford': benford_res.get('chart_path', ''),
             'clustering': clustering_res.get('chart_path', ''),
         }
+        # Shortlist by activity (cheap, avoids scoring all 855k+ accounts),
+        # then the helper itself re-ranks the shortlist by actual computed
+        # risk score — so the returned order reflects suspicion, not just volume.
+        top_suspicious = self._build_top_suspicious_list(
+            candidate_ids=list(all_features.index),
+            metric_label='Transaction count',
+            metric_values=(
+                all_features['transaction_count'].to_dict()
+                if 'transaction_count' in all_features.columns else {}
+            ),
+            all_features_df=all_features,
+        )
         return self.formatter.format_full_result(
             execution_summary_json=self.formatter.format_execution_summary(execution_summary),
             execution_summary=execution_summary,
@@ -412,11 +458,72 @@ class AMLOrchestrator:
             committee_minutes=committee_res['meeting_minutes'],
             explanation=explanation,
             charts=charts,
+            top_suspicious=top_suspicious,
         )
 
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------
+
+    def _build_top_suspicious_list(
+        self,
+        candidate_ids: list,
+        metric_label: str = '',
+        metric_values: dict = None,
+        all_features_df=None,
+        top_n: int = 10,
+    ) -> list:
+        """Build a genuine ranked list of suspicious accounts, not just the
+        single case that gets the full deep-dive treatment below.
+
+        Running the full committee (Groq calls per specialist agent) for
+        every candidate would be far too slow, so this uses only the cheap
+        signals — Benford's Law and threshold clustering, plus the ML
+        anomaly model if it's already fitted — to produce a defensible
+        composite risk score per candidate. The single top-ranked account
+        still separately gets the full committee deliberation and risk memo.
+
+        Args:
+            candidate_ids: Ordered list of customer/account IDs (most
+                interesting first, per whatever cheap heuristic selected
+                them — e.g. activity volume or a pattern-specific score).
+            metric_label: Human label for the metric that produced the
+                candidate shortlist (shown alongside each row for context).
+            metric_values: Optional {id: value} map for that metric.
+            all_features_df: Bulk feature DataFrame; enables cheap ML scoring
+                via the already-fitted model if provided.
+            top_n: How many candidates to score and return.
+
+        Returns:
+            List of dicts sorted by composite risk score descending:
+            {customer_id, risk_score, risk_tier, key_metric}.
+        """
+        metric_values = metric_values or {}
+        results = []
+        for cid in candidate_ids[:top_n]:
+            try:
+                benford_res = self.benford.analyze_customer(self._transactions_df, cid)
+                clustering_res = self.clustering.analyze_customer(self._transactions_df, cid)
+                ml_res = {}
+                if (
+                    all_features_df is not None
+                    and cid in all_features_df.index
+                    and getattr(self.ml_model, '_is_fitted', False)
+                ):
+                    ml_res = self.ml_model.predict_single(all_features_df.loc[cid].to_dict())
+                risk = self.risk_class.classify_customer(cid, {}, benford_res, clustering_res, ml_res, {})
+                entry = {
+                    'customer_id': str(cid),
+                    'risk_score': risk.get('composite_score', 0),
+                    'risk_tier': risk.get('risk_tier', 'LOW'),
+                }
+                if metric_label and cid in metric_values:
+                    entry['key_metric'] = f"{metric_label}: {metric_values[cid]:.4f}"
+                results.append(entry)
+            except Exception as exc:
+                logger.warning("Could not score candidate %s for top-suspicious list: %s", cid, exc)
+        results.sort(key=lambda r: r['risk_score'], reverse=True)
+        return results
 
     def _build_case_file(
         self,
