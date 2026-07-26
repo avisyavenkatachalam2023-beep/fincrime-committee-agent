@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Financial Crime Committee — AML Intelligence Platform</title>
+  <link rel="icon" type="image/png" href="/static/img/logo-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -56,6 +57,7 @@
     }
     .topbar-brand { display: flex; align-items: center; gap: .7rem; }
     .topbar-brand .icon { font-size: 1.4rem; }
+    .topbar-brand .brand-logo { height: 32px; width: auto; display: block; }
     .topbar-brand h1 { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: .02em; }
     .topbar-brand small { color: var(--muted); font-size: .7rem; margin-left: .4rem; font-weight: 400; }
     #status-dot {
@@ -363,7 +365,7 @@
 <!-- Top bar -->
 <header class="topbar">
   <div class="topbar-brand">
-    <span class="icon">🏦</span>
+    <img src="/static/img/logo-icon.png" alt="Financial Crime Committee logo" class="brand-logo" />
     <h1>Financial Crime Committee <small>AML Intelligence Platform</small></h1>
   </div>
   <div class="status-badge">

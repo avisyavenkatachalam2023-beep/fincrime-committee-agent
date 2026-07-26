@@ -6,4 +6,5 @@ data/charts/
 data/raw/
 app/static/uploads/
 *.png
+!app/static/img/*.png
 .DS_Store
