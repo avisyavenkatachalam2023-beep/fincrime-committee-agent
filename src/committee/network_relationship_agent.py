@@ -124,6 +124,21 @@ class NetworkRelationshipAgent(BaseCommitteeAgent):
 
         network_flags: list[str] = []
 
+        # network_tool.py's is_hub is a RELATIVE designation (top decile of
+        # betweenness centrality across the whole graph). In a large sparse
+        # graph, most nodes have near-zero centrality, so the 90th-percentile
+        # cutoff itself can round to ~0 — making is_hub=True even when this
+        # account's actual centrality is negligible and it has zero
+        # connected flagged accounts. Every is_hub-gated flag below (not
+        # just the hub designation itself) requires this real absolute
+        # signal; otherwise it's not a meaningful network finding,
+        # regardless of the relative label.
+        has_real_hub_signal = (
+            betweenness_centrality > _HIGH_BETWEENNESS_CENTRALITY
+            or connected_flagged_accounts > 0
+        )
+        is_hub = is_hub and has_real_hub_signal
+
         # --- 1. Hub account identification ---
         if is_hub:
             network_flags.append(

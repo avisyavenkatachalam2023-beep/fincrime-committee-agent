@@ -3,6 +3,80 @@ from datetime import date
 import random
 
 from src.committee.transaction_monitoring_agent import _HIGH_STRUCTURING_REGULARITY
+from src.committee.network_relationship_agent import _HIGH_BETWEENNESS_CENTRALITY
+
+
+def build_red_flags(case_file: dict) -> list[str]:
+    """Single source of truth for which signals count as a red flag for a
+    case. Used identically by the Risk Memo's "Red Flags Identified"
+    section and the Executive Summary narrative (explanation.py) — each
+    previously computed its own independent list with different
+    thresholds, so the two sections could (and did) disagree for the same
+    customer.
+
+    Returns a list of plain description strings (no bullet/prefix).
+    """
+    flags: list[str] = []
+    features = case_file.get('features', {}) or {}
+    benford = case_file.get('benford_results', {}) or {}
+    clustering = case_file.get('clustering_results', {}) or {}
+    ml = case_file.get('ml_results', {}) or {}
+    network = case_file.get('network_results', {}) or {}
+
+    if benford.get('insufficient_sample'):
+        flags.append(
+            f"{benford.get('sample_warning', 'Insufficient transaction volume for Benford analysis.')} "
+            "Risk scoring falls back to the threshold-clustering signal alone for this component."
+        )
+    else:
+        deviation_score = float(benford.get('deviation_score', 0) or 0)
+        if deviation_score > 0.3:
+            flags.append(
+                f"Benford's Law deviation score of {deviation_score:.2f} indicates a non-conforming amount distribution."
+            )
+
+    composite_clustering = float(clustering.get('composite_clustering_score', 0) or 0)
+    if composite_clustering > 0.5:
+        sub_threshold_count = features.get('sub_threshold_count', 0)
+        flags.append(
+            f"Sub-threshold clustering score of {composite_clustering:.2f}: "
+            f"{sub_threshold_count} transactions found just under the reporting threshold."
+        )
+
+    round_ratio = float(clustering.get('round_numbers', {}).get('round_number_ratio', 0) or 0)
+    if round_ratio > 0.25:
+        flags.append(f"Round-number transaction ratio of {round_ratio:.1%}, well above the ~5% baseline.")
+
+    structuring_regularity = float(features.get('structuring_regularity_score', 0) or 0)
+    if structuring_regularity > _HIGH_STRUCTURING_REGULARITY:
+        flags.append(
+            f"Structuring regularity score of {structuring_regularity:.2f}: "
+            "near-identical amounts/intervals across transactions."
+        )
+
+    ml_score = float(ml.get('ml_anomaly_score', 0) or 0)
+    if ml_score > 0.6:
+        flags.append(f"ML Isolation Forest anomaly score of {ml_score:.3f}: statistical outlier in the feature space.")
+
+    # Only assert a hub/network concern with a real absolute signal behind
+    # it — network_tool.py's is_hub is a relative (top-decile) designation
+    # that can be True even when betweenness_centrality is ~0 and there are
+    # no connected flagged accounts, which previously produced a "hub"
+    # red flag alongside betweenness_centrality=0.0000 and 0 connections.
+    hub_score = float(network.get('hub_score', 0) or 0)
+    is_hub = bool(network.get('is_hub', False))
+    flagged_accounts_field = network.get('connected_flagged_accounts', 0)
+    connected_flagged_count = (
+        len(flagged_accounts_field) if isinstance(flagged_accounts_field, list)
+        else int(flagged_accounts_field or 0)
+    )
+    if is_hub and (hub_score > _HIGH_BETWEENNESS_CENTRALITY or connected_flagged_count > 0):
+        flags.append(f"Network betweenness centrality of {hub_score:.4f}: identified as a hub in the transaction network.")
+    if connected_flagged_count > 0:
+        flags.append(f"Directly connected to {connected_flagged_count} flagged account(s).")
+
+    return flags
+
 
 class OutputFormatter:
     def format_execution_summary(self, execution_summary: dict) -> str:
@@ -13,36 +87,13 @@ class OutputFormatter:
                          agent_votes: list, chair_result: dict, 
                          explanation: str, charts: dict = None) -> str:
         today = date.today().strftime("%Y-%m-%d")
-        case_id = f"CASE-{date.today().year}-{random.randint(1000, 9999)}"
-        
-        red_flags = []
-        benford_results = case_file.get('benford_results', {}) or {}
-        if benford_results.get('insufficient_sample'):
-            red_flags.append(f"- {benford_results.get('sample_warning', 'Insufficient transaction volume for Benford analysis.')} Risk scoring falls back to the threshold-clustering signal alone for this component.")
-        elif benford_results.get('deviation_score', 0) > 0.3:
-            red_flags.append(f"- Benford's Law deviation: {benford_results['deviation_score']:.2f}")
-        # threshold_clustering.analyze_customer() has no top-level "spike_score"
-        # or "sub_threshold_band_count" key (nested under sub_threshold/
-        # round_numbers instead) — this condition previously never fired, and
-        # would have raised a KeyError if it somehow had. composite_clustering_score
-        # is the tool's own top-level 0-1 signal; sub_threshold_count (the actual
-        # near-threshold transaction count) lives on features, not clustering_results.
-        if case_file.get('clustering_results', {}).get('composite_clustering_score', 0) > 0.5:
-            sub_threshold_count = case_file.get('features', {}).get('sub_threshold_count', 0)
-            red_flags.append(f"- Sub-threshold clustering: {sub_threshold_count} transactions just under reporting threshold")
-        # Same threshold the Transaction Monitoring Analyst's rule-based
-        # fallback uses to trigger its "structuring_regularity" signal —
-        # this is a genuinely computed feature (near-identical amounts and
-        # intervals), but was previously invisible here even when it was
-        # the actual signal driving the committee's vote.
-        structuring_regularity = case_file.get('features', {}).get('structuring_regularity_score', 0)
-        if structuring_regularity > _HIGH_STRUCTURING_REGULARITY:
-            red_flags.append(f"- Structuring regularity: {structuring_regularity:.2f} (near-identical amounts/intervals across transactions)")
-        if case_file.get('network_results', {}).get('is_hub', False):
-            red_flags.append(f"- Network centrality: Identified as a hub in a transaction network")
-        for flag in (chair_result.get('key_signals') or []):
-            red_flags.append(f"- {flag}")
-            
+        # Reuse the Chair's case_reference (generated once per run) instead
+        # of minting a second random ID here — previously the memo and the
+        # Committee Minutes each generated their own, so the two almost
+        # never matched for the same analysis.
+        case_id = (chair_result or {}).get('case_reference') or f"CASE-{date.today().year}-{random.randint(1000, 9999)}"
+
+        red_flags = [f"- {f}" for f in build_red_flags(case_file)]
         if not red_flags:
             red_flags.append("- No significant quantitative red flags identified.")
 

@@ -67,7 +67,8 @@ _TIER_BASELINE_DECISION = {"LOW": "MONITOR", "MEDIUM": "REVIEW", "HIGH": "REPORT
 _CHAIR_SYSTEM_PROMPT = """You are the Chair of an AML Financial Crime Committee.
 You have just received votes from four specialist agents and must synthesise their
 findings into a coherent 3-5 sentence paragraph that:
-1. Summarises the key signals identified across all agents
+1. Explicitly cites at least one specific finding from EACH specialist agent listed
+   below, by name — do not summarise only the most severe agent and omit the rest
 2. Explains the rationale for the final committee decision
 3. Notes any dissenting opinions or areas of uncertainty
 4. Uses formal, regulatory-grade language appropriate for compliance records
@@ -161,6 +162,13 @@ class ChairAgent:
             ``{final_decision, synthesis, meeting_minutes, vote_breakdown,
                escalation_action, case_reference}``
         """
+        # Generated once here and threaded through to meeting_minutes and the
+        # returned case_reference — previously each was generated with its
+        # own separate random call, so the Risk Memo (which also reused
+        # case_reference) and the Committee Minutes almost always showed
+        # different case IDs for the same run.
+        case_ref = self._make_case_reference()
+
         votes = [str(v.get("vote", "MONITOR")).upper() for v in agent_votes]
         final_decision = self._apply_voting_rules(votes)
         escalation_action = self._get_escalation_action(final_decision)
@@ -170,10 +178,8 @@ class ChairAgent:
         synthesis = self._generate_synthesis(case_file, agent_votes, final_decision)
         meeting_minutes = self._generate_meeting_minutes(
             case_file, agent_votes, final_decision, synthesis, escalation_action,
-            tier_decision_note,
+            tier_decision_note, case_ref,
         )
-
-        case_ref = self._make_case_reference()
 
         vote_breakdown = {
             v.get("agent", f"Agent_{i}"): {
@@ -379,26 +385,42 @@ class ChairAgent:
                 return ""
 
             bad_number = find_unverifiable_number(synthesis, case_file, vote_text_numbers)
-            if bad_number is None:
+            missing_agents = [
+                v.get("agent", "Unknown Agent") for v in agent_votes
+                if v.get("agent") and v.get("agent").lower() not in synthesis.lower()
+            ]
+            if bad_number is None and not missing_agents:
                 return synthesis
 
             last_bad_number = bad_number
-            logger.warning(
-                "[Chair] LLM synthesis cited unverifiable number %s not present "
-                "in the case file or specialist reasoning (attempt %d/2).",
-                bad_number, attempt + 1,
-            )
             messages.append({"role": "assistant", "content": synthesis})
-            messages.append({"role": "user", "content": (
-                f"Your synthesis cited the number {bad_number}, which does not "
-                "appear anywhere in the case file or the specialists' own "
-                "reasoning above. Write the synthesis again, citing only "
-                "numbers explicitly present in that data."
-            )})
+            if bad_number is not None:
+                logger.warning(
+                    "[Chair] LLM synthesis cited unverifiable number %s not present "
+                    "in the case file or specialist reasoning (attempt %d/2).",
+                    bad_number, attempt + 1,
+                )
+                messages.append({"role": "user", "content": (
+                    f"Your synthesis cited the number {bad_number}, which does not "
+                    "appear anywhere in the case file or the specialists' own "
+                    "reasoning above. Write the synthesis again, citing only "
+                    "numbers explicitly present in that data."
+                )})
+            else:
+                logger.warning(
+                    "[Chair] LLM synthesis omitted agent(s) %s (attempt %d/2).",
+                    missing_agents, attempt + 1,
+                )
+                messages.append({"role": "user", "content": (
+                    f"Your synthesis never mentioned: {', '.join(missing_agents)}. "
+                    "Write the synthesis again, explicitly citing at least one "
+                    "specific finding from every specialist agent listed above, "
+                    "including the one(s) you omitted."
+                )})
 
         logger.error(
-            "[Chair] LLM synthesis still cited unverifiable number %s after a "
-            "corrective retry; falling back to template.", last_bad_number,
+            "[Chair] LLM synthesis still invalid after a corrective retry "
+            "(bad_number=%s); falling back to template.", last_bad_number,
         )
         return ""
 
@@ -473,15 +495,24 @@ class ChairAgent:
         risk_tier = case_file.get("risk_tier", "UNKNOWN")
 
         vote_counts = {"MONITOR": 0, "REVIEW": 0, "REPORT": 0}
-        all_signals: list[str] = []
         for v in agent_votes:
             vote = str(v.get("vote", "MONITOR")).upper()
             if vote in vote_counts:
                 vote_counts[vote] += 1
-            all_signals.extend(v.get("key_signals", []))
 
-        top_signals = list(dict.fromkeys(all_signals))[:5]  # deduplicated, top 5
-        signal_str = ", ".join(top_signals) if top_signals else "no dominant signals"
+        # One representative finding per agent that voted, explicitly by
+        # agent name — a flat deduplicated top-5 of all signals combined
+        # could (and did) end up citing several signals from one agent
+        # while dropping the others entirely whenever one agent's
+        # key_signals list was longer than the others'.
+        per_agent_findings = []
+        for v in agent_votes:
+            agent_name = v.get("agent", "Unknown Agent")
+            sigs = [s for s in (v.get("key_signals") or []) if s]
+            real_sigs = [s for s in sigs if not s.lower().startswith("no_")]
+            highlight = real_sigs[0] if real_sigs else (sigs[0] if sigs else "no distinguishing signal")
+            per_agent_findings.append(f"{agent_name} ({v.get('vote', 'MONITOR')}): {highlight}")
+        signal_str = "; ".join(per_agent_findings) if per_agent_findings else "no dominant signals"
 
         avg_confidence = (
             sum(v.get("confidence", 0.5) for v in agent_votes) / len(agent_votes)
@@ -517,6 +548,7 @@ class ChairAgent:
         synthesis: str,
         escalation_action: str,
         tier_decision_note: Optional[str] = None,
+        case_ref: Optional[str] = None,
     ) -> str:
         """
         Generate formatted Committee Meeting Minutes as a structured text block.
@@ -547,6 +579,10 @@ class ChairAgent:
         tier_decision_note : str, optional
             Explanatory note when the composite risk tier and final_decision
             disagree (see _tier_decision_note).
+        case_ref : str, optional
+            The case reference generated once by synthesize() — passed in so
+            the minutes use the same ID as the returned case_reference field
+            (and, downstream, the Risk Memo) instead of generating their own.
 
         Returns
         -------
@@ -555,7 +591,7 @@ class ChairAgent:
         """
         customer_id = case_file.get("customer_id", "N/A")
         today_str = date.today().strftime("%B %d, %Y")
-        case_ref = self._make_case_reference()
+        case_ref = case_ref or self._make_case_reference()
         risk_score = case_file.get("risk_score", 0.0)
         risk_tier = case_file.get("risk_tier", "UNKNOWN")
         pattern = case_file.get("pattern", "none")

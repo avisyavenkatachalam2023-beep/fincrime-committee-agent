@@ -17,6 +17,8 @@ import logging
 import os
 from typing import Optional, Any
 
+from src.output_formatter import build_red_flags
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -131,7 +133,7 @@ class ExplanationTool:
                     "LLM explanation failed for %s (%s); using template.", customer_id, exc
                 )
 
-        return self._explain_with_template(customer_id, context["signals"])
+        return self._explain_with_template(customer_id, context["signals"], context["case_file"])
 
     def retrieve_and_explain_flag(
         self, entity_id: str, existing_flags: dict
@@ -230,7 +232,7 @@ Write the investigation narrative now:"""
     # ------------------------------------------------------------------
 
     def _explain_with_template(
-        self, customer_id: str, signals: dict
+        self, customer_id: str, signals: dict, case_file: Optional[dict] = None
     ) -> str:
         """Generate a deterministic template-based explanation from numeric signals.
 
@@ -240,75 +242,14 @@ Write the investigation narrative now:"""
         Args:
             customer_id: Account identifier.
             signals: Dictionary of signal values from _build_context().
+            case_file: Case-file-shaped view of the same signals, used with
+                build_red_flags() so this narrative and the Risk Memo's Red
+                Flags Identified section always agree.
 
         Returns:
             Formatted narrative string.
         """
-        red_flags: list[str] = []
-
-        # Benford
-        if signals.get("benford_insufficient_sample"):
-            red_flags.append(
-                signals.get("benford_sample_warning")
-                or "Insufficient transaction volume for a statistically meaningful Benford analysis."
-            )
-        else:
-            benford_mad = signals.get("benford_mad_score")
-            benford_dev = signals.get("benford_deviation_score")
-            if benford_mad is not None and benford_mad > self.BENFORD_FLAG_THRESHOLD:
-                red_flags.append(
-                    f"Benford MAD score of {benford_mad:.4f} (threshold: {self.BENFORD_FLAG_THRESHOLD}) "
-                    f"with deviation score {benford_dev:.4f}: digit distribution is non-conforming"
-                )
-
-        # Clustering
-        spike = signals.get("clustering_spike_score")
-        round_ratio = signals.get("round_number_ratio")
-        if spike is not None and spike > 0.3:
-            red_flags.append(
-                f"Sub-threshold clustering spike score of {spike:.4f} — transactions cluster "
-                "abnormally close to regulatory reporting thresholds"
-            )
-        if round_ratio is not None and round_ratio > 0.25:
-            red_flags.append(
-                f"Round-number transaction ratio of {round_ratio:.1%} — far above baseline (~5%)"
-            )
-
-        # ML
-        ml_score = signals.get("ml_anomaly_score")
-        if ml_score is not None and ml_score > 0.6:
-            red_flags.append(
-                f"ML Isolation Forest anomaly score of {ml_score:.4f} — customer is a "
-                "statistical outlier in the feature space"
-            )
-
-        # Network
-        hub_score = signals.get("network_hub_score")
-        flagged_connections = signals.get("connected_flagged_accounts", 0)
-        if hub_score is not None and hub_score > 0.05:
-            red_flags.append(
-                f"Network betweenness centrality of {hub_score:.4f} — elevated hub role "
-                "in the transaction network"
-            )
-        if isinstance(flagged_connections, list) and len(flagged_connections) > 0:
-            red_flags.append(
-                f"Directly connected to {len(flagged_connections)} flagged account(s)"
-            )
-
-        # Features
-        sub_thresh = signals.get("sub_threshold_count")
-        if sub_thresh is not None and sub_thresh > 2:
-            red_flags.append(
-                f"{sub_thresh} transactions found in the 85–99.9% structuring band "
-                "within the rolling 30-day window"
-            )
-
-        regularity = signals.get("structuring_regularity_score")
-        if regularity is not None and regularity > 0.7:
-            red_flags.append(
-                f"Structuring regularity score of {regularity:.4f} — near-identical "
-                "amounts and intervals consistent with mechanised splitting"
-            )
+        red_flags = build_red_flags(case_file or {})
 
         # Risk tier
         risk_tier = signals.get("risk_tier", "UNKNOWN")
@@ -418,6 +359,22 @@ Write the investigation narrative now:"""
             "pattern": pattern,
             "risk_classification": risk_classification,
             "signals": signals,
+            # Case-file-shaped view of the same raw signal dicts, used by
+            # build_red_flags() so the Executive Summary and the Risk Memo's
+            # Red Flags Identified section are always derived from the exact
+            # same underlying signal object instead of each maintaining its
+            # own independent (and previously divergent) detection logic.
+            "case_file": {
+                "customer_id": customer_id,
+                "pattern": pattern,
+                "risk_score": risk_classification.get("composite_score", 0.0),
+                "risk_tier": risk_classification.get("risk_tier"),
+                "features": features or {},
+                "benford_results": benford_results or {},
+                "clustering_results": clustering_results or {},
+                "ml_results": ml_results or {},
+                "network_results": network_results or {},
+            },
         }
 
     def _format_signals(self, signals: dict) -> str:
