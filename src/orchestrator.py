@@ -459,6 +459,13 @@ class AMLOrchestrator:
             explanation=explanation,
             charts=charts,
             top_suspicious=top_suspicious,
+            # Previously omitted from this handler's return — the committee
+            # deliberation ran and its content was baked into risk_memo, but
+            # the structured agent_votes/chair_result were never surfaced at
+            # the top level, so the Committee tab's vote cards were always
+            # empty for broad_exploration despite the committee having voted.
+            agent_votes=committee_res['agent_votes'],
+            chair_result=committee_res['chair_result'],
         )
 
     # ------------------------------------------------------------------

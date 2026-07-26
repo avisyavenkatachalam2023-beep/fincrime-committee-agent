@@ -16,8 +16,15 @@ class OutputFormatter:
         red_flags = []
         if case_file.get('benford_results', {}).get('deviation_score', 0) > 0.3:
             red_flags.append(f"- Benford's Law deviation: {case_file['benford_results']['deviation_score']:.2f}")
-        if case_file.get('clustering_results', {}).get('spike_score', 0) > 0.5:
-            red_flags.append(f"- Sub-threshold clustering: {case_file['clustering_results']['sub_threshold_band_count']} transactions just under reporting threshold")
+        # threshold_clustering.analyze_customer() has no top-level "spike_score"
+        # or "sub_threshold_band_count" key (nested under sub_threshold/
+        # round_numbers instead) — this condition previously never fired, and
+        # would have raised a KeyError if it somehow had. composite_clustering_score
+        # is the tool's own top-level 0-1 signal; sub_threshold_count (the actual
+        # near-threshold transaction count) lives on features, not clustering_results.
+        if case_file.get('clustering_results', {}).get('composite_clustering_score', 0) > 0.5:
+            sub_threshold_count = case_file.get('features', {}).get('sub_threshold_count', 0)
+            red_flags.append(f"- Sub-threshold clustering: {sub_threshold_count} transactions just under reporting threshold")
         if case_file.get('network_results', {}).get('is_hub', False):
             red_flags.append(f"- Network centrality: Identified as a hub in a transaction network")
         for flag in (chair_result.get('key_signals') or []):

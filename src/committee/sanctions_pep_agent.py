@@ -127,8 +127,11 @@ class SanctionsPepAgent(BaseCommitteeAgent):
 
         rolling_sum_30d = float(features.get("rolling_sum_30d", 0.0))
         avg_amount = float(features.get("avg_amount", 0.0))
-        anomaly_score = float(ml.get("anomaly_score", 0.0))
-        is_outlier: bool = bool(ml.get("is_outlier", False))
+        # ml_model.predict_single() returns "ml_anomaly_score"/"ml_is_outlier",
+        # not "anomaly_score"/"is_outlier" — reading the wrong keys silently
+        # defaulted this signal to 0.0/False for every case.
+        anomaly_score = float(ml.get("ml_anomaly_score", 0.0))
+        is_outlier: bool = bool(ml.get("ml_is_outlier", False))
 
         risk_factors: list[str] = []
 

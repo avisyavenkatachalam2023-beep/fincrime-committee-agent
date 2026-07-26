@@ -130,12 +130,24 @@ class NetworkAnalysisTool:
         #   2. Unweighted BFS instead of weighted Dijkstra — coordination
         #      structure (hop distance) matters more here than dollar-weighted
         #      paths, and BFS is an order of magnitude faster.
+        # k=100 measured as far too slow on the real Kaggle SAML-D graph
+        # (855k nodes / 887k edges — a k=100 sample still took 10+ minutes
+        # and counting, since each sampled source still runs a full O(V+E)
+        # traversal). Scale k down much more aggressively as the graph grows;
+        # accuracy of the *approximation* degrades, but it stays an
+        # unbiased estimator and the relative ranking of hub accounts (which
+        # is what actually matters for flagging coordinators) holds up fine
+        # with far fewer samples on a graph this sparse.
         n = G.number_of_nodes()
-        if n > 500:
-            k = 100 if n > 20_000 else 500
+        if n > 200_000:
+            k = 15
+        elif n > 20_000:
+            k = 100
+        elif n > 500:
+            k = 500
         else:
             k = None
-        betweenness_cent = nx.betweenness_centrality(G, k=k, normalized=True, weight=None)
+        betweenness_cent = nx.betweenness_centrality(G, k=k, normalized=True, weight=None, seed=42)
 
         centrality: dict[str, dict] = {}
         for node in G.nodes():
@@ -265,7 +277,8 @@ class NetworkAnalysisTool:
 
         Returns:
             Dictionary with keys:
-            customer_id, community_id, hub_score (betweenness centrality),
+            customer_id, community_id, community_size (int, accounts sharing
+            that community), hub_score (betweenness centrality),
             is_hub (bool), centrality_scores (dict),
             connected_flagged_accounts (list), interpretation (str),
             ego_network_size (int), chart_path (str).
@@ -279,6 +292,10 @@ class NetworkAnalysisTool:
 
         node_centrality = centrality.get(customer_id, {})
         community_id = communities.get(customer_id, -1)
+        community_size = (
+            sum(1 for v in communities.values() if v == community_id)
+            if community_id != -1 else 0
+        )
         hub_score = node_centrality.get("betweenness_centrality", 0.0)
 
         # Ego network: nodes within 1 hop
@@ -327,6 +344,7 @@ class NetworkAnalysisTool:
         return {
             "customer_id": customer_id,
             "community_id": int(community_id),
+            "community_size": int(community_size),
             "hub_score": round(hub_score, 6),
             "is_hub": is_hub,
             "centrality_scores": node_centrality,

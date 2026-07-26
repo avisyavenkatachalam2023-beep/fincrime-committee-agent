@@ -106,8 +106,12 @@ class TransactionMonitoringAgent(BaseCommitteeAgent):
         benford_deviation = float(benford.get("deviation_score", 0.0))
         p_value = float(benford.get("p_value", 1.0))
 
-        round_number_score = float(clustering.get("round_number_score", 0.0))
-        spike_score = float(clustering.get("spike_score", 0.0))
+        # threshold_clustering.analyze_customer() nests these under
+        # "round_numbers"/"composite_clustering_score", not top-level
+        # "round_number_score"/"spike_score" — reading the wrong keys
+        # silently defaulted both signals to 0.0 for every case.
+        round_number_score = float(clustering.get("round_numbers", {}).get("round_number_ratio", 0.0))
+        spike_score = float(clustering.get("composite_clustering_score", 0.0))
 
         triggered_signals: list[str] = []
 

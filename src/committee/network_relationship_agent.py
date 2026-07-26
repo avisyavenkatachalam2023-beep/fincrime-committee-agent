@@ -103,10 +103,21 @@ class NetworkRelationshipAgent(BaseCommitteeAgent):
         ml = case_file.get("ml_results", {})
         pattern = case_file.get("pattern", "none").lower()
 
-        betweenness_centrality = float(network.get("betweenness_centrality", 0.0))
+        # network_tool.analyze_entity() exposes the betweenness score as
+        # "hub_score" at the top level (it's also nested under
+        # centrality_scores.betweenness_centrality) and
+        # "connected_flagged_accounts" as the actual *list* of flagged
+        # neighbour account IDs, not a pre-computed count — reading it as an
+        # int directly crashes this rule-based fallback exactly when it's
+        # needed most (when the LLM path has failed and we're relying on it).
+        betweenness_centrality = float(network.get("hub_score", 0.0))
         is_hub: bool = bool(network.get("is_hub", False))
         community_size = int(network.get("community_size", 0))
-        connected_flagged_accounts = int(network.get("connected_flagged_accounts", 0))
+        flagged_accounts_field = network.get("connected_flagged_accounts", 0)
+        connected_flagged_accounts = (
+            len(flagged_accounts_field) if isinstance(flagged_accounts_field, list)
+            else int(flagged_accounts_field)
+        )
 
         anomaly_score = float(ml.get("anomaly_score", 0.0))
         is_outlier: bool = bool(ml.get("is_outlier", False))
