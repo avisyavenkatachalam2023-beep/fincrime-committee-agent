@@ -69,6 +69,7 @@ This is an agent-driven system that accepts natural-language instructions and au
 - **Fields Used**: sender/receiver bank, country, payment type, currency, amount, timestamp, is_suspicious label, laundering_type.
 - **Alternative/Supplement Note**: If more complex network-relationship structure is required in future builds, IBM AMLSim (GitHub) may be used as a graph-native synthetic dataset supplement.
 - **Bring-your-own-data**: the running app also accepts a user-uploaded CSV (via the "Upload Dataset" control or `POST /api/v1/upload-dataset`) to replace the live dataset for all subsequent queries, so a judge can test the agent against a dataset of their own choosing. See Usage below.
+- **Local storage note**: the raw ~951MB `SAML-D.csv` is not committed to this repository (it's gitignored due to its size) and has since been removed from local development storage to free up disk space. It is still loaded and served on the live demo instance; running `python data/download_data.py` re-downloads it for local development (see Setup below).
 
 **Synthetic Augmentation Required for this Build**:
 To support the specialized agents in our Financial Crime Committee, we programmatically augmented the Kaggle dataset with the following synthetic tables (documented here per hackathon rules):
