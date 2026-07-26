@@ -2,6 +2,7 @@
 
 ## Live Demo
 A running instance (full 9.5M-row Kaggle SAML-D dataset loaded) is available at **http://13.218.136.25**, no setup required to try it.
+Github repo : **https://github.com/avisyavenkatachalam2023-beep/fincrime-committee-agent.git**
 
 ## 1. Problem Statement
 Financial institutions are mandated by regulators (FinCEN, FATF, local authorities) to run AML compliance programs. Traditional rule-based systems generate excessive false positives, overwhelming compliance teams and raising costs. Sophisticated laundering techniques, including structuring, smurfing, and layering, evade conventional detection. We are building an intelligent, autonomous agent that:
