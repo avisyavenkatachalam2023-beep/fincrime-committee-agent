@@ -1,501 +1,501 @@
 customer_id,account_id,full_name,occupation,declared_income_band,country_of_residence,account_open_date,is_pep,is_high_risk_jurisdiction
-CUS-1518D2C0,RCV-6C89EA3E,Anya Brown,Politician,100k-250k,NL,2015-08-14,False,False
-CUS-4B4BF41F,SND-1009424C,Chen Sharma,Import/Export Manager,25k-50k,JP,2002-05-25,False,False
-CUS-F6945422,SND-7E7E9CDF,Sofia Brown,Software Engineer,50k-100k,CA,2007-04-03,False,False
-CUS-09AD7886,RCV-FF51BA04,Aiko Lindqvist,Retired,250k+,SG,2000-09-08,False,False
-CUS-5091DAEE,SND-42381386,James Osei,Chef,50k-100k,DE,2011-07-22,True,False
-CUS-2A4C79EC,SND-17426602,Aiko Hassan,Software Engineer,250k+,UA,2009-06-12,False,True
-CUS-14827F40,SND-B276A2A7,Lucas Garcia,Chef,25k-50k,FR,2002-08-02,False,False
-CUS-9F97144F,SND-8A813039,Sofia Petrova,Business Owner,25k-50k,UA,2006-08-16,False,True
-CUS-96321B37,SND-EEC9852C,Omar Garcia,Teacher,250k+,NO,2009-11-04,False,False
-CUS-826FD98A,SND-95D16711,Chen Smith,Import/Export Manager,25k-50k,PT,2001-04-06,False,False
-CUS-73EEB1F2,SND-2BA902C4,Sofia Sharma,Software Engineer,<25k,FI,2011-11-11,False,False
-CUS-DE0869DB,SND-33507846,Amara Santos,Unknown,250k+,FI,2017-10-08,False,False
-CUS-BAA341D3,SND-1C8135D0,Fatima Tanaka,Accountant,50k-100k,CH,2007-02-14,False,False
-CUS-88E20A48,SND-B0310D9D,Kwame Wang,Doctor,25k-50k,CA,2016-11-22,True,False
-CUS-7F56B26F,SND-8287384B,Diego Fernandez,Pharmacist,100k-250k,FR,2016-01-07,False,False
-CUS-D2F31C36,SND-D4B70BFC,Ingrid Kim,Business Owner,25k-50k,DK,2013-02-12,True,False
-CUS-2780AFE1,SND-D8CF91C1,Yusuf Brown,Freelancer,250k+,ES,2008-08-16,False,False
-CUS-73A8634D,RCV-5E1D19E4,Kwame Nguyen,Politician,25k-50k,NZ,2015-02-08,False,False
-CUS-29FB1295,SND-964A747B,Lucas Rossi,Consultant,25k-50k,DE,2013-11-14,False,False
-CUS-D04088E5,SND-85DD197A,Maria Lindqvist,Politician,<25k,US,2002-12-03,False,False
-CUS-B2295EAB,RCV-B30B0911,Mohammed Sharma,Pharmacist,25k-50k,PK,2018-01-18,False,True
-CUS-7F9ECD54,RCV-8A1B1090,Amara Sharma,Pharmacist,50k-100k,BE,2006-10-11,False,False
-CUS-75125432,RCV-59FAF9B1,Liam Dubois,Unknown,25k-50k,SG,2011-08-14,False,False
-CUS-CEB4147B,SND-54F777E7,Maria Dubois,Pharmacist,25k-50k,SG,2019-09-26,False,False
-CUS-2AD530EB,RCV-CB7BBFDE,Diego Petrova,Student,50k-100k,AU,2015-10-06,False,False
-CUS-F9286489,SND-367389EE,Anya Petrova,Pharmacist,<25k,US,2015-04-03,False,False
-CUS-7010F7FE,SND-AF008D59,Amara Mueller,Accountant,25k-50k,PT,2006-09-02,False,False
-CUS-3548FFC3,SND-7D9D0C24,Fatima Smith,Doctor,100k-250k,US,2002-10-20,False,False
-CUS-B5415407,SND-5CB72CAE,Diego Dubois,Doctor,50k-100k,AU,2020-02-08,False,False
-CUS-AEF9BB99,SND-5CE65F31,Chen Lindqvist,Doctor,25k-50k,DK,2014-02-03,False,False
-CUS-94997411,RCV-C46F6B98,Elena Hassan,Lawyer,50k-100k,NL,2015-08-19,False,False
-CUS-958C437D,RCV-BF0824F6,Ingrid Brown,Unknown,50k-100k,DK,2001-05-25,False,False
-CUS-CCCAC51A,RCV-1F31BA44,Lucas Dubois,Civil Servant,250k+,FR,2008-12-22,False,False
-CUS-3E773023,SND-73D64B62,Priya Hassan,Nurse,25k-50k,SO,2009-10-22,False,True
-CUS-6331AEF8,RCV-DC0BD717,Fatima Hassan,Civil Servant,<25k,PK,2014-07-27,False,True
-CUS-4E2DDC20,RCV-83071B5A,Valentina Mueller,Chef,25k-50k,AT,2008-07-26,False,False
-CUS-99CE4151,RCV-4EDAE901,Ingrid Mueller,Software Engineer,250k+,FI,2021-10-06,False,False
-CUS-2B64F1D3,RCV-D480124C,Omar Mueller,Teacher,250k+,AU,2006-05-14,False,False
-CUS-7E02338D,SND-19130D9B,Ingrid Ali,Software Engineer,<25k,AU,2004-09-19,False,False
-CUS-79FE4AF8,SND-08F36351,Mohammed Smith,Lawyer,250k+,IT,2014-08-02,False,False
-CUS-8FA1BD6B,RCV-23B72F7A,Diego Ibrahim,Freelancer,100k-250k,NL,2016-09-27,False,False
-CUS-020A9960,SND-72B94ABC,Mohammed Nguyen,Freelancer,100k-250k,NZ,2019-02-05,False,False
-CUS-ECAFE7AF,SND-AF83186D,Lucas Osei,Import/Export Manager,<25k,PT,2019-07-12,False,False
-CUS-5CBED2E9,SND-2C5E1C65,Fatima Kim,Pharmacist,25k-50k,PT,2014-11-24,False,False
-CUS-64833BF9,RCV-222E7F66,Kwame Petrova,Teacher,<25k,SE,2001-03-01,False,False
-CUS-848C30D2,SND-40DA3557,Amara Sharma,Business Owner,250k+,FR,2018-05-10,False,False
-CUS-1B31493C,SND-D1D6FC1A,Valentina Ali,Politician,50k-100k,BY,2015-06-17,False,True
-CUS-E3BB8020,SND-390029FE,Diego Sharma,Politician,<25k,AU,2015-10-01,False,False
-CUS-D9A33361,RCV-F25DE83D,Chen Mensah,Business Owner,100k-250k,CA,2011-12-20,False,False
-CUS-2A3A9B42,RCV-1F0D63DB,Omar Smith,Lawyer,250k+,FR,2020-01-15,False,False
-CUS-D1441321,RCV-BB94BF0E,Chen Wang,Architect,<25k,DK,2008-07-28,False,False
-CUS-487C05D6,SND-CE664D2B,Diego Kim,Lawyer,250k+,VE,2007-02-09,False,True
-CUS-5C58EC43,SND-6F9440DF,Aiko Smith,Doctor,50k-100k,ES,2010-03-25,False,False
-CUS-934152BD,SND-6622028C,Kwame Brown,Doctor,100k-250k,SG,2007-04-20,True,False
-CUS-29DD0FB1,RCV-7574B1B2,Amara Hassan,Doctor,50k-100k,GB,2001-12-23,False,False
-CUS-EE53623A,SND-C8116B36,Mohammed Nguyen,Teacher,50k-100k,CH,2008-03-15,False,False
-CUS-E05E6FE6,SND-F827CEA7,Aiko Fernandez,Consultant,250k+,BE,2006-06-11,False,False
-CUS-7F75F2BB,RCV-2EED6433,Chen Nguyen,Unknown,<25k,SG,2007-08-22,False,False
-CUS-DC681BF3,RCV-0158351F,Sofia Fernandez,Doctor,250k+,ZW,2001-11-28,False,True
-CUS-85FA6ED3,SND-D1D3F9E9,Fatima Ali,Doctor,25k-50k,SE,2014-04-10,False,False
-CUS-E86A22B4,RCV-4734DDA4,Yusuf Tanaka,Pharmacist,250k+,SG,2011-07-09,False,False
-CUS-40C7712C,SND-A9846FDC,Aiko Kim,Import/Export Manager,25k-50k,FI,2000-06-05,False,False
-CUS-7DC04B05,RCV-5B70A4EF,James Petrova,Retired,25k-50k,CH,2016-02-07,False,False
-CUS-5CDCD443,RCV-A2482308,Elena Hassan,Civil Servant,<25k,DE,2013-12-13,False,False
-CUS-1411A9C6,RCV-D2C47954,Amara Smith,Civil Servant,25k-50k,SE,2019-08-22,False,False
-CUS-03A8ED89,RCV-4B87C329,Noah Ibrahim,Software Engineer,250k+,SO,2016-03-13,False,True
-CUS-130CF975,SND-38449D40,Chen Hassan,Real Estate Agent,100k-250k,PK,2008-03-16,False,True
-CUS-F963641E,SND-40EEB1C8,Chen Garcia,Import/Export Manager,25k-50k,SY,2003-07-26,False,True
-CUS-06A34B80,SND-BAA65A4C,Aiko Mueller,Business Owner,25k-50k,JP,2018-08-27,False,False
-CUS-49C03E49,SND-655E98E6,Liam Ali,Pharmacist,<25k,NZ,2014-12-28,False,False
-CUS-E3F06C99,SND-6D73BBBE,Valentina Fernandez,Unknown,100k-250k,AU,2011-10-21,False,False
-CUS-6ED82395,SND-80718C9B,Diego Santos,Doctor,250k+,BE,2010-05-08,False,False
-CUS-C9431F43,RCV-3363F780,Priya Mensah,Retired,50k-100k,SG,2009-04-27,False,False
-CUS-C51BB889,SND-76E8AC27,Liam Petrova,Software Engineer,<25k,NZ,2002-06-18,False,False
-CUS-1E4D6280,RCV-A297B0AF,James Smith,Trader,25k-50k,SD,2013-05-04,False,True
-CUS-467BF0FB,SND-8F20F5D7,Sofia Osei,Unknown,50k-100k,AU,2017-05-25,False,False
-CUS-9BF31DE2,SND-D8349A19,Priya Mensah,Chef,<25k,AT,2018-07-16,False,False
-CUS-AF9A0046,SND-D3696DA8,Mohammed Rossi,Pharmacist,<25k,PT,2014-01-19,False,False
-CUS-2F70F7DD,SND-4D9F6809,Mohammed Ibrahim,Pharmacist,100k-250k,JP,2017-04-13,False,False
-CUS-63CAE5B6,SND-84004155,Elena Dubois,Teacher,<25k,NO,2010-08-25,False,False
-CUS-9F0F1A8A,SND-751FACEF,Amara Ibrahim,Real Estate Agent,50k-100k,DE,2017-06-17,False,False
-CUS-1CAD599B,RCV-37518FDE,James Tanaka,Software Engineer,25k-50k,ES,2021-04-24,False,False
-CUS-96E3D485,RCV-5233D3CD,James Ibrahim,Lawyer,<25k,FI,2004-07-19,False,False
-CUS-C5201A51,SND-8B45C03A,Valentina Wang,Retired,250k+,PT,2009-11-14,False,False
-CUS-1C5D5162,SND-75485FA9,Omar Smith,Doctor,<25k,BE,2019-09-23,False,False
-CUS-6FC46F17,SND-F9305476,Fatima Garcia,Unknown,50k-100k,CH,2003-12-21,False,False
-CUS-A74029DC,RCV-776D28E5,Aiko Lindqvist,Real Estate Agent,25k-50k,FI,2017-07-11,False,False
-CUS-94D73A13,SND-5517113A,Amara Hassan,Real Estate Agent,50k-100k,BE,2008-12-09,True,False
-CUS-7D6928EB,RCV-C4104998,Chen Osei,Import/Export Manager,25k-50k,ES,2004-09-07,False,False
-CUS-2FA96914,RCV-6726E250,Valentina Ali,Consultant,100k-250k,US,2006-07-06,False,False
-CUS-6E303E23,SND-0B4D5470,Aiko Mueller,Retired,25k-50k,GB,2005-07-04,False,False
-CUS-10ECCF2A,SND-614197D2,Chen Smith,Retired,100k-250k,FR,2000-03-23,False,False
-CUS-902737EB,SND-0BFB4E2C,Priya Smith,Chef,100k-250k,BE,2012-08-17,False,False
-CUS-50AC2D25,SND-2F79F6E5,Aiko Tanaka,Accountant,250k+,NZ,2012-04-01,False,False
-CUS-A233BB2E,SND-A26B967B,Fatima Santos,Teacher,50k-100k,DK,2006-08-18,False,False
-CUS-AC11FFBE,SND-02214A63,Diego Sharma,Nurse,250k+,PT,2014-11-11,False,False
-CUS-A3F45ECF,SND-85E33EB6,Mohammed Smith,Import/Export Manager,50k-100k,NZ,2017-06-03,False,False
-CUS-914CDFFD,SND-FB0046FF,Valentina Brown,Freelancer,<25k,FR,2005-02-10,False,False
-CUS-CD21ADC3,SND-07C58CBD,Valentina Kim,Accountant,250k+,DE,2011-03-01,False,False
-CUS-11C7E791,RCV-97221F64,Fatima Ibrahim,Lawyer,<25k,NZ,2007-03-16,False,False
-CUS-7906B9FC,RCV-6EDF5907,Yusuf Nguyen,Teacher,25k-50k,DK,2006-02-23,False,False
-CUS-666DAAA7,SND-75376D65,Fatima Ibrahim,Civil Servant,25k-50k,AT,2003-08-28,False,False
-CUS-EB5B888C,SND-457894D3,Omar Osei,Software Engineer,<25k,JP,2001-12-17,False,False
-CUS-22849EF7,SND-75944038,Maria Rossi,Doctor,100k-250k,BE,2010-10-22,True,False
-CUS-39892E1C,RCV-571A5F78,James Smith,Chef,<25k,NO,2016-12-28,False,False
-CUS-FBCAAA7B,SND-B2B08E35,Liam Brown,Consultant,<25k,NL,2018-03-21,False,False
-CUS-4ADA6D01,SND-526DC1FD,Mohammed Wang,Retired,25k-50k,NZ,2002-03-01,False,False
-CUS-DDE35238,RCV-FCC40D51,Maria Brown,Unknown,<25k,DK,2019-03-15,False,False
-CUS-26BE408E,SND-9C76B09E,James Ali,Student,25k-50k,BE,2004-03-28,False,False
-CUS-FB87CF4C,RCV-ECDB7533,Lucas Tanaka,Import/Export Manager,<25k,AT,2000-06-17,False,False
-CUS-113BD923,SND-E015AC7F,Anya Petrova,Freelancer,100k-250k,BE,2013-11-16,False,False
-CUS-20FDE05C,RCV-DB510DD9,Fatima Rossi,Freelancer,<25k,NO,2000-12-08,False,False
-CUS-E93A1930,SND-72E082BA,Sofia Smith,Doctor,<25k,JP,2006-01-06,False,False
-CUS-9EBFFCF4,RCV-B544D76C,Valentina Dubois,Business Owner,<25k,JP,2017-08-03,False,False
-CUS-6ADF12C8,RCV-98D5331B,Chen Nguyen,Chef,25k-50k,SE,2000-08-08,False,False
-CUS-016A7EC5,SND-72B41024,Fatima Nguyen,Student,50k-100k,DE,2002-02-14,False,False
-CUS-0966B199,SND-1D7EA4EE,Kwame Kim,Import/Export Manager,250k+,FI,2005-03-18,False,False
-CUS-891076E9,SND-976C829F,Chen Santos,Consultant,<25k,FR,2003-11-03,True,False
-CUS-9C575B33,RCV-D9FAFB7D,James Mueller,Trader,<25k,NZ,2019-03-25,False,False
-CUS-877C0497,RCV-E5031EDC,Diego Wang,Teacher,50k-100k,FI,2013-10-08,False,False
-CUS-E5705F1B,SND-581FD37A,Amara Wang,Teacher,50k-100k,IR,2014-06-09,False,True
-CUS-42B1B613,SND-07C37BE7,Ingrid Smith,Retired,100k-250k,AU,2013-10-18,False,False
-CUS-CDAFA4C8,SND-EA5F0C74,Anya Santos,Nurse,100k-250k,CA,2012-03-01,True,False
-CUS-DC0D6D3B,SND-4E4C5D33,Ingrid Lindqvist,Pharmacist,50k-100k,SE,2014-08-25,False,False
-CUS-2D8097D0,SND-8664E9AB,Amara Tanaka,Real Estate Agent,<25k,SE,2011-05-18,False,False
-CUS-05727564,SND-45DF7669,Noah Kim,Business Owner,25k-50k,US,2012-04-10,False,False
-CUS-96C187BE,SND-F486239D,Sofia Osei,Lawyer,25k-50k,DK,2006-06-10,False,False
-CUS-75CAA92B,RCV-553C1B38,Sofia Brown,Software Engineer,100k-250k,ES,2011-12-24,False,False
-CUS-3ED0A74B,RCV-B5AF101F,Aiko Osei,Accountant,100k-250k,JP,2001-06-26,False,False
-CUS-58D5BF1D,SND-576C384F,Fatima Hassan,Software Engineer,<25k,ES,2010-02-03,False,False
-CUS-BEB0A0F1,SND-80C2A308,Yusuf Ali,Retired,25k-50k,SG,2012-04-10,False,False
-CUS-ADDA7BAF,SND-7E811E8D,Noah Dubois,Real Estate Agent,100k-250k,FR,2012-06-11,False,False
-CUS-1EE13AEB,RCV-27ED536C,Maria Petrova,Trader,25k-50k,CA,2020-12-26,False,False
-CUS-0D62D877,RCV-D277AE7D,Sofia Dubois,Architect,250k+,CH,2021-05-08,False,False
-CUS-0FCCAEAF,SND-665D2FB2,Chen Petrova,Nurse,<25k,PT,2019-06-25,False,False
-CUS-BEAFE633,SND-6BDC8233,Yusuf Sharma,Civil Servant,50k-100k,DK,2015-06-27,False,False
-CUS-45C02EB5,SND-42720ABD,Ingrid Wang,Business Owner,50k-100k,ES,2002-11-02,False,False
-CUS-6E6AC8AF,SND-8A63B14C,Chen Kim,Teacher,100k-250k,PT,2020-03-18,False,False
-CUS-C79FF65D,SND-BA9DDA56,Omar Wang,Consultant,250k+,SG,2014-01-10,False,False
-CUS-1A41DB8A,RCV-48609530,Chen Santos,Student,25k-50k,SG,2009-10-28,False,False
-CUS-EF6A1744,SND-83D3DC56,Mohammed Garcia,Trader,100k-250k,NO,2006-08-27,False,False
-CUS-C77E1504,SND-BB1B19EF,Elena Dubois,Accountant,100k-250k,KP,2021-03-01,False,True
-CUS-4AA837BC,RCV-47B52880,Chen Kim,Lawyer,250k+,FI,2010-09-11,True,False
-CUS-466CA7C5,SND-1F345EE1,Elena Kim,Unknown,<25k,FR,2000-07-14,False,False
-CUS-E49A82F3,SND-CA4062B7,Diego Tanaka,Pharmacist,250k+,NL,2006-05-09,False,False
-CUS-95895AA8,SND-0C4A7F10,Mohammed Ibrahim,Politician,250k+,NZ,2005-10-17,False,False
-CUS-332614DD,RCV-B28C90EA,Noah Tanaka,Teacher,100k-250k,AT,2008-02-13,False,False
-CUS-14918AAB,SND-FFF32BA5,Anya Tanaka,Real Estate Agent,100k-250k,NZ,2001-06-10,False,False
-CUS-F8A83851,SND-0E975639,Aiko Smith,Politician,25k-50k,JP,2013-11-18,False,False
-CUS-8B926BA2,SND-786CCE62,Ingrid Petrova,Civil Servant,50k-100k,JP,2005-05-16,False,False
-CUS-28802F1D,RCV-2E84A178,Valentina Smith,Business Owner,50k-100k,GB,2021-04-24,False,False
-CUS-D5132DE8,SND-D3670260,Kwame Mueller,Doctor,100k-250k,CH,2008-06-17,True,False
-CUS-C5AF0BE8,SND-E5667FA6,Chen Hassan,Consultant,<25k,NZ,2021-08-08,False,False
-CUS-2B2F2CC8,SND-5BA2AD54,Omar Tanaka,Software Engineer,250k+,NI,2006-03-22,False,True
-CUS-620B26B6,SND-24489796,Maria Ali,Retired,<25k,PT,2019-03-19,False,False
-CUS-95CF9303,SND-4007E8BC,Liam Sharma,Retired,100k-250k,DK,2003-11-09,False,False
-CUS-4389815B,SND-7B3CC083,Valentina Osei,Unknown,100k-250k,NO,2021-09-09,False,False
-CUS-AA771620,SND-3887060D,James Lindqvist,Doctor,25k-50k,NO,2016-07-01,False,False
-CUS-439CDEF7,SND-22F187C1,Sofia Sharma,Doctor,100k-250k,JP,2000-11-22,False,False
-CUS-77D77D6F,SND-31A0CF7D,Kwame Sharma,Civil Servant,250k+,JP,2011-12-14,False,False
-CUS-8390015F,SND-49C720E6,Lucas Rossi,Unknown,<25k,PT,2020-06-11,True,False
-CUS-06DC1A79,RCV-D92AA1EB,James Nguyen,Real Estate Agent,50k-100k,MM,2020-02-26,False,True
-CUS-FE9163F4,SND-BDBDF73E,Chen Mueller,Pharmacist,50k-100k,DE,2020-01-08,False,False
-CUS-A4A95EC7,SND-1EA376B1,Priya Mueller,Trader,50k-100k,AU,2012-10-19,False,False
-CUS-5B74DEE0,SND-6866A25B,Mohammed Wang,Architect,<25k,GB,2018-06-05,False,False
-CUS-9E947C6D,SND-A59294DE,Aiko Nguyen,Politician,25k-50k,DK,2004-03-05,False,False
-CUS-B4373C35,SND-5C9A69F9,Priya Osei,Nurse,25k-50k,JP,2006-02-27,False,False
-CUS-CACDEE6C,SND-F2301D3F,Aiko Dubois,Business Owner,25k-50k,IT,2018-06-17,False,False
-CUS-929CF0F3,SND-889D8D9D,Priya Kim,Business Owner,<25k,GB,2019-02-20,False,False
-CUS-1CE774D8,SND-AB5C0D34,Omar Smith,Lawyer,50k-100k,PT,2017-06-10,False,False
-CUS-70D74ED2,RCV-D872A559,Ingrid Wang,Freelancer,100k-250k,GB,2011-08-06,False,False
-CUS-5A51D26B,RCV-A450F470,Omar Osei,Civil Servant,100k-250k,CH,2020-08-27,False,False
-CUS-D0ECF079,SND-45DF9FDD,Sofia Rossi,Pharmacist,250k+,CH,2017-02-12,False,False
-CUS-A05AC330,RCV-EE047264,Diego Hassan,Nurse,50k-100k,CH,2008-03-07,False,False
-CUS-1C7B695E,SND-D1E8DD24,Elena Petrova,Accountant,250k+,NZ,2011-08-24,False,False
-CUS-71B4CFE3,RCV-6C542217,Amara Wang,Student,<25k,US,2002-03-11,False,False
-CUS-F969C636,SND-5691471E,Anya Wang,Freelancer,100k-250k,NL,2007-03-19,False,False
-CUS-D24709CC,SND-F88D5D8D,Chen Tanaka,Lawyer,250k+,FR,2020-06-03,False,False
-CUS-8D573597,SND-0B20B250,Maria Kim,Unknown,<25k,CH,2000-04-27,False,False
-CUS-ACF24FEE,SND-586BA7F8,Aiko Osei,Real Estate Agent,250k+,AU,2001-08-18,False,False
-CUS-24502556,RCV-E48F0E76,Ingrid Brown,Nurse,<25k,JP,2007-06-08,False,False
-CUS-D19516A4,RCV-B2DE1215,Aiko Mueller,Architect,50k-100k,AU,2014-10-15,False,False
-CUS-ECD7BBD8,SND-37FC2BF1,Chen Smith,Lawyer,<25k,NL,2017-08-14,False,False
-CUS-0F24D0BE,RCV-933D4CAE,Chen Wang,Architect,250k+,BE,2005-01-24,False,False
-CUS-8C613571,RCV-50A68318,Ingrid Petrova,Architect,25k-50k,SE,2019-03-02,False,False
-CUS-E666B698,SND-1BB83BE9,Chen Petrova,Pharmacist,<25k,US,2021-11-22,False,False
-CUS-7BED860C,SND-A72C62A0,Anya Kim,Freelancer,25k-50k,GB,2009-10-12,False,False
-CUS-02BCA822,SND-A7B59348,Elena Fernandez,Politician,50k-100k,AU,2018-07-13,False,False
-CUS-9FEB77AA,SND-8532A697,Sofia Ibrahim,Freelancer,250k+,AU,2008-06-11,False,False
-CUS-00AA5428,SND-D837BE87,Amara Garcia,Doctor,<25k,NO,2009-08-25,False,False
-CUS-FC30CBD6,SND-01D1DB4D,Amara Ali,Trader,25k-50k,ES,2020-04-12,False,False
-CUS-8ADD0D26,SND-4F7D00A8,Elena Hassan,Civil Servant,25k-50k,US,2015-09-14,False,False
-CUS-52CF9CCF,SND-499A9B65,Ingrid Kim,Architect,25k-50k,FI,2016-08-09,False,False
-CUS-BD2EE2DE,SND-98A16954,Anya Nguyen,Chef,<25k,NZ,2002-04-04,False,False
-CUS-80FCDA95,RCV-9F2BD0F6,Anya Santos,Student,50k-100k,IT,2004-07-06,False,False
-CUS-FD6417F3,RCV-56C945E9,Priya Wang,Unknown,50k-100k,DE,2010-06-08,False,False
-CUS-F81CFB6D,RCV-386D76BD,Valentina Ali,Nurse,100k-250k,FI,2004-03-06,False,False
-CUS-369004AA,RCV-10234619,Ingrid Ibrahim,Unknown,50k-100k,FI,2019-06-14,False,False
-CUS-B80D8900,SND-7AB9BF98,Diego Petrova,Import/Export Manager,250k+,BE,2004-08-21,False,False
-CUS-06020643,SND-D26881BF,Yusuf Wang,Nurse,250k+,UA,2021-03-20,False,True
-CUS-0931DDBB,SND-A2D303C8,Fatima Kim,Teacher,100k-250k,NO,2020-09-16,False,False
-CUS-8E68DA53,RCV-3A0B58A8,Yusuf Fernandez,Real Estate Agent,250k+,US,2001-12-02,False,False
-CUS-D53C7352,RCV-DD64F620,Priya Rossi,Consultant,250k+,AU,2010-08-13,False,False
-CUS-B7FB8263,SND-B520A53D,Chen Ali,Software Engineer,<25k,FR,2006-11-06,False,False
-CUS-EA8E445F,SND-1E8AA7ED,Sofia Smith,Teacher,250k+,PK,2008-03-15,False,True
-CUS-0AE3198D,SND-BE193A82,Aiko Brown,Civil Servant,25k-50k,NZ,2014-09-14,False,False
-CUS-618EBEE7,RCV-28173F62,Ingrid Ibrahim,Unknown,100k-250k,NL,2004-07-08,True,False
-CUS-49CD0783,SND-D2249463,James Brown,Consultant,50k-100k,NI,2021-08-09,False,True
-CUS-09E6110D,SND-86BB90DE,Noah Mueller,Politician,100k-250k,JP,2018-08-26,False,False
-CUS-52D63694,SND-3A822722,Fatima Brown,Freelancer,250k+,US,2012-01-06,False,False
-CUS-AB737A37,SND-844B0CB6,Ingrid Hassan,Retired,<25k,SG,2015-09-01,False,False
-CUS-ED9ED34B,SND-27734922,Amara Fernandez,Trader,25k-50k,CH,2014-11-05,False,False
-CUS-541F88E9,SND-440F17A9,Omar Kim,Software Engineer,50k-100k,US,2014-11-07,False,False
-CUS-259DB0E5,SND-43A9DAD0,Ingrid Hassan,Teacher,250k+,ZW,2021-03-05,False,True
-CUS-C30C97F1,RCV-9E08E6EB,Amara Nguyen,Retired,250k+,DK,2014-07-14,False,False
-CUS-E3E11FE9,SND-B2AE2832,Valentina Hassan,Chef,250k+,NI,2003-07-14,False,True
-CUS-374970A7,SND-A25BB2CE,Fatima Mensah,Freelancer,250k+,IT,2006-04-26,False,False
-CUS-A48F75FB,SND-E7FFA774,Kwame Lindqvist,Lawyer,50k-100k,DE,2017-02-02,False,False
-CUS-69CEB6C4,SND-293EF26D,Yusuf Dubois,Business Owner,50k-100k,CA,2013-11-16,False,False
-CUS-83BEFA2A,RCV-D13D16AC,Elena Smith,Consultant,250k+,AT,2017-09-16,False,False
-CUS-D3137508,SND-9035607A,Maria Osei,Doctor,25k-50k,SE,2000-02-25,False,False
-CUS-BA8432C2,SND-C0BB3D2B,Priya Garcia,Import/Export Manager,100k-250k,NL,2021-06-11,False,False
-CUS-BE081CFF,RCV-83BA6212,Maria Nguyen,Lawyer,100k-250k,SG,2004-06-09,False,False
-CUS-83DD1EE9,SND-B48880E6,Anya Dubois,Consultant,250k+,AU,2015-10-19,False,False
-CUS-50BDE4C5,SND-A2892493,Chen Nguyen,Doctor,100k-250k,US,2001-08-14,False,False
-CUS-8CCBC1A8,RCV-AE01EA64,Ingrid Nguyen,Retired,100k-250k,LY,2002-12-04,False,True
-CUS-BE8C181C,SND-192D0284,Chen Osei,Lawyer,50k-100k,DE,2019-06-08,False,False
-CUS-D40E090E,SND-146DAADE,Anya Ibrahim,Nurse,25k-50k,ES,2012-12-26,True,False
-CUS-9B667486,SND-ECDA33EC,Valentina Nguyen,Business Owner,250k+,US,2000-02-01,False,False
-CUS-B098BEB1,RCV-976BA2CE,Anya Brown,Real Estate Agent,100k-250k,PT,2003-11-18,False,False
-CUS-805D0469,SND-47D2B321,Maria Ibrahim,Unknown,50k-100k,CH,2016-01-11,False,False
-CUS-5981A253,RCV-66062888,Mohammed Tanaka,Consultant,100k-250k,JP,2014-12-06,False,False
-CUS-3915AD86,SND-0C9F1605,Fatima Osei,Politician,250k+,DE,2004-10-26,False,False
-CUS-0607511E,SND-F8232366,Chen Fernandez,Consultant,100k-250k,VE,2015-07-10,False,True
-CUS-EC703CBE,RCV-03C33D9C,James Osei,Unknown,<25k,DE,2010-05-22,False,False
-CUS-4E789BF2,RCV-B5A9873C,Kwame Ali,Chef,25k-50k,DK,2016-10-27,False,False
-CUS-1D805F94,SND-AF42307E,Kwame Ibrahim,Trader,<25k,FR,2006-06-21,False,False
-CUS-A7E1A093,SND-40537B15,Kwame Kim,Trader,100k-250k,NZ,2005-07-16,False,False
-CUS-CF4CC4D5,SND-9B90F230,Aiko Fernandez,Trader,50k-100k,DE,2020-08-07,False,False
-CUS-6D6EF98F,SND-9BAD9428,Maria Hassan,Architect,250k+,DE,2015-07-08,False,False
-CUS-6A6E08A0,SND-6C41803C,Fatima Mueller,Real Estate Agent,250k+,AF,2003-08-08,False,True
-CUS-CC7D6C32,RCV-F837850F,Lucas Garcia,Real Estate Agent,250k+,VE,2006-07-09,False,True
-CUS-19624501,SND-310C6FB7,James Brown,Architect,<25k,NO,2015-01-16,False,False
-CUS-38E087AF,SND-8A207D7E,Noah Mensah,Consultant,<25k,GB,2016-09-18,False,False
-CUS-EEE60069,SND-2437FF79,Yusuf Brown,Nurse,50k-100k,NO,2001-11-27,False,False
-CUS-4CC98CED,SND-5535E83E,Chen Lindqvist,Retired,100k-250k,SG,2013-04-03,False,False
-CUS-32DF3C17,SND-91282BB5,James Petrova,Import/Export Manager,100k-250k,PT,2012-07-17,False,False
-CUS-C846FE5D,RCV-CCA434B6,Diego Nguyen,Accountant,50k-100k,DE,2021-04-03,True,False
-CUS-FA1FCC1E,SND-D6FB9B31,James Brown,Student,250k+,SG,2010-08-16,False,False
-CUS-257A3C63,SND-7CB93840,Diego Lindqvist,Consultant,25k-50k,NO,2013-07-12,False,False
-CUS-81782834,SND-70D9C58B,Diego Wang,Doctor,250k+,FR,2007-02-23,False,False
-CUS-D7D144F2,SND-A0EE2822,Liam Nguyen,Civil Servant,100k-250k,ES,2011-12-21,False,False
-CUS-40DFFC30,RCV-32C35CD4,Ingrid Dubois,Teacher,250k+,AT,2007-09-24,False,False
-CUS-BBF5E105,RCV-30C6DB8B,Anya Dubois,Retired,50k-100k,FR,2012-10-08,False,False
-CUS-A8D4B50A,SND-F2B4896D,Noah Dubois,Consultant,50k-100k,SE,2008-06-04,False,False
-CUS-74BF1315,SND-4E9382AF,Noah Ibrahim,Unknown,250k+,SG,2015-01-24,False,False
-CUS-D940D4EB,SND-E3E4DC05,Ingrid Dubois,Doctor,250k+,BY,2007-06-23,False,True
-CUS-7F13CC0E,SND-91CC300B,Maria Lindqvist,Civil Servant,100k-250k,MM,2010-05-12,False,True
-CUS-0CF38419,RCV-D0CF4CD2,Chen Smith,Unknown,50k-100k,FI,2011-04-15,False,False
-CUS-D6B5421E,SND-7B49DB52,Liam Osei,Architect,50k-100k,NZ,2016-11-01,False,False
-CUS-04E12E71,SND-25E2C95D,Ingrid Fernandez,Accountant,250k+,NI,2017-02-23,False,True
-CUS-0A14F451,SND-8CB0EDE9,Fatima Tanaka,Doctor,50k-100k,AU,2010-03-10,False,False
-CUS-FED2E0CA,RCV-4D1F4CC6,Aiko Ibrahim,Politician,100k-250k,BE,2002-06-27,False,False
-CUS-E923C88A,SND-DCF87F85,Chen Hassan,Doctor,100k-250k,US,2017-12-16,False,False
-CUS-86519A0C,SND-0F5295E2,Mohammed Wang,Chef,100k-250k,PK,2009-01-16,True,True
-CUS-284A0415,SND-6EA25F1D,Diego Tanaka,Teacher,100k-250k,GB,2018-06-07,False,False
-CUS-2A910A40,RCV-2D9B899A,Yusuf Fernandez,Politician,250k+,DE,2011-06-08,False,False
-CUS-211E717E,SND-3B5EF108,Omar Ibrahim,Politician,25k-50k,NO,2000-08-26,False,False
-CUS-A05E801C,SND-2B5C5D85,Lucas Nguyen,Trader,100k-250k,SE,2005-04-19,False,False
-CUS-650F89F1,SND-203DEE33,Chen Sharma,Freelancer,25k-50k,BE,2012-09-06,False,False
-CUS-C4F2D81D,SND-DB728806,Chen Wang,Business Owner,50k-100k,GB,2012-10-03,False,False
-CUS-6A6B16A5,SND-9A397498,Diego Smith,Retired,50k-100k,GB,2010-10-07,False,False
-CUS-DD46B8D5,SND-A8BBC331,Anya Brown,Teacher,250k+,NG,2019-08-26,False,True
-CUS-1B19EA1B,SND-C358AA38,Kwame Rossi,Software Engineer,25k-50k,NI,2019-01-02,False,True
-CUS-ECD504B5,SND-2856930F,James Rossi,Software Engineer,25k-50k,FR,2001-01-22,False,False
-CUS-C23ABFB1,SND-DEAA0314,Sofia Smith,Nurse,250k+,AF,2017-02-05,False,True
-CUS-9DECDE95,SND-A3FC2572,Chen Dubois,Architect,50k-100k,SD,2006-04-21,False,True
-CUS-AF12460A,SND-1F9617EF,Amara Wang,Lawyer,<25k,NO,2006-12-23,False,False
-CUS-1F208263,SND-4885AB3D,Valentina Smith,Real Estate Agent,50k-100k,GB,2004-02-11,False,False
-CUS-1CE3F3AC,SND-9B639B58,Ingrid Smith,Software Engineer,100k-250k,NL,2009-01-27,False,False
-CUS-5D595232,SND-A0028C7C,Sofia Lindqvist,Chef,<25k,GB,2004-08-01,False,False
-CUS-2683BBBD,RCV-899CE94A,Chen Mueller,Business Owner,50k-100k,DK,2018-06-21,False,False
-CUS-72EB9B77,SND-E6ACD190,Ingrid Lindqvist,Nurse,100k-250k,SY,2017-05-25,False,True
-CUS-4F053C96,RCV-EB23C715,Mohammed Mensah,Architect,100k-250k,GB,2021-01-18,False,False
-CUS-CDB8B3A0,SND-F6E58E6B,James Ibrahim,Accountant,<25k,NZ,2020-05-23,False,False
-CUS-B263388E,RCV-DF0752D0,Kwame Smith,Doctor,100k-250k,NO,2004-04-23,False,False
-CUS-D729397F,SND-23139A55,Yusuf Fernandez,Architect,50k-100k,US,2015-12-19,False,False
-CUS-58467197,SND-6E324359,James Wang,Student,25k-50k,IR,2011-08-06,False,True
-CUS-41DDCAB4,RCV-13D5AB9C,Liam Kim,Real Estate Agent,100k-250k,IT,2010-06-02,False,False
-CUS-130C46EA,SND-9F347A45,Sofia Nguyen,Trader,50k-100k,US,2008-11-28,False,False
-CUS-28368F9B,SND-E56500F4,James Petrova,Import/Export Manager,50k-100k,ES,2011-10-26,False,False
-CUS-CC5902A6,SND-31DBED4D,Maria Fernandez,Lawyer,25k-50k,SE,2009-05-14,False,False
-CUS-5EAD1F38,SND-C90AEEE3,Omar Wang,Pharmacist,100k-250k,CH,2000-08-27,False,False
-CUS-3B32898E,SND-82E0D230,Amara Fernandez,Lawyer,50k-100k,DE,2002-11-24,False,False
-CUS-5B5A1881,SND-8C7EF598,Maria Osei,Teacher,50k-100k,IT,2004-01-23,False,False
-CUS-E1C61818,RCV-81C4465A,James Ali,Software Engineer,100k-250k,AT,2019-09-26,False,False
-CUS-DED0523A,SND-1D68BFA2,Aiko Santos,Business Owner,250k+,SG,2018-09-20,False,False
-CUS-71606623,RCV-A8695DE4,Liam Nguyen,Politician,250k+,CH,2014-06-04,False,False
-CUS-7F228E2E,RCV-3404EBC0,Lucas Petrova,Real Estate Agent,<25k,NZ,2006-09-07,True,False
-CUS-41F3EEFF,SND-CEA4DCEF,Chen Wang,Freelancer,25k-50k,GB,2002-01-18,False,False
-CUS-473EADEB,SND-B65AE2FC,Omar Fernandez,Import/Export Manager,25k-50k,BE,2016-07-17,False,False
-CUS-07093E15,RCV-5D2F2B76,Fatima Dubois,Politician,<25k,DE,2005-07-15,False,False
-CUS-5738254E,SND-B2B19F49,Sofia Mensah,Student,100k-250k,BE,2016-08-28,False,False
-CUS-A0C88AC5,SND-431BF3F3,Ingrid Dubois,Retired,25k-50k,LA,2006-07-09,False,True
-CUS-85E9FE97,RCV-EF0E61DE,Diego Mensah,Politician,100k-250k,AT,2018-08-18,False,False
-CUS-3A2F1BDE,SND-5402FE08,Maria Ibrahim,Freelancer,100k-250k,PT,2019-02-19,False,False
-CUS-2278A2CD,SND-38B03652,Yusuf Hassan,Politician,<25k,GB,2009-04-04,False,False
-CUS-1CAAA519,SND-2EAD9F80,Fatima Mensah,Student,<25k,DK,2008-12-21,False,False
-CUS-853F29C1,SND-0F6D9A1D,Omar Fernandez,Doctor,250k+,US,2020-01-10,False,False
-CUS-E43BE68F,SND-697C6505,Kwame Smith,Teacher,100k-250k,NZ,2005-03-24,False,False
-CUS-90A5EF92,RCV-2A35291C,Omar Garcia,Retired,25k-50k,YE,2017-01-16,False,True
-CUS-336B5405,SND-E27A7366,Priya Nguyen,Nurse,250k+,MM,2004-08-06,False,True
-CUS-A584BCF6,SND-D726CF12,Kwame Tanaka,Teacher,50k-100k,SE,2018-04-25,True,False
-CUS-82455A3A,SND-C47FEDFF,Chen Osei,Retired,100k-250k,FI,2017-09-18,False,False
-CUS-91CCC30F,RCV-E02D710D,James Hassan,Business Owner,100k-250k,SE,2020-06-03,False,False
-CUS-43AE22AD,SND-07A2DEF1,Liam Kim,Consultant,<25k,LY,2006-08-14,False,True
-CUS-805D7197,SND-17B80FC7,Fatima Nguyen,Nurse,100k-250k,FI,2004-12-14,False,False
-CUS-2E53E94F,SND-746ECA40,Lucas Fernandez,Politician,50k-100k,NI,2011-07-15,False,True
-CUS-525A50C6,SND-4BFA58A2,Omar Ali,Lawyer,50k-100k,GB,2008-06-27,False,False
-CUS-7A683F97,SND-9600CCE1,Fatima Ibrahim,Freelancer,250k+,SE,2005-11-04,False,False
-CUS-152199BD,RCV-1A10D2AC,Kwame Wang,Civil Servant,25k-50k,IT,2008-07-01,False,False
-CUS-C31511CB,SND-5D5B0256,Yusuf Kim,Student,25k-50k,IR,2014-09-06,False,True
-CUS-2B5827CD,SND-0CC4F639,Kwame Kim,Civil Servant,50k-100k,ES,2015-04-16,False,False
-CUS-728F5A33,SND-3650CEB8,Diego Petrova,Consultant,50k-100k,AT,2003-07-28,False,False
-CUS-1CE9969A,SND-3D8B023A,Amara Brown,Lawyer,250k+,IT,2016-02-03,False,False
-CUS-442A8767,SND-7C1A09C9,Maria Wang,Real Estate Agent,250k+,AT,2015-04-18,False,False
-CUS-C94A9396,SND-51AC4442,Elena Nguyen,Civil Servant,<25k,US,2020-10-20,False,False
-CUS-ED093042,RCV-1CA6E20B,Amara Wang,Retired,100k-250k,BE,2019-02-19,False,False
-CUS-92E2277C,SND-364FD5B6,Maria Mensah,Teacher,50k-100k,SG,2009-04-17,False,False
-CUS-50D7FA58,SND-57E5CCEC,Elena Tanaka,Software Engineer,50k-100k,FI,2009-05-01,False,False
-CUS-37CD4DAD,SND-135F1F66,Yusuf Petrova,Accountant,50k-100k,ES,2006-02-08,False,False
-CUS-3878B445,SND-69E78937,Liam Mueller,Architect,<25k,NL,2011-06-13,True,False
-CUS-5293777F,RCV-BC15439F,Maria Rossi,Unknown,100k-250k,JP,2004-12-04,False,False
-CUS-F7C42426,SND-C6C3B238,Chen Lindqvist,Unknown,250k+,CA,2012-06-27,True,False
-CUS-3E30B95C,RCV-BC43F89A,Elena Ibrahim,Lawyer,250k+,GB,2019-03-26,False,False
-CUS-0DCDB957,SND-26B890C7,Diego Rossi,Nurse,<25k,SG,2006-03-06,False,False
-CUS-3619C6FF,RCV-F67DDC05,Maria Kim,Unknown,50k-100k,FR,2000-08-05,True,False
-CUS-BA9C84C5,SND-E9CDF0AD,Maria Rossi,Real Estate Agent,<25k,NZ,2008-09-14,False,False
-CUS-0E0DDA7D,SND-58C216DB,Valentina Ali,Accountant,100k-250k,DK,2014-06-11,False,False
-CUS-3F317CBA,SND-DAE29A24,Maria Tanaka,Pharmacist,100k-250k,AU,2015-07-07,False,False
-CUS-FC47DC37,RCV-64CCEAE3,Yusuf Sharma,Import/Export Manager,25k-50k,PT,2014-12-21,False,False
-CUS-5F23CE5C,SND-80CA1A19,Ingrid Garcia,Import/Export Manager,<25k,SE,2011-06-21,False,False
-CUS-498143C2,RCV-F3F24E5F,Ingrid Dubois,Retired,<25k,NZ,2014-10-20,False,False
-CUS-4EDAB70C,SND-BE07854B,Yusuf Mensah,Lawyer,25k-50k,ES,2013-09-11,False,False
-CUS-95BC1104,SND-953304D7,Omar Dubois,Business Owner,50k-100k,JP,2007-02-13,False,False
-CUS-A4050670,SND-202C8502,Mohammed Nguyen,Retired,25k-50k,GB,2007-12-08,False,False
-CUS-CBBCE2B1,SND-62EE1A16,Priya Wang,Architect,<25k,AT,2006-06-14,False,False
-CUS-2C62602D,RCV-03E9FFB0,Liam Mensah,Import/Export Manager,<25k,GB,2021-11-27,False,False
-CUS-CE46419E,RCV-1463EF80,Noah Ibrahim,Import/Export Manager,50k-100k,NO,2020-02-16,False,False
-CUS-47B7C75C,RCV-668FF14A,Yusuf Ali,Import/Export Manager,<25k,IT,2002-01-21,False,False
-CUS-13BBFE4F,RCV-5B192139,Ingrid Dubois,Student,25k-50k,AT,2015-08-27,False,False
-CUS-1942729B,SND-BF485B64,Liam Mueller,Lawyer,100k-250k,AU,2021-02-08,False,False
-CUS-A39222D0,SND-8B9E6BA4,Omar Nguyen,Teacher,100k-250k,DK,2008-10-25,False,False
-CUS-EC561244,SND-138604E6,Lucas Kim,Import/Export Manager,250k+,NO,2020-09-10,False,False
-CUS-049498BC,RCV-97620267,Diego Lindqvist,Nurse,100k-250k,CA,2003-11-21,True,False
-CUS-C0BF4A2A,RCV-2FA1E3E9,Amara Ali,Doctor,<25k,AU,2006-08-28,False,False
-CUS-67A6342C,RCV-B25BEC55,Noah Wang,Nurse,50k-100k,SO,2014-08-08,False,True
-CUS-C7B5087B,SND-96D9A020,Valentina Lindqvist,Architect,25k-50k,BE,2008-01-23,False,False
-CUS-04F27FB8,SND-44491D2C,James Tanaka,Politician,250k+,PK,2020-07-25,False,True
-CUS-9FD2E5A2,RCV-4EE8C991,Noah Wang,Retired,100k-250k,BE,2005-09-07,False,False
-CUS-47A92663,RCV-2F82BE5C,Diego Fernandez,Retired,25k-50k,BE,2004-08-26,False,False
-CUS-CD2CB57D,SND-B50D57A2,Amara Ibrahim,Chef,25k-50k,HT,2014-05-06,False,True
-CUS-971275F7,SND-5D44A7EC,Amara Osei,Architect,25k-50k,PT,2005-12-18,False,False
-CUS-F905CE39,SND-E7D6D19A,Diego Brown,Software Engineer,<25k,SG,2018-11-03,False,False
-CUS-6AFA22CA,SND-578416C9,Elena Dubois,Nurse,50k-100k,FI,2010-01-25,False,False
-CUS-C6591C8F,SND-7A0B2F7E,Fatima Brown,Nurse,25k-50k,US,2021-08-20,False,False
-CUS-F500DAD8,SND-AED3F96C,Mohammed Kim,Teacher,100k-250k,SG,2009-09-06,False,False
-CUS-67ED8DB3,SND-CF2D49D0,Amara Garcia,Civil Servant,25k-50k,FI,2020-07-19,False,False
-CUS-A69BB072,SND-52FF961E,Chen Nguyen,Unknown,<25k,PT,2021-07-14,False,False
-CUS-E52A8C32,SND-DCA304CE,Sofia Hassan,Software Engineer,25k-50k,PK,2005-05-06,False,True
-CUS-A0277525,RCV-99C644D5,Chen Kim,Consultant,250k+,GB,2019-02-24,False,False
-CUS-FC0A7C9E,RCV-F5A141D5,Priya Rossi,Retired,25k-50k,NL,2015-09-24,False,False
-CUS-716C9BDE,SND-7AA9AA26,Anya Brown,Architect,<25k,IT,2018-09-02,False,False
-CUS-680AD83F,SND-0F7B4827,Maria Garcia,Accountant,50k-100k,GB,2005-02-08,True,False
-CUS-5FC9BC99,SND-0EB2993F,Kwame Kim,Nurse,100k-250k,BE,2012-05-09,False,False
-CUS-A194E270,SND-B26129BF,Liam Lindqvist,Doctor,250k+,AU,2012-06-05,False,False
-CUS-CE683978,SND-8A0B46DB,Diego Santos,Student,250k+,JP,2010-11-25,False,False
-CUS-23DCF157,SND-4F893BD5,Amara Lindqvist,Business Owner,<25k,DE,2015-11-02,False,False
-CUS-14C550CC,RCV-1FC989DF,Liam Santos,Chef,100k-250k,IR,2020-07-28,False,True
-CUS-0D3F5256,SND-047211A9,Kwame Osei,Business Owner,50k-100k,CA,2017-12-24,False,False
-CUS-35088D0B,SND-D2773AD2,James Ali,Trader,100k-250k,JP,2018-02-26,False,False
-CUS-7A49F8F7,RCV-1DAA0E18,Noah Tanaka,Business Owner,50k-100k,UA,2014-11-13,False,True
-CUS-6E7853DB,RCV-D1107933,Noah Osei,Business Owner,25k-50k,NL,2013-09-06,False,False
-CUS-A8B86435,SND-1E03EB0D,Anya Dubois,Accountant,50k-100k,FR,2016-05-13,False,False
-CUS-96B20829,SND-5DBC86C2,Chen Osei,Chef,250k+,JP,2013-03-02,True,False
-CUS-F9F730B8,RCV-FD424123,Lucas Hassan,Chef,50k-100k,SE,2014-12-14,False,False
-CUS-1BE6127B,RCV-42254D0A,Noah Dubois,Business Owner,<25k,IR,2005-01-27,False,True
-CUS-53765FA8,SND-BCB533B7,Sofia Dubois,Teacher,25k-50k,FI,2015-02-03,False,False
-CUS-8326D79D,SND-74ED3C00,Elena Tanaka,Architect,250k+,SE,2005-11-21,False,False
-CUS-630A2E59,SND-78877B14,Amara Fernandez,Nurse,<25k,FR,2008-11-12,False,False
-CUS-DA382016,SND-9BEE0AB7,Omar Smith,Software Engineer,25k-50k,NL,2006-08-10,False,False
-CUS-8FBF2400,SND-C22C713A,Lucas Petrova,Nurse,<25k,PT,2021-01-08,False,False
-CUS-29E7DE05,SND-96075A63,Kwame Sharma,Teacher,50k-100k,US,2000-06-26,False,False
-CUS-A617EE3A,SND-BCB0490E,Chen Petrova,Teacher,25k-50k,DE,2003-04-24,False,False
-CUS-6D8CFD96,SND-D0C5A3BB,Chen Nguyen,Lawyer,50k-100k,US,2016-01-17,False,False
-CUS-8DA31860,SND-964D2DBA,Valentina Smith,Accountant,50k-100k,NZ,2005-01-02,False,False
-CUS-4291B63C,SND-51766BDA,Yusuf Garcia,Unknown,100k-250k,JP,2007-03-07,False,False
-CUS-F6644A7F,RCV-977F4B6E,Maria Osei,Retired,<25k,US,2010-03-14,True,False
-CUS-154DADEF,RCV-6A57D991,Elena Ibrahim,Civil Servant,50k-100k,NZ,2003-09-06,False,False
-CUS-BD44EF61,SND-8BC26829,Priya Petrova,Lawyer,100k-250k,SE,2018-12-22,False,False
-CUS-E46D700E,RCV-52DCD770,Amara Lindqvist,Student,25k-50k,NL,2002-02-23,False,False
-CUS-F2457E93,SND-267881DB,Aiko Mueller,Lawyer,50k-100k,SE,2000-07-15,True,False
-CUS-03EE7B61,SND-B318591D,James Nguyen,Politician,250k+,SE,2011-05-25,False,False
-CUS-ECC5A193,SND-46001C01,Lucas Tanaka,Accountant,25k-50k,DK,2012-09-08,False,False
-CUS-BF8A6010,SND-61756821,James Tanaka,Student,50k-100k,FI,2020-09-09,False,False
-CUS-91DDDB41,RCV-61976176,Kwame Ali,Nurse,<25k,AU,2013-01-11,False,False
-CUS-8E5FFB92,RCV-AA522D60,Aiko Brown,Retired,<25k,LY,2011-05-07,False,True
-CUS-8D2100EE,RCV-8977C555,Lucas Dubois,Freelancer,25k-50k,CA,2019-02-09,False,False
-CUS-0D2AA0C6,SND-0D8ED921,Fatima Garcia,Business Owner,100k-250k,SG,2005-01-28,False,False
-CUS-D0E63111,RCV-C5AF33FB,Liam Tanaka,Accountant,100k-250k,ES,2006-05-16,False,False
-CUS-00714BCD,SND-B6225759,Liam Rossi,Politician,100k-250k,FI,2015-01-05,False,False
-CUS-90C3A4EB,SND-697121D0,Yusuf Lindqvist,Consultant,25k-50k,NZ,2005-06-11,True,False
-CUS-44CC5F94,RCV-4149DE5B,Maria Brown,Trader,250k+,PT,2000-02-23,False,False
-CUS-827691AA,RCV-D4BCA08C,Sofia Nguyen,Import/Export Manager,25k-50k,NZ,2010-07-20,False,False
-CUS-1AB4EFE5,SND-FC4CF924,Maria Mensah,Lawyer,25k-50k,JP,2012-06-18,False,False
-CUS-3A899A0C,RCV-5B98FE40,Aiko Hassan,Import/Export Manager,<25k,PT,2004-03-12,False,False
-CUS-C54D12EB,RCV-1E1C8363,Ingrid Ali,Real Estate Agent,250k+,DK,2001-08-20,False,False
-CUS-753ECE69,SND-326A4C12,Chen Santos,Teacher,<25k,PT,2014-01-07,False,False
-CUS-DE4F7C27,RCV-CF6FDA16,Priya Dubois,Politician,<25k,AT,2000-04-09,False,False
-CUS-285EB04C,SND-D6638456,Lucas Brown,Retired,50k-100k,BE,2002-02-13,False,False
-CUS-C1D7142F,SND-320A3581,Sofia Hassan,Politician,<25k,CA,2008-02-12,False,False
-CUS-302D401C,SND-3A22435D,Chen Tanaka,Consultant,<25k,BE,2008-08-05,False,False
-CUS-46F7D26F,SND-171B2697,Yusuf Lindqvist,Architect,<25k,NO,2008-03-07,True,False
-CUS-8817D38C,RCV-590C6A74,Kwame Lindqvist,Teacher,25k-50k,ES,2015-08-10,False,False
-CUS-D4895235,SND-E18FB710,Diego Wang,Consultant,<25k,MM,2017-08-01,False,True
-CUS-5ACD5253,SND-DB450484,Maria Garcia,Trader,25k-50k,AT,2019-03-10,False,False
-CUS-D1F885E9,SND-E937F731,Fatima Osei,Lawyer,25k-50k,JP,2014-01-22,False,False
-CUS-58C947D9,SND-C90E1867,Liam Wang,Consultant,100k-250k,FI,2021-01-02,False,False
-CUS-5D9552D4,SND-6381433F,Lucas Tanaka,Pharmacist,50k-100k,FI,2013-01-11,False,False
-CUS-3C6C17AA,SND-F377C5B6,Sofia Mensah,Business Owner,100k-250k,JP,2014-06-21,False,False
-CUS-FC424BEC,RCV-825E9A21,Ingrid Hassan,Doctor,25k-50k,VE,2019-08-03,False,True
-CUS-7F8F6EBF,RCV-EABF3ACD,Ingrid Dubois,Teacher,50k-100k,US,2017-09-28,False,False
-CUS-7A03C257,SND-332EF1FD,Mohammed Mensah,Chef,25k-50k,LA,2002-10-17,False,True
-CUS-38474BA9,SND-5FCD5A01,Amara Lindqvist,Doctor,25k-50k,SO,2001-05-09,False,True
-CUS-7FC525C7,SND-6172731A,Aiko Nguyen,Nurse,250k+,SG,2006-12-03,False,False
-CUS-8E0B1A9F,SND-859FB5B4,Chen Kim,Accountant,<25k,NL,2004-04-17,False,False
-CUS-9DBEC332,SND-18EBB4E0,Ingrid Wang,Business Owner,25k-50k,NL,2001-07-12,False,False
-CUS-E5871F1A,RCV-E595C311,Maria Ali,Pharmacist,50k-100k,US,2016-11-15,False,False
-CUS-37F13A8B,SND-7C15648D,Elena Sharma,Lawyer,100k-250k,FR,2002-05-03,False,False
-CUS-6E7C9511,SND-A1C56F59,Anya Ibrahim,Pharmacist,<25k,BE,2015-08-23,False,False
-CUS-D3E42BE6,RCV-D31301A6,Amara Ibrahim,Accountant,100k-250k,HT,2001-09-02,False,True
-CUS-1C802858,SND-F21B29EC,Ingrid Ibrahim,Trader,100k-250k,NL,2016-08-28,False,False
-CUS-B08031B6,SND-6DADF8A0,Aiko Hassan,Freelancer,100k-250k,JP,2001-01-06,False,False
-CUS-B09BDF48,SND-576BB4EB,Liam Dubois,Consultant,50k-100k,SE,2005-08-10,False,False
-CUS-3EF54271,SND-FAB16B66,Omar Brown,Civil Servant,50k-100k,JP,2018-01-03,False,False
-CUS-E9BFA552,RCV-4E60EBD9,Chen Ali,Nurse,100k-250k,DE,2011-07-28,False,False
-CUS-6229A898,SND-0742DAA0,Diego Petrova,Consultant,<25k,CA,2013-07-23,False,False
-CUS-D9794D67,RCV-F1E018B0,Maria Osei,Trader,50k-100k,FR,2005-07-03,True,False
-CUS-4A3CFF3A,SND-47DF08AD,Diego Dubois,Real Estate Agent,250k+,NO,2007-08-23,False,False
-CUS-D4AF94CE,RCV-8697CF3C,Diego Sharma,Student,<25k,CA,2001-04-24,False,False
-CUS-54B5014D,SND-948C43A5,Chen Hassan,Politician,250k+,GB,2019-10-21,True,False
-CUS-84A2AAAE,SND-01B68B3F,Diego Kim,Chef,100k-250k,NZ,2009-05-13,False,False
-CUS-1E235BF5,SND-6512CB06,Diego Ibrahim,Student,25k-50k,FR,2002-11-17,False,False
-CUS-C60775F7,SND-CC6D621B,Valentina Garcia,Politician,250k+,BE,2021-02-14,False,False
-CUS-649CF4DE,SND-03A96116,Priya Hassan,Consultant,25k-50k,CA,2003-07-02,False,False
-CUS-B0423BEB,RCV-C2B0814A,Lucas Dubois,Student,25k-50k,AT,2014-07-16,False,False
-CUS-2C82F8AD,RCV-7B42583C,Fatima Tanaka,Architect,250k+,SG,2018-03-10,False,False
-CUS-EB2FF851,RCV-2543C797,Elena Ibrahim,Software Engineer,250k+,CH,2019-06-03,False,False
-CUS-33261583,SND-59C6A309,Valentina Mueller,Architect,25k-50k,US,2000-05-12,False,False
-CUS-0069495F,SND-5C4392A9,Valentina Ibrahim,Retired,25k-50k,BE,2012-08-28,False,False
-CUS-19F9E3D3,SND-58F856A8,Liam Santos,Unknown,25k-50k,SE,2019-10-19,False,False
-CUS-2E8356CA,RCV-CF2D3251,Aiko Brown,Accountant,25k-50k,NZ,2020-06-14,False,False
-CUS-919BF0D6,SND-98E416CB,Omar Sharma,Real Estate Agent,<25k,FR,2018-10-23,False,False
-CUS-BE386769,RCV-A3360544,Yusuf Wang,Software Engineer,100k-250k,FI,2006-10-06,False,False
-CUS-B69659A6,SND-B7404C85,Noah Lindqvist,Doctor,100k-250k,AT,2009-06-07,False,False
-CUS-09AF9072,RCV-59CA0E32,Maria Garcia,Pharmacist,100k-250k,CH,2008-06-09,False,False
-CUS-868E566D,RCV-49E0DCED,Omar Brown,Architect,50k-100k,BE,2003-12-24,False,False
-CUS-CF1AE595,SND-1838A3F5,Chen Tanaka,Retired,<25k,AU,2009-04-08,False,False
-CUS-EE131D94,SND-24A968F4,Yusuf Brown,Chef,<25k,JP,2019-11-06,False,False
-CUS-DD47AF08,RCV-28646FC9,Chen Smith,Trader,250k+,BY,2002-01-17,False,True
-CUS-843A6033,SND-263ABD3B,Amara Osei,Politician,250k+,FR,2001-11-28,False,False
-CUS-9DE4F0E1,SND-99BA3049,Ingrid Mueller,Chef,100k-250k,AT,2000-04-03,False,False
-CUS-9A820FD1,SND-940A10AD,Maria Sharma,Software Engineer,25k-50k,GB,2001-11-20,False,False
-CUS-BFBA8F70,SND-E3C3349D,Sofia Kim,Import/Export Manager,100k-250k,PT,2005-06-01,False,False
-CUS-045C7391,RCV-A2CAB4D2,Ingrid Fernandez,Trader,250k+,PT,2017-04-13,True,False
-CUS-3FFC291D,RCV-2B066145,Kwame Dubois,Unknown,50k-100k,CH,2007-04-23,False,False
-CUS-DAF5C4CC,SND-74EDD6A6,Priya Kim,Business Owner,100k-250k,SE,2002-10-04,False,False
-CUS-2B171400,SND-76D3E70C,Liam Santos,Chef,250k+,FR,2015-03-18,False,False
-CUS-59601B06,SND-CDD61014,Diego Hassan,Retired,<25k,ES,2009-04-04,False,False
-CUS-E71AEDE6,RCV-475FDCF2,Chen Dubois,Business Owner,50k-100k,YE,2012-09-23,False,True
-CUS-875A1286,RCV-37A1622B,Mohammed Nguyen,Teacher,100k-250k,SE,2021-09-27,False,False
-CUS-E13E7C30,RCV-0BACC50A,Lucas Petrova,Pharmacist,25k-50k,CU,2019-07-17,False,True
-CUS-3364724E,SND-43EC403E,Ingrid Mensah,Politician,25k-50k,ES,2005-05-11,False,False
-CUS-6C061736,RCV-56F79B1C,Fatima Brown,Politician,25k-50k,AU,2011-07-03,False,False
-CUS-4238A4B6,SND-6ED3FB77,Lucas Brown,Pharmacist,100k-250k,NZ,2021-07-18,False,False
-CUS-C5D0CF79,SND-032CCE88,Kwame Mensah,Chef,50k-100k,AT,2000-07-26,False,False
-CUS-AAB48490,RCV-C33CEE53,James Mensah,Doctor,<25k,CA,2014-02-14,False,False
-CUS-D463C4C6,RCV-4D6B0E03,Kwame Sharma,Chef,25k-50k,CH,2014-03-01,False,False
-CUS-9F81D32F,RCV-AD810E70,Amara Ibrahim,Civil Servant,100k-250k,US,2014-04-07,False,False
-CUS-59C1F46B,RCV-7E91E86D,Lucas Tanaka,Chef,<25k,AT,2008-03-11,False,False
-CUS-377368AE,SND-4B30BE11,Diego Ibrahim,Business Owner,100k-250k,AU,2003-04-06,False,False
-CUS-F45FC479,RCV-E7703D8B,Valentina Tanaka,Software Engineer,50k-100k,SE,2008-04-28,False,False
-CUS-8CB18F99,RCV-7A487119,Amara Sharma,Software Engineer,50k-100k,SG,2002-11-10,False,False
-CUS-2F6D6BD5,SND-4A23C15D,Noah Hassan,Accountant,50k-100k,NO,2019-02-08,False,False
-CUS-2040959C,RCV-13A3AEB0,James Smith,Pharmacist,250k+,CA,2020-05-17,False,False
-CUS-1684BE02,RCV-E7F7AD2F,Lucas Mensah,Chef,100k-250k,PT,2017-05-17,False,False
-CUS-C84E5238,RCV-0DB78742,Diego Sharma,Civil Servant,<25k,AU,2004-07-13,False,False
-CUS-F5B2D3DE,SND-1A7A4A22,Omar Santos,Civil Servant,50k-100k,ES,2007-04-10,False,False
-CUS-F1E5667F,RCV-6B289612,Aiko Wang,Business Owner,250k+,AT,2021-11-02,False,False
-CUS-AF982997,SND-2E56673E,Fatima Petrova,Retired,50k-100k,DE,2017-11-23,False,False
+CUS-D8FD1BD8,SND-FED417D3,Anya Brown,Politician,100k-250k,NL,2015-08-14,False,False
+CUS-E17EE1B4,RCV-8CFA15DD,Chen Sharma,Import/Export Manager,25k-50k,JP,2002-05-25,False,False
+CUS-B7AE08E3,RCV-0FDFB832,Sofia Brown,Software Engineer,50k-100k,CA,2007-04-03,False,False
+CUS-0E01532F,RCV-06FDDD21,Aiko Lindqvist,Retired,250k+,KR,2000-09-08,False,False
+CUS-7C85D33F,SND-64D80BD4,James Osei,Chef,50k-100k,DE,2011-07-22,True,False
+CUS-8E01606B,SND-C34054A0,Aiko Hassan,Software Engineer,250k+,UA,2009-06-12,False,True
+CUS-0CE0C743,RCV-4CC00507,Lucas Garcia,Chef,25k-50k,FR,2002-08-02,False,False
+CUS-C4E1E7B6,RCV-11296158,Sofia Petrova,Business Owner,25k-50k,UA,2006-08-16,False,True
+CUS-08DA532B,SND-5F3095D6,Omar Garcia,Teacher,250k+,NO,2009-11-04,False,False
+CUS-C3B0A023,RCV-91D843C8,Chen Smith,Import/Export Manager,25k-50k,PT,2001-04-06,False,False
+CUS-F69273BD,SND-5B24F950,Sofia Sharma,Software Engineer,<25k,FI,2011-11-11,False,False
+CUS-295AE003,SND-86F52EB6,Amara Santos,Unknown,250k+,FI,2017-10-08,False,False
+CUS-E647A36C,SND-E06CEFC1,Fatima Tanaka,Accountant,50k-100k,CH,2007-02-14,False,False
+CUS-C799872F,SND-16033D4E,Kwame Wang,Doctor,25k-50k,CA,2016-11-22,True,False
+CUS-EAB8ABC9,SND-68D1F4D2,Diego Fernandez,Pharmacist,100k-250k,FR,2016-01-07,False,False
+CUS-AE0B8110,RCV-FCC689E6,Ingrid Kim,Business Owner,25k-50k,DK,2013-02-12,True,False
+CUS-0C407149,SND-92A609EE,Yusuf Brown,Freelancer,250k+,ES,2008-08-16,False,False
+CUS-278E46D2,RCV-002FD1AC,Kwame Nguyen,Politician,25k-50k,NZ,2015-02-08,False,False
+CUS-394C6522,SND-962FBEAE,Lucas Rossi,Consultant,25k-50k,DE,2013-11-14,False,False
+CUS-C3968782,SND-74AEE5E6,Maria Lindqvist,Politician,<25k,US,2002-12-03,False,False
+CUS-70199364,RCV-87EBBF71,Mohammed Sharma,Pharmacist,25k-50k,PK,2018-01-18,False,True
+CUS-EDFE48B6,SND-4B5F7001,Amara Sharma,Pharmacist,50k-100k,BE,2006-10-11,False,False
+CUS-7C5CDD9A,RCV-9A34A02E,Liam Dubois,Unknown,25k-50k,KR,2011-08-14,False,False
+CUS-971C872A,SND-F2723C96,Maria Dubois,Pharmacist,25k-50k,KR,2019-09-26,False,False
+CUS-0C1D5F0C,SND-49BCF172,Diego Petrova,Student,50k-100k,AU,2015-10-06,False,False
+CUS-6727776E,SND-A3D1833A,Anya Petrova,Pharmacist,<25k,US,2015-04-03,False,False
+CUS-AB1A3DCD,SND-536D87A6,Amara Mueller,Accountant,25k-50k,PT,2006-09-02,False,False
+CUS-4C8EC0FA,RCV-B0556A7A,Fatima Smith,Doctor,100k-250k,US,2002-10-20,False,False
+CUS-619FBAAE,RCV-C53CE7E3,Diego Dubois,Doctor,50k-100k,AU,2020-02-08,False,False
+CUS-694FD5DF,SND-FB5BEDBC,Chen Lindqvist,Doctor,25k-50k,DK,2014-02-03,False,False
+CUS-E78D16A5,RCV-BB41F8FD,Elena Hassan,Lawyer,50k-100k,NL,2015-08-19,False,False
+CUS-2835F498,SND-846F24D5,Ingrid Brown,Unknown,50k-100k,DK,2001-05-25,False,False
+CUS-C1893EE2,SND-3FFB8A8F,Lucas Dubois,Civil Servant,250k+,FR,2008-12-22,False,False
+CUS-CDC88300,RCV-C2705BE7,Priya Hassan,Nurse,25k-50k,SO,2009-10-22,False,True
+CUS-2DDC1E48,SND-E16F1001,Fatima Hassan,Civil Servant,<25k,PK,2014-07-27,False,True
+CUS-958F29FF,RCV-81FEBE17,Valentina Mueller,Chef,25k-50k,AT,2008-07-26,False,False
+CUS-A33B397D,SND-9D2B7DAC,Ingrid Mueller,Software Engineer,250k+,FI,2021-10-06,False,False
+CUS-E218DFC0,SND-62EE4D32,Omar Mueller,Teacher,250k+,AU,2006-05-14,False,False
+CUS-05234496,RCV-5C6F0C7B,Ingrid Ali,Software Engineer,<25k,AU,2004-09-19,False,False
+CUS-8A603182,RCV-101B259D,Mohammed Smith,Lawyer,250k+,IT,2014-08-02,False,False
+CUS-E7C6082D,RCV-86FBD407,Diego Ibrahim,Freelancer,100k-250k,NL,2016-09-27,False,False
+CUS-C17C0769,RCV-3BD51243,Mohammed Nguyen,Freelancer,100k-250k,NZ,2019-02-05,False,False
+CUS-0FE29A9D,SND-9285C90B,Lucas Osei,Import/Export Manager,<25k,PT,2019-07-12,False,False
+CUS-23CB7DED,SND-6E434E8D,Fatima Kim,Pharmacist,25k-50k,PT,2014-11-24,False,False
+CUS-14B31998,SND-283E8D4C,Kwame Petrova,Teacher,<25k,SE,2001-03-01,False,False
+CUS-C7135349,SND-AB7D9E2F,Amara Sharma,Business Owner,250k+,FR,2018-05-10,False,False
+CUS-E12C3AEB,SND-5C5FE181,Valentina Ali,Politician,50k-100k,BY,2015-06-17,False,True
+CUS-8CAF8FF2,SND-B2746C81,Diego Sharma,Politician,<25k,AU,2015-10-01,False,False
+CUS-30F3ACDE,SND-5B54387E,Chen Mensah,Business Owner,100k-250k,CA,2011-12-20,False,False
+CUS-784A5658,RCV-4591434E,Omar Smith,Lawyer,250k+,FR,2020-01-15,False,False
+CUS-B6882714,SND-FD772BF0,Chen Wang,Architect,<25k,DK,2008-07-28,False,False
+CUS-8CBEE004,SND-AE030BAA,Diego Kim,Lawyer,250k+,VE,2007-02-09,False,True
+CUS-D3A7AB51,SND-507CAE95,Aiko Smith,Doctor,50k-100k,ES,2010-03-25,False,False
+CUS-09950F16,SND-5DF66498,Kwame Brown,Doctor,100k-250k,KR,2007-04-20,True,False
+CUS-AEA0B723,RCV-5DD02A21,Amara Hassan,Doctor,50k-100k,GB,2001-12-23,False,False
+CUS-71200999,RCV-A0555848,Mohammed Nguyen,Teacher,50k-100k,CH,2008-03-15,False,False
+CUS-E29337F8,SND-EED71E6D,Aiko Fernandez,Consultant,250k+,BE,2006-06-11,False,False
+CUS-60FC446F,SND-457E2826,Chen Nguyen,Unknown,<25k,KR,2007-08-22,False,False
+CUS-47FFB3C0,SND-EBB527D9,Sofia Fernandez,Doctor,250k+,ZW,2001-11-28,False,True
+CUS-D3EF9975,SND-234A1174,Fatima Ali,Doctor,25k-50k,SE,2014-04-10,False,False
+CUS-287F490D,SND-B4EAC57C,Yusuf Tanaka,Pharmacist,250k+,KR,2011-07-09,False,False
+CUS-AAEEED70,RCV-28EB3C8C,Aiko Kim,Import/Export Manager,25k-50k,FI,2000-06-05,False,False
+CUS-9FFAD98B,RCV-9D8886BF,James Petrova,Retired,25k-50k,CH,2016-02-07,False,False
+CUS-BDF36C35,RCV-D55BE1E0,Elena Hassan,Civil Servant,<25k,DE,2013-12-13,False,False
+CUS-0787280C,SND-FFF940B7,Amara Smith,Civil Servant,25k-50k,SE,2019-08-22,False,False
+CUS-6610CCAA,SND-48DC4B1F,Noah Ibrahim,Software Engineer,250k+,SO,2016-03-13,False,True
+CUS-54AA310B,RCV-8AAD8170,Chen Hassan,Real Estate Agent,100k-250k,PK,2008-03-16,False,True
+CUS-9C50D1EA,RCV-75C346BC,Chen Garcia,Import/Export Manager,25k-50k,SY,2003-07-26,False,True
+CUS-A98207FC,SND-4CEC0AAD,Aiko Mueller,Business Owner,25k-50k,JP,2018-08-27,False,False
+CUS-6937B952,SND-0D2BDE35,Liam Ali,Pharmacist,<25k,NZ,2014-12-28,False,False
+CUS-A6D4FCEE,SND-84E8F45C,Valentina Fernandez,Unknown,100k-250k,AU,2011-10-21,False,False
+CUS-747D8D51,SND-7D7DD54F,Diego Santos,Doctor,250k+,BE,2010-05-08,False,False
+CUS-6D57998A,SND-C66A649D,Priya Mensah,Retired,50k-100k,KR,2009-04-27,False,False
+CUS-D9CCBE6F,SND-06508FB9,Liam Petrova,Software Engineer,<25k,NZ,2002-06-18,False,False
+CUS-AAFDC76C,SND-C65AF511,James Smith,Trader,25k-50k,SD,2013-05-04,False,True
+CUS-8E91A925,RCV-1678AD03,Sofia Osei,Unknown,50k-100k,AU,2017-05-25,False,False
+CUS-93D5F6BD,RCV-15DD88D4,Priya Mensah,Chef,<25k,AT,2018-07-16,False,False
+CUS-3C4CF8D7,SND-2EC95AFD,Mohammed Rossi,Pharmacist,<25k,PT,2014-01-19,False,False
+CUS-481A751A,SND-5B2FD099,Mohammed Ibrahim,Pharmacist,100k-250k,JP,2017-04-13,False,False
+CUS-882006BA,SND-F3B12ACB,Elena Dubois,Teacher,<25k,NO,2010-08-25,False,False
+CUS-15FB455B,SND-D7845795,Amara Ibrahim,Real Estate Agent,50k-100k,DE,2017-06-17,False,False
+CUS-A34E120A,SND-85944656,James Tanaka,Software Engineer,25k-50k,ES,2021-04-24,False,False
+CUS-455BFF31,RCV-C5003B70,James Ibrahim,Lawyer,<25k,FI,2004-07-19,False,False
+CUS-4692C1F0,RCV-FA18B08C,Valentina Wang,Retired,250k+,PT,2009-11-14,False,False
+CUS-DA98B075,SND-382C02D1,Omar Smith,Doctor,<25k,BE,2019-09-23,False,False
+CUS-618774F0,RCV-E5681C01,Fatima Garcia,Unknown,50k-100k,CH,2003-12-21,False,False
+CUS-098477F1,RCV-E8AAAD06,Aiko Lindqvist,Real Estate Agent,25k-50k,FI,2017-07-11,False,False
+CUS-06D0FE94,SND-9BC7C741,Amara Hassan,Real Estate Agent,50k-100k,BE,2008-12-09,True,False
+CUS-C69F97DB,SND-E8ECD799,Chen Osei,Import/Export Manager,25k-50k,ES,2004-09-07,False,False
+CUS-1C8BAB92,SND-383ED865,Valentina Ali,Consultant,100k-250k,US,2006-07-06,False,False
+CUS-7DB1936F,SND-79E1BEDA,Aiko Mueller,Retired,25k-50k,GB,2005-07-04,False,False
+CUS-233DA7BE,SND-ACDCD0F0,Chen Smith,Retired,100k-250k,FR,2000-03-23,False,False
+CUS-DFB6B3FE,RCV-3F58E5FA,Priya Smith,Chef,100k-250k,BE,2012-08-17,False,False
+CUS-D10D25D7,RCV-D1A10F2C,Aiko Tanaka,Accountant,250k+,NZ,2012-04-01,False,False
+CUS-D56785A7,SND-1012BD5C,Fatima Santos,Teacher,50k-100k,DK,2006-08-18,False,False
+CUS-BC3FBF38,SND-26F0CB4C,Diego Sharma,Nurse,250k+,PT,2014-11-11,False,False
+CUS-3E90101E,SND-5E069BDC,Mohammed Smith,Import/Export Manager,50k-100k,NZ,2017-06-03,False,False
+CUS-ABCCC5FB,SND-DC2187AF,Valentina Brown,Freelancer,<25k,FR,2005-02-10,False,False
+CUS-469F2780,SND-09E5C9C8,Valentina Kim,Accountant,250k+,DE,2011-03-01,False,False
+CUS-079095B3,SND-51AE442E,Fatima Ibrahim,Lawyer,<25k,NZ,2007-03-16,False,False
+CUS-86A8388D,SND-FF763982,Yusuf Nguyen,Teacher,25k-50k,DK,2006-02-23,False,False
+CUS-9ED28436,SND-CEA78319,Fatima Ibrahim,Civil Servant,25k-50k,AT,2003-08-28,False,False
+CUS-D4AD0982,SND-87319E85,Omar Osei,Software Engineer,<25k,JP,2001-12-17,False,False
+CUS-7EC6C574,SND-629231E8,Maria Rossi,Doctor,100k-250k,BE,2010-10-22,True,False
+CUS-2457A2B7,RCV-F6BB1573,James Smith,Chef,<25k,NO,2016-12-28,False,False
+CUS-181319DA,RCV-0C6E6ED2,Liam Brown,Consultant,<25k,NL,2018-03-21,False,False
+CUS-B44FFF98,SND-24C84111,Mohammed Wang,Retired,25k-50k,NZ,2002-03-01,False,False
+CUS-914D3206,RCV-14ED5A96,Maria Brown,Unknown,<25k,DK,2019-03-15,False,False
+CUS-52BEA1A1,RCV-F5960FDB,James Ali,Student,25k-50k,BE,2004-03-28,False,False
+CUS-AB6C01B9,SND-3D9AC596,Lucas Tanaka,Import/Export Manager,<25k,AT,2000-06-17,False,False
+CUS-FBBB581E,SND-14B2E0D6,Anya Petrova,Freelancer,100k-250k,BE,2013-11-16,False,False
+CUS-18D91AC0,SND-AF57B8B4,Fatima Rossi,Freelancer,<25k,NO,2000-12-08,False,False
+CUS-75B41941,SND-762C7C4B,Sofia Smith,Doctor,<25k,JP,2006-01-06,False,False
+CUS-E65753DF,SND-53044B73,Valentina Dubois,Business Owner,<25k,JP,2017-08-03,False,False
+CUS-6FE5CC53,SND-9C5D8400,Chen Nguyen,Chef,25k-50k,SE,2000-08-08,False,False
+CUS-3B9AAC20,RCV-7C8FD8CD,Fatima Nguyen,Student,50k-100k,DE,2002-02-14,False,False
+CUS-04E9825A,RCV-D676E8A2,Kwame Kim,Import/Export Manager,250k+,FI,2005-03-18,False,False
+CUS-3FB22172,SND-4B809E5B,Chen Santos,Consultant,<25k,FR,2003-11-03,True,False
+CUS-DB032762,RCV-10C78EFF,James Mueller,Trader,<25k,NZ,2019-03-25,False,False
+CUS-5EF89BF5,SND-367DECD9,Diego Wang,Teacher,50k-100k,FI,2013-10-08,False,False
+CUS-CE7CE30F,SND-3D8BCC73,Amara Wang,Teacher,50k-100k,IR,2014-06-09,False,True
+CUS-3D008474,RCV-578D4B75,Ingrid Smith,Retired,100k-250k,AU,2013-10-18,False,False
+CUS-8523CFC0,SND-566245DB,Anya Santos,Nurse,100k-250k,CA,2012-03-01,True,False
+CUS-CE1A5978,SND-B3D847A8,Ingrid Lindqvist,Pharmacist,50k-100k,SE,2014-08-25,False,False
+CUS-89335A50,RCV-FC6D583D,Amara Tanaka,Real Estate Agent,<25k,SE,2011-05-18,False,False
+CUS-293EF2F3,SND-455DAF74,Noah Kim,Business Owner,25k-50k,US,2012-04-10,False,False
+CUS-DC9C7B26,RCV-E2128DCB,Sofia Osei,Lawyer,25k-50k,DK,2006-06-10,False,False
+CUS-971BF31B,SND-CBF0A406,Sofia Brown,Software Engineer,100k-250k,ES,2011-12-24,False,False
+CUS-9A88BAEC,RCV-46D00917,Aiko Osei,Accountant,100k-250k,JP,2001-06-26,False,False
+CUS-F3DF5064,SND-188B29DA,Fatima Hassan,Software Engineer,<25k,ES,2010-02-03,False,False
+CUS-8C19388C,SND-4AEACA65,Yusuf Ali,Retired,25k-50k,KR,2012-04-10,False,False
+CUS-50836AF9,RCV-E36CBCAC,Noah Dubois,Real Estate Agent,100k-250k,FR,2012-06-11,False,False
+CUS-B879BEFF,SND-687B1D2C,Maria Petrova,Trader,25k-50k,CA,2020-12-26,False,False
+CUS-A4417D7E,SND-616FEC0B,Sofia Dubois,Architect,250k+,CH,2021-05-08,False,False
+CUS-9F6BC493,SND-376777E9,Chen Petrova,Nurse,<25k,PT,2019-06-25,False,False
+CUS-88A99421,SND-A4766B56,Yusuf Sharma,Civil Servant,50k-100k,DK,2015-06-27,False,False
+CUS-FEAA48A8,RCV-DF6BF7EB,Ingrid Wang,Business Owner,50k-100k,ES,2002-11-02,False,False
+CUS-162066CF,RCV-18C6F3E6,Chen Kim,Teacher,100k-250k,PT,2020-03-18,False,False
+CUS-48133EC5,SND-DBD8E60D,Omar Wang,Consultant,250k+,KR,2014-01-10,False,False
+CUS-61490D1A,SND-7593C01E,Chen Santos,Student,25k-50k,KR,2009-10-28,False,False
+CUS-F0E14441,SND-5512F544,Mohammed Garcia,Trader,100k-250k,NO,2006-08-27,False,False
+CUS-26E6F325,SND-34F7EA60,Elena Dubois,Accountant,100k-250k,KP,2021-03-01,False,True
+CUS-74423F3B,RCV-B2A85A2B,Chen Kim,Lawyer,250k+,FI,2010-09-11,True,False
+CUS-943E7AE2,RCV-D3971A5E,Elena Kim,Unknown,<25k,FR,2000-07-14,False,False
+CUS-6BBACCEF,RCV-1992048D,Diego Tanaka,Pharmacist,250k+,NL,2006-05-09,False,False
+CUS-0F577125,SND-93417A0A,Mohammed Ibrahim,Politician,250k+,NZ,2005-10-17,False,False
+CUS-88AA6328,SND-3236DFBC,Noah Tanaka,Teacher,100k-250k,AT,2008-02-13,False,False
+CUS-C090BA91,RCV-0BD3F83D,Anya Tanaka,Real Estate Agent,100k-250k,NZ,2001-06-10,False,False
+CUS-F9F7F375,RCV-26AFEA0A,Aiko Smith,Politician,25k-50k,JP,2013-11-18,False,False
+CUS-895C9E76,SND-BC82ADDF,Ingrid Petrova,Civil Servant,50k-100k,JP,2005-05-16,False,False
+CUS-24A73B5F,RCV-543B143C,Valentina Smith,Business Owner,50k-100k,GB,2021-04-24,False,False
+CUS-B956E514,SND-D97C1734,Kwame Mueller,Doctor,100k-250k,CH,2008-06-17,True,False
+CUS-00BAC6D9,SND-3CD6C55E,Chen Hassan,Consultant,<25k,NZ,2021-08-08,False,False
+CUS-E71CFAD6,SND-52C824A2,Omar Tanaka,Software Engineer,250k+,NI,2006-03-22,False,True
+CUS-FEEAB43C,SND-3743EE21,Maria Ali,Retired,<25k,PT,2019-03-19,False,False
+CUS-D3FAE6C0,SND-4557EE3B,Liam Sharma,Retired,100k-250k,DK,2003-11-09,False,False
+CUS-1B38284A,RCV-91AB172B,Valentina Osei,Unknown,100k-250k,NO,2021-09-09,False,False
+CUS-15E86E7E,RCV-131ABD79,James Lindqvist,Doctor,25k-50k,NO,2016-07-01,False,False
+CUS-8204FC99,RCV-E012FCE3,Sofia Sharma,Doctor,100k-250k,JP,2000-11-22,False,False
+CUS-249520AE,SND-EA8A5972,Kwame Sharma,Civil Servant,250k+,JP,2011-12-14,False,False
+CUS-0F7C00B6,SND-8B0BDA82,Lucas Rossi,Unknown,<25k,PT,2020-06-11,True,False
+CUS-4A5B3D8E,SND-FFF40AEF,James Nguyen,Real Estate Agent,50k-100k,MM,2020-02-26,False,True
+CUS-55AA42D7,SND-985A096B,Chen Mueller,Pharmacist,50k-100k,DE,2020-01-08,False,False
+CUS-81644CD4,SND-F9266AE6,Priya Mueller,Trader,50k-100k,AU,2012-10-19,False,False
+CUS-3DD0E4F4,SND-E82D94DA,Mohammed Wang,Architect,<25k,GB,2018-06-05,False,False
+CUS-3445F7AC,RCV-47370E12,Aiko Nguyen,Politician,25k-50k,DK,2004-03-05,False,False
+CUS-4BA198DA,RCV-4B495055,Priya Osei,Nurse,25k-50k,JP,2006-02-27,False,False
+CUS-3108BE0D,SND-26F8A094,Aiko Dubois,Business Owner,25k-50k,IT,2018-06-17,False,False
+CUS-0509DC0C,RCV-086E7B56,Priya Kim,Business Owner,<25k,GB,2019-02-20,False,False
+CUS-BB7310B6,SND-BF524DD4,Omar Smith,Lawyer,50k-100k,PT,2017-06-10,False,False
+CUS-88E9A612,SND-21A82E2B,Ingrid Wang,Freelancer,100k-250k,GB,2011-08-06,False,False
+CUS-FAD41248,SND-E5B47FBA,Omar Osei,Civil Servant,100k-250k,CH,2020-08-27,False,False
+CUS-259E9367,SND-6409B9EA,Sofia Rossi,Pharmacist,250k+,CH,2017-02-12,False,False
+CUS-F2ACC079,RCV-316AE97B,Diego Hassan,Nurse,50k-100k,CH,2008-03-07,False,False
+CUS-11A93B62,RCV-A5EA5FA6,Elena Petrova,Accountant,250k+,NZ,2011-08-24,False,False
+CUS-C8AF83A0,SND-7B857DE2,Amara Wang,Student,<25k,US,2002-03-11,False,False
+CUS-E4AEA645,SND-C03441BA,Anya Wang,Freelancer,100k-250k,NL,2007-03-19,False,False
+CUS-68121854,SND-39061156,Chen Tanaka,Lawyer,250k+,FR,2020-06-03,False,False
+CUS-EDF14DE1,SND-6E28FBC5,Maria Kim,Unknown,<25k,CH,2000-04-27,False,False
+CUS-95648578,SND-1680562A,Aiko Osei,Real Estate Agent,250k+,AU,2001-08-18,False,False
+CUS-F1F81A4E,SND-2140C49C,Ingrid Brown,Nurse,<25k,JP,2007-06-08,False,False
+CUS-098E3F70,SND-4DC20D99,Aiko Mueller,Architect,50k-100k,AU,2014-10-15,False,False
+CUS-E06CE2E0,SND-38ED61F4,Chen Smith,Lawyer,<25k,NL,2017-08-14,False,False
+CUS-14293C3C,SND-AF87B666,Chen Wang,Architect,250k+,BE,2005-01-24,False,False
+CUS-31CA0120,SND-B09A7786,Ingrid Petrova,Architect,25k-50k,SE,2019-03-02,False,False
+CUS-88A03CF2,SND-51C361EA,Chen Petrova,Pharmacist,<25k,US,2021-11-22,False,False
+CUS-F5947C14,SND-613A23FA,Anya Kim,Freelancer,25k-50k,GB,2009-10-12,False,False
+CUS-6271B576,SND-D48A3EEB,Elena Fernandez,Politician,50k-100k,AU,2018-07-13,False,False
+CUS-A6DC2AF3,SND-1814A7AC,Sofia Ibrahim,Freelancer,250k+,AU,2008-06-11,False,False
+CUS-BD08D8BB,RCV-DC02C323,Amara Garcia,Doctor,<25k,NO,2009-08-25,False,False
+CUS-3913A6C0,SND-0A2016E0,Amara Ali,Trader,25k-50k,ES,2020-04-12,False,False
+CUS-E9E0A139,RCV-4ED45D03,Elena Hassan,Civil Servant,25k-50k,US,2015-09-14,False,False
+CUS-16735A4C,RCV-B93D6B85,Ingrid Kim,Architect,25k-50k,FI,2016-08-09,False,False
+CUS-0D78F5CA,SND-00EDFCE5,Anya Nguyen,Chef,<25k,NZ,2002-04-04,False,False
+CUS-5E0DD9A3,SND-37C11C7F,Anya Santos,Student,50k-100k,IT,2004-07-06,False,False
+CUS-ACC0397B,RCV-189F4B85,Priya Wang,Unknown,50k-100k,DE,2010-06-08,False,False
+CUS-8E625F44,SND-EEFDA97B,Valentina Ali,Nurse,100k-250k,FI,2004-03-06,False,False
+CUS-DFF1C155,RCV-E6BDD819,Ingrid Ibrahim,Unknown,50k-100k,FI,2019-06-14,False,False
+CUS-183AFF8A,SND-EA827E5D,Diego Petrova,Import/Export Manager,250k+,BE,2004-08-21,False,False
+CUS-0DFE2EB3,SND-1F2FCA73,Yusuf Wang,Nurse,250k+,UA,2021-03-20,False,True
+CUS-E3346BC9,SND-CEAC0C69,Fatima Kim,Teacher,100k-250k,NO,2020-09-16,False,False
+CUS-F07082CE,SND-DC07DC09,Yusuf Fernandez,Real Estate Agent,250k+,US,2001-12-02,False,False
+CUS-F8B06959,SND-08DAE954,Priya Rossi,Consultant,250k+,AU,2010-08-13,False,False
+CUS-D5F6CACF,SND-47ED35EC,Chen Ali,Software Engineer,<25k,FR,2006-11-06,False,False
+CUS-279D0CD3,SND-393A3366,Sofia Smith,Teacher,250k+,PK,2008-03-15,False,True
+CUS-A93A340E,RCV-F00E2AD7,Aiko Brown,Civil Servant,25k-50k,NZ,2014-09-14,False,False
+CUS-3D89371F,RCV-21DDC1C4,Ingrid Ibrahim,Unknown,100k-250k,NL,2004-07-08,True,False
+CUS-79FCA8D2,SND-EF71A8F9,James Brown,Consultant,50k-100k,NI,2021-08-09,False,True
+CUS-BE92FA5B,SND-55AD1C62,Noah Mueller,Politician,100k-250k,JP,2018-08-26,False,False
+CUS-CB8A657E,SND-7DB67BBF,Fatima Brown,Freelancer,250k+,US,2012-01-06,False,False
+CUS-4D754A13,SND-A0F29F45,Ingrid Hassan,Retired,<25k,KR,2015-09-01,False,False
+CUS-83C2EEC0,SND-C2E7DD4F,Amara Fernandez,Trader,25k-50k,CH,2014-11-05,False,False
+CUS-51FF6A90,SND-971624E5,Omar Kim,Software Engineer,50k-100k,US,2014-11-07,False,False
+CUS-0D242CF9,SND-B312278C,Ingrid Hassan,Teacher,250k+,ZW,2021-03-05,False,True
+CUS-9A3C319C,SND-B03954D5,Amara Nguyen,Retired,250k+,DK,2014-07-14,False,False
+CUS-01CFC7F1,SND-093CB470,Valentina Hassan,Chef,250k+,NI,2003-07-14,False,True
+CUS-00199FCE,SND-694A9F2F,Fatima Mensah,Freelancer,250k+,IT,2006-04-26,False,False
+CUS-5F50A129,SND-77F19B8E,Kwame Lindqvist,Lawyer,50k-100k,DE,2017-02-02,False,False
+CUS-55258466,SND-A945B05E,Yusuf Dubois,Business Owner,50k-100k,CA,2013-11-16,False,False
+CUS-27628D81,SND-EFA45ED4,Elena Smith,Consultant,250k+,AT,2017-09-16,False,False
+CUS-9720AE63,SND-ECE646FE,Maria Osei,Doctor,25k-50k,SE,2000-02-25,False,False
+CUS-38DC0DE5,SND-48C21F39,Priya Garcia,Import/Export Manager,100k-250k,NL,2021-06-11,False,False
+CUS-84285557,SND-0A226FF4,Maria Nguyen,Lawyer,100k-250k,KR,2004-06-09,False,False
+CUS-5BDCC565,SND-50F1EDD0,Anya Dubois,Consultant,250k+,AU,2015-10-19,False,False
+CUS-33D504DB,RCV-CE47EE1F,Chen Nguyen,Doctor,100k-250k,US,2001-08-14,False,False
+CUS-D494CDC1,SND-609C9C7F,Ingrid Nguyen,Retired,100k-250k,LY,2002-12-04,False,True
+CUS-D0F896F5,RCV-FB485FAD,Chen Osei,Lawyer,50k-100k,DE,2019-06-08,False,False
+CUS-E5AF4AEC,RCV-9C502EA9,Anya Ibrahim,Nurse,25k-50k,ES,2012-12-26,True,False
+CUS-669CFC13,SND-9EBB1217,Valentina Nguyen,Business Owner,250k+,US,2000-02-01,False,False
+CUS-542CFBC0,RCV-F1A0C760,Anya Brown,Real Estate Agent,100k-250k,PT,2003-11-18,False,False
+CUS-9B886905,RCV-3AEADF69,Maria Ibrahim,Unknown,50k-100k,CH,2016-01-11,False,False
+CUS-E511B8CD,SND-CF247107,Mohammed Tanaka,Consultant,100k-250k,JP,2014-12-06,False,False
+CUS-43D30ABB,SND-9D731BC7,Fatima Osei,Politician,250k+,DE,2004-10-26,False,False
+CUS-48433E06,SND-0E543CFC,Chen Fernandez,Consultant,100k-250k,VE,2015-07-10,False,True
+CUS-398E391C,SND-7CA69627,James Osei,Unknown,<25k,DE,2010-05-22,False,False
+CUS-87F7627B,SND-6AAFE233,Kwame Ali,Chef,25k-50k,DK,2016-10-27,False,False
+CUS-33A75E8A,SND-CC742B25,Kwame Ibrahim,Trader,<25k,FR,2006-06-21,False,False
+CUS-DC61DF2D,SND-CAF9E9AB,Kwame Kim,Trader,100k-250k,NZ,2005-07-16,False,False
+CUS-75BA74AB,SND-D25F40B1,Aiko Fernandez,Trader,50k-100k,DE,2020-08-07,False,False
+CUS-B1580C8F,SND-2EDCE66E,Maria Hassan,Architect,250k+,DE,2015-07-08,False,False
+CUS-072C40BF,RCV-C123B026,Fatima Mueller,Real Estate Agent,250k+,AF,2003-08-08,False,True
+CUS-EAE89B7A,SND-6558B9D0,Lucas Garcia,Real Estate Agent,250k+,VE,2006-07-09,False,True
+CUS-7D078694,SND-4D50FECD,James Brown,Architect,<25k,NO,2015-01-16,False,False
+CUS-B7FDFBA8,RCV-29A1662F,Noah Mensah,Consultant,<25k,GB,2016-09-18,False,False
+CUS-9735E30A,SND-27C1DE2F,Yusuf Brown,Nurse,50k-100k,NO,2001-11-27,False,False
+CUS-59E6B5B2,SND-578B2C31,Chen Lindqvist,Retired,100k-250k,KR,2013-04-03,False,False
+CUS-749A82D5,SND-E2858D1B,James Petrova,Import/Export Manager,100k-250k,PT,2012-07-17,False,False
+CUS-92773ABA,SND-85796BA0,Diego Nguyen,Accountant,50k-100k,DE,2021-04-03,True,False
+CUS-7078D251,RCV-9422D531,James Brown,Student,250k+,KR,2010-08-16,False,False
+CUS-275405B5,SND-970ABB37,Diego Lindqvist,Consultant,25k-50k,NO,2013-07-12,False,False
+CUS-3253501F,SND-E40D5BEF,Diego Wang,Doctor,250k+,FR,2007-02-23,False,False
+CUS-86EF8CEE,RCV-06A11588,Liam Nguyen,Civil Servant,100k-250k,ES,2011-12-21,False,False
+CUS-48FB57BB,SND-EFD9D4AF,Ingrid Dubois,Teacher,250k+,AT,2007-09-24,False,False
+CUS-985775AD,RCV-B00608A6,Anya Dubois,Retired,50k-100k,FR,2012-10-08,False,False
+CUS-CE02C501,SND-5B768FD2,Noah Dubois,Consultant,50k-100k,SE,2008-06-04,False,False
+CUS-BD825C4C,RCV-8D79AC34,Noah Ibrahim,Unknown,250k+,KR,2015-01-24,False,False
+CUS-160137FC,SND-5DC797D6,Ingrid Dubois,Doctor,250k+,BY,2007-06-23,False,True
+CUS-F30A5902,SND-77E85EB6,Maria Lindqvist,Civil Servant,100k-250k,MM,2010-05-12,False,True
+CUS-62971804,SND-959489E1,Chen Smith,Unknown,50k-100k,FI,2011-04-15,False,False
+CUS-C90E6A28,SND-F7B866C6,Liam Osei,Architect,50k-100k,NZ,2016-11-01,False,False
+CUS-70D86C86,SND-D7E7D9DF,Ingrid Fernandez,Accountant,250k+,NI,2017-02-23,False,True
+CUS-2D20FA4E,RCV-CAADD999,Fatima Tanaka,Doctor,50k-100k,AU,2010-03-10,False,False
+CUS-FA6F5708,RCV-9F143822,Aiko Ibrahim,Politician,100k-250k,BE,2002-06-27,False,False
+CUS-F5E81D5C,SND-EDA0C554,Chen Hassan,Doctor,100k-250k,US,2017-12-16,False,False
+CUS-E5D18205,SND-AEFED158,Mohammed Wang,Chef,100k-250k,PK,2009-01-16,True,True
+CUS-303B2079,SND-204996AA,Diego Tanaka,Teacher,100k-250k,GB,2018-06-07,False,False
+CUS-36D0C39D,RCV-29482164,Yusuf Fernandez,Politician,250k+,DE,2011-06-08,False,False
+CUS-89714A7F,SND-ECC1CF6F,Omar Ibrahim,Politician,25k-50k,NO,2000-08-26,False,False
+CUS-DF4D7091,RCV-B8D78813,Lucas Nguyen,Trader,100k-250k,SE,2005-04-19,False,False
+CUS-246687D0,SND-460AD2C6,Chen Sharma,Freelancer,25k-50k,BE,2012-09-06,False,False
+CUS-F8789F35,SND-337A6B4D,Chen Wang,Business Owner,50k-100k,GB,2012-10-03,False,False
+CUS-3F5500F1,SND-9F5CA8F3,Diego Smith,Retired,50k-100k,GB,2010-10-07,False,False
+CUS-061F52EB,SND-AAB0783E,Anya Brown,Teacher,250k+,NG,2019-08-26,False,True
+CUS-3D9FF669,SND-80D19747,Kwame Rossi,Software Engineer,25k-50k,NI,2019-01-02,False,True
+CUS-D41863B2,SND-EA932116,James Rossi,Software Engineer,25k-50k,FR,2001-01-22,False,False
+CUS-7725F79B,SND-0E0168D5,Sofia Smith,Nurse,250k+,AF,2017-02-05,False,True
+CUS-39217F28,SND-A5B206FA,Chen Dubois,Architect,50k-100k,SD,2006-04-21,False,True
+CUS-4DE93BAD,RCV-CA0EBCFE,Amara Wang,Lawyer,<25k,NO,2006-12-23,False,False
+CUS-F5CEEBC4,SND-6959C411,Valentina Smith,Real Estate Agent,50k-100k,GB,2004-02-11,False,False
+CUS-34D5D4D4,SND-7BB8BF84,Ingrid Smith,Software Engineer,100k-250k,NL,2009-01-27,False,False
+CUS-0B737526,SND-E5DE0DF9,Sofia Lindqvist,Chef,<25k,GB,2004-08-01,False,False
+CUS-37898FB8,RCV-B4891C6C,Chen Mueller,Business Owner,50k-100k,DK,2018-06-21,False,False
+CUS-3EAB863B,SND-8B2A725F,Ingrid Lindqvist,Nurse,100k-250k,SY,2017-05-25,False,True
+CUS-58D440E0,SND-EE083122,Mohammed Mensah,Architect,100k-250k,GB,2021-01-18,False,False
+CUS-E5B2D5EF,SND-5AB79DF5,James Ibrahim,Accountant,<25k,NZ,2020-05-23,False,False
+CUS-B7AA5C4A,SND-8165E132,Kwame Smith,Doctor,100k-250k,NO,2004-04-23,False,False
+CUS-8AA9B889,SND-A0D54D6D,Yusuf Fernandez,Architect,50k-100k,US,2015-12-19,False,False
+CUS-DA31D12A,SND-5B9D0721,James Wang,Student,25k-50k,IR,2011-08-06,False,True
+CUS-7739438D,SND-45717B65,Liam Kim,Real Estate Agent,100k-250k,IT,2010-06-02,False,False
+CUS-4632E95B,SND-90BA18C0,Sofia Nguyen,Trader,50k-100k,US,2008-11-28,False,False
+CUS-FEB32002,SND-81E3EC39,James Petrova,Import/Export Manager,50k-100k,ES,2011-10-26,False,False
+CUS-28759AF7,SND-F74CDA58,Maria Fernandez,Lawyer,25k-50k,SE,2009-05-14,False,False
+CUS-ECA14DDA,SND-10C105F3,Omar Wang,Pharmacist,100k-250k,CH,2000-08-27,False,False
+CUS-BFE38019,RCV-CE09409C,Amara Fernandez,Lawyer,50k-100k,DE,2002-11-24,False,False
+CUS-E8D69910,RCV-E3E542BF,Maria Osei,Teacher,50k-100k,IT,2004-01-23,False,False
+CUS-826EE0BF,RCV-B6D7A87F,James Ali,Software Engineer,100k-250k,AT,2019-09-26,False,False
+CUS-9EFA7403,RCV-69CFD917,Aiko Santos,Business Owner,250k+,KR,2018-09-20,False,False
+CUS-E8424B2D,RCV-F6051748,Liam Nguyen,Politician,250k+,CH,2014-06-04,False,False
+CUS-51FF42D5,SND-34311E59,Lucas Petrova,Real Estate Agent,<25k,NZ,2006-09-07,True,False
+CUS-DD475428,SND-C0BF4AB0,Chen Wang,Freelancer,25k-50k,GB,2002-01-18,False,False
+CUS-157F5283,RCV-55BFDD98,Omar Fernandez,Import/Export Manager,25k-50k,BE,2016-07-17,False,False
+CUS-F47DF93D,RCV-8917653D,Fatima Dubois,Politician,<25k,DE,2005-07-15,False,False
+CUS-2C704B5F,RCV-5853D5D4,Sofia Mensah,Student,100k-250k,BE,2016-08-28,False,False
+CUS-E10D4B72,SND-3470A28B,Ingrid Dubois,Retired,25k-50k,LA,2006-07-09,False,True
+CUS-81E9E856,SND-A2A0F071,Diego Mensah,Politician,100k-250k,AT,2018-08-18,False,False
+CUS-10AC93C4,SND-A82C91D3,Maria Ibrahim,Freelancer,100k-250k,PT,2019-02-19,False,False
+CUS-987687E5,SND-3DB88C8A,Yusuf Hassan,Politician,<25k,GB,2009-04-04,False,False
+CUS-8FF4D7EB,SND-B906E69C,Fatima Mensah,Student,<25k,DK,2008-12-21,False,False
+CUS-73D426E6,RCV-7997BE48,Omar Fernandez,Doctor,250k+,US,2020-01-10,False,False
+CUS-BB4B8F4C,SND-A0591784,Kwame Smith,Teacher,100k-250k,NZ,2005-03-24,False,False
+CUS-FC9BD221,RCV-18F7CD32,Omar Garcia,Retired,25k-50k,YE,2017-01-16,False,True
+CUS-D46D00AB,SND-820B9B9D,Priya Nguyen,Nurse,250k+,MM,2004-08-06,False,True
+CUS-49709621,RCV-8B1EDC76,Kwame Tanaka,Teacher,50k-100k,SE,2018-04-25,True,False
+CUS-FA140BF7,RCV-5B269A9E,Chen Osei,Retired,100k-250k,FI,2017-09-18,False,False
+CUS-3E68F1D9,RCV-B233C35E,James Hassan,Business Owner,100k-250k,SE,2020-06-03,False,False
+CUS-B52EFA41,SND-D0177C1D,Liam Kim,Consultant,<25k,LY,2006-08-14,False,True
+CUS-0724DDDF,RCV-BE9774F1,Fatima Nguyen,Nurse,100k-250k,FI,2004-12-14,False,False
+CUS-FA7B3180,RCV-159765F4,Lucas Fernandez,Politician,50k-100k,NI,2011-07-15,False,True
+CUS-ED74F7B9,SND-63042566,Omar Ali,Lawyer,50k-100k,GB,2008-06-27,False,False
+CUS-68FC46FD,SND-4F5374AA,Fatima Ibrahim,Freelancer,250k+,SE,2005-11-04,False,False
+CUS-F6C31085,SND-9D84ADC4,Kwame Wang,Civil Servant,25k-50k,IT,2008-07-01,False,False
+CUS-23999E4D,SND-0BA8853B,Yusuf Kim,Student,25k-50k,IR,2014-09-06,False,True
+CUS-A3880B35,SND-6540AB65,Kwame Kim,Civil Servant,50k-100k,ES,2015-04-16,False,False
+CUS-A5BAEEE3,SND-75CFB6B1,Diego Petrova,Consultant,50k-100k,AT,2003-07-28,False,False
+CUS-A83616BA,RCV-F197D050,Amara Brown,Lawyer,250k+,IT,2016-02-03,False,False
+CUS-4510ACF2,SND-1512E941,Maria Wang,Real Estate Agent,250k+,AT,2015-04-18,False,False
+CUS-96941FA7,RCV-5024795A,Elena Nguyen,Civil Servant,<25k,US,2020-10-20,False,False
+CUS-8C5AC146,SND-FD063F0B,Amara Wang,Retired,100k-250k,BE,2019-02-19,False,False
+CUS-BA3BBB87,SND-A631460A,Maria Mensah,Teacher,50k-100k,KR,2009-04-17,False,False
+CUS-198A2490,SND-B06BAA6B,Elena Tanaka,Software Engineer,50k-100k,FI,2009-05-01,False,False
+CUS-AFFB9E1A,SND-D3ED96A7,Yusuf Petrova,Accountant,50k-100k,ES,2006-02-08,False,False
+CUS-DB728158,SND-0CFCB91B,Liam Mueller,Architect,<25k,NL,2011-06-13,True,False
+CUS-58929C59,SND-1301F89E,Maria Rossi,Unknown,100k-250k,JP,2004-12-04,False,False
+CUS-3EB846F2,RCV-FD090400,Chen Lindqvist,Unknown,250k+,CA,2012-06-27,True,False
+CUS-AAFB5AB7,SND-2714A465,Elena Ibrahim,Lawyer,250k+,GB,2019-03-26,False,False
+CUS-176ED134,SND-0CB7B3B1,Diego Rossi,Nurse,<25k,KR,2006-03-06,False,False
+CUS-3FC46FE8,RCV-FC2B9EAE,Maria Kim,Unknown,50k-100k,FR,2000-08-05,True,False
+CUS-2C53B9D5,SND-89D1C249,Maria Rossi,Real Estate Agent,<25k,NZ,2008-09-14,False,False
+CUS-D8A630CB,SND-01317A84,Valentina Ali,Accountant,100k-250k,DK,2014-06-11,False,False
+CUS-22F44D5F,SND-7E22D4FA,Maria Tanaka,Pharmacist,100k-250k,AU,2015-07-07,False,False
+CUS-5EDF6AC1,RCV-2B9D23F5,Yusuf Sharma,Import/Export Manager,25k-50k,PT,2014-12-21,False,False
+CUS-C413577B,SND-E47FB997,Ingrid Garcia,Import/Export Manager,<25k,SE,2011-06-21,False,False
+CUS-87661B30,SND-67BD6A75,Ingrid Dubois,Retired,<25k,NZ,2014-10-20,False,False
+CUS-9F06B6C5,RCV-07DC81EB,Yusuf Mensah,Lawyer,25k-50k,ES,2013-09-11,False,False
+CUS-FE0E5AC0,RCV-538F0930,Omar Dubois,Business Owner,50k-100k,JP,2007-02-13,False,False
+CUS-A529B15B,SND-4515872B,Mohammed Nguyen,Retired,25k-50k,GB,2007-12-08,False,False
+CUS-A4A2ABB1,SND-0AF66B2A,Priya Wang,Architect,<25k,AT,2006-06-14,False,False
+CUS-92C02A72,SND-2687E8C2,Liam Mensah,Import/Export Manager,<25k,GB,2021-11-27,False,False
+CUS-6B107133,SND-62046FF7,Noah Ibrahim,Import/Export Manager,50k-100k,NO,2020-02-16,False,False
+CUS-DD22BFCA,SND-A7BEF9D0,Yusuf Ali,Import/Export Manager,<25k,IT,2002-01-21,False,False
+CUS-F0888C9A,RCV-9447DE87,Ingrid Dubois,Student,25k-50k,AT,2015-08-27,False,False
+CUS-0D8772E3,SND-AADA0AB2,Liam Mueller,Lawyer,100k-250k,AU,2021-02-08,False,False
+CUS-9233C1AF,SND-D06614E5,Omar Nguyen,Teacher,100k-250k,DK,2008-10-25,False,False
+CUS-3CCE8446,SND-202B314B,Lucas Kim,Import/Export Manager,250k+,NO,2020-09-10,False,False
+CUS-0CE87F68,SND-49408D0A,Diego Lindqvist,Nurse,100k-250k,CA,2003-11-21,True,False
+CUS-434BF5CF,SND-7A27B44D,Amara Ali,Doctor,<25k,AU,2006-08-28,False,False
+CUS-40B1AC68,RCV-D0592622,Noah Wang,Nurse,50k-100k,SO,2014-08-08,False,True
+CUS-8A22C186,SND-23C11FD2,Valentina Lindqvist,Architect,25k-50k,BE,2008-01-23,False,False
+CUS-61805D2C,SND-27689EB7,James Tanaka,Politician,250k+,PK,2020-07-25,False,True
+CUS-9B915167,SND-9B50C8F8,Noah Wang,Retired,100k-250k,BE,2005-09-07,False,False
+CUS-E1241A50,SND-F59A4B2C,Diego Fernandez,Retired,25k-50k,BE,2004-08-26,False,False
+CUS-196402E1,RCV-C5C946FC,Amara Ibrahim,Chef,25k-50k,HT,2014-05-06,False,True
+CUS-1B5FAB28,RCV-FBF4A9FD,Amara Osei,Architect,25k-50k,PT,2005-12-18,False,False
+CUS-FC2D540E,SND-A9EC0DCA,Diego Brown,Software Engineer,<25k,KR,2018-11-03,False,False
+CUS-57AB0271,SND-B3C541D3,Elena Dubois,Nurse,50k-100k,FI,2010-01-25,False,False
+CUS-3BF08540,SND-63834767,Fatima Brown,Nurse,25k-50k,US,2021-08-20,False,False
+CUS-2794B08D,RCV-C268FA4B,Mohammed Kim,Teacher,100k-250k,KR,2009-09-06,False,False
+CUS-B6E87B4F,SND-A78BD3B5,Amara Garcia,Civil Servant,25k-50k,FI,2020-07-19,False,False
+CUS-03A158D5,RCV-0D1B21A5,Chen Nguyen,Unknown,<25k,PT,2021-07-14,False,False
+CUS-B907635C,RCV-61124C7D,Sofia Hassan,Software Engineer,25k-50k,PK,2005-05-06,False,True
+CUS-896E31BF,RCV-785DBB7F,Chen Kim,Consultant,250k+,GB,2019-02-24,False,False
+CUS-B0B596E8,SND-F7BF0CE7,Priya Rossi,Retired,25k-50k,NL,2015-09-24,False,False
+CUS-A841DA6B,SND-A70F270B,Anya Brown,Architect,<25k,IT,2018-09-02,False,False
+CUS-13197E23,SND-0A09CF52,Maria Garcia,Accountant,50k-100k,GB,2005-02-08,True,False
+CUS-769CFDA6,RCV-F2F00E8C,Kwame Kim,Nurse,100k-250k,BE,2012-05-09,False,False
+CUS-461A86E4,SND-7FEFE1BF,Liam Lindqvist,Doctor,250k+,AU,2012-06-05,False,False
+CUS-137DE9D4,RCV-C8163283,Diego Santos,Student,250k+,JP,2010-11-25,False,False
+CUS-BA778B46,SND-7044E306,Amara Lindqvist,Business Owner,<25k,DE,2015-11-02,False,False
+CUS-BFFCEA73,SND-907E48A1,Liam Santos,Chef,100k-250k,IR,2020-07-28,False,True
+CUS-989B9B43,SND-E28852DD,Kwame Osei,Business Owner,50k-100k,CA,2017-12-24,False,False
+CUS-8411FB84,SND-D53BD19C,James Ali,Trader,100k-250k,JP,2018-02-26,False,False
+CUS-A406F90E,RCV-F6AA87F4,Noah Tanaka,Business Owner,50k-100k,UA,2014-11-13,False,True
+CUS-A73606E8,SND-771524BB,Noah Osei,Business Owner,25k-50k,NL,2013-09-06,False,False
+CUS-B3FEA729,RCV-FA5C0BFA,Anya Dubois,Accountant,50k-100k,FR,2016-05-13,False,False
+CUS-DC57701C,SND-67D1D74E,Chen Osei,Chef,250k+,JP,2013-03-02,True,False
+CUS-01910D13,SND-6B34DFE7,Lucas Hassan,Chef,50k-100k,SE,2014-12-14,False,False
+CUS-907CAEEC,RCV-2BE08BA6,Noah Dubois,Business Owner,<25k,IR,2005-01-27,False,True
+CUS-0C209D07,SND-60043CD2,Sofia Dubois,Teacher,25k-50k,FI,2015-02-03,False,False
+CUS-7E0A1AF1,SND-51FD3405,Elena Tanaka,Architect,250k+,SE,2005-11-21,False,False
+CUS-170DBBC7,RCV-80D0609B,Amara Fernandez,Nurse,<25k,FR,2008-11-12,False,False
+CUS-6CD65C94,RCV-80E491D5,Omar Smith,Software Engineer,25k-50k,NL,2006-08-10,False,False
+CUS-037D044C,RCV-0063577E,Lucas Petrova,Nurse,<25k,PT,2021-01-08,False,False
+CUS-44572478,SND-F56D4D05,Kwame Sharma,Teacher,50k-100k,US,2000-06-26,False,False
+CUS-7FBD7C8F,SND-10E9F450,Chen Petrova,Teacher,25k-50k,DE,2003-04-24,False,False
+CUS-D650CC69,SND-8A683324,Chen Nguyen,Lawyer,50k-100k,US,2016-01-17,False,False
+CUS-DEC51C99,SND-9659B63B,Valentina Smith,Accountant,50k-100k,NZ,2005-01-02,False,False
+CUS-E77CF079,RCV-E0CCB571,Yusuf Garcia,Unknown,100k-250k,JP,2007-03-07,False,False
+CUS-D567AD8A,SND-B55AC759,Maria Osei,Retired,<25k,US,2010-03-14,True,False
+CUS-51318FE6,SND-10E456D1,Elena Ibrahim,Civil Servant,50k-100k,NZ,2003-09-06,False,False
+CUS-4E862303,RCV-3E64632A,Priya Petrova,Lawyer,100k-250k,SE,2018-12-22,False,False
+CUS-DC285507,RCV-C5BCE3DC,Amara Lindqvist,Student,25k-50k,NL,2002-02-23,False,False
+CUS-0F6930E7,SND-E7A6B555,Aiko Mueller,Lawyer,50k-100k,SE,2000-07-15,True,False
+CUS-EDF7DF7C,SND-273D4008,James Nguyen,Politician,250k+,SE,2011-05-25,False,False
+CUS-F576AFC7,SND-C7482A44,Lucas Tanaka,Accountant,25k-50k,DK,2012-09-08,False,False
+CUS-0F9A67A3,SND-D533CD03,James Tanaka,Student,50k-100k,FI,2020-09-09,False,False
+CUS-0F9EF71D,SND-D56830CC,Kwame Ali,Nurse,<25k,AU,2013-01-11,False,False
+CUS-BFC171D6,SND-5ADB3704,Aiko Brown,Retired,<25k,LY,2011-05-07,False,True
+CUS-46202164,SND-DBB07EB1,Lucas Dubois,Freelancer,25k-50k,CA,2019-02-09,False,False
+CUS-BE1AF6BE,SND-28C71DDA,Fatima Garcia,Business Owner,100k-250k,KR,2005-01-28,False,False
+CUS-08025BD7,SND-CE538B39,Liam Tanaka,Accountant,100k-250k,ES,2006-05-16,False,False
+CUS-E801572F,SND-A2EE9508,Liam Rossi,Politician,100k-250k,FI,2015-01-05,False,False
+CUS-F3BB0078,SND-F1972E12,Yusuf Lindqvist,Consultant,25k-50k,NZ,2005-06-11,True,False
+CUS-73236CF7,SND-9219C90E,Maria Brown,Trader,250k+,PT,2000-02-23,False,False
+CUS-63741623,RCV-C536799B,Sofia Nguyen,Import/Export Manager,25k-50k,NZ,2010-07-20,False,False
+CUS-99B39CED,RCV-FB663A25,Maria Mensah,Lawyer,25k-50k,JP,2012-06-18,False,False
+CUS-B392E44C,SND-3A15CD3F,Aiko Hassan,Import/Export Manager,<25k,PT,2004-03-12,False,False
+CUS-7B5CE402,SND-0309190E,Ingrid Ali,Real Estate Agent,250k+,DK,2001-08-20,False,False
+CUS-51B312F4,SND-DE752F97,Chen Santos,Teacher,<25k,PT,2014-01-07,False,False
+CUS-560F617B,SND-B7706F0A,Priya Dubois,Politician,<25k,AT,2000-04-09,False,False
+CUS-485697E8,RCV-16D022F3,Lucas Brown,Retired,50k-100k,BE,2002-02-13,False,False
+CUS-49E0DB11,RCV-214D66EC,Sofia Hassan,Politician,<25k,CA,2008-02-12,False,False
+CUS-1B92B8CF,RCV-53910D41,Chen Tanaka,Consultant,<25k,BE,2008-08-05,False,False
+CUS-8F6588D6,SND-6DE3965D,Yusuf Lindqvist,Architect,<25k,NO,2008-03-07,True,False
+CUS-A01FDD25,SND-BC11CC7E,Kwame Lindqvist,Teacher,25k-50k,ES,2015-08-10,False,False
+CUS-FA1B0904,SND-D36D8BF6,Diego Wang,Consultant,<25k,MM,2017-08-01,False,True
+CUS-5FB86DEE,SND-A517DC71,Maria Garcia,Trader,25k-50k,AT,2019-03-10,False,False
+CUS-C55BB5B3,SND-5ABB11E9,Fatima Osei,Lawyer,25k-50k,JP,2014-01-22,False,False
+CUS-690F9D10,SND-BAA3B2CF,Liam Wang,Consultant,100k-250k,FI,2021-01-02,False,False
+CUS-FDA0D081,RCV-0E598C70,Lucas Tanaka,Pharmacist,50k-100k,FI,2013-01-11,False,False
+CUS-53F3B0B7,SND-5BE08400,Sofia Mensah,Business Owner,100k-250k,JP,2014-06-21,False,False
+CUS-2DBBAC7D,SND-B6CC7C4E,Ingrid Hassan,Doctor,25k-50k,VE,2019-08-03,False,True
+CUS-57492422,RCV-6C6A7936,Ingrid Dubois,Teacher,50k-100k,US,2017-09-28,False,False
+CUS-BC036402,SND-B148FAC9,Mohammed Mensah,Chef,25k-50k,LA,2002-10-17,False,True
+CUS-8ED647C9,SND-DCEC365B,Amara Lindqvist,Doctor,25k-50k,SO,2001-05-09,False,True
+CUS-40671962,SND-31C70866,Aiko Nguyen,Nurse,250k+,KR,2006-12-03,False,False
+CUS-22BDA8C5,SND-3132072D,Chen Kim,Accountant,<25k,NL,2004-04-17,False,False
+CUS-85DD1197,SND-D33D22F7,Ingrid Wang,Business Owner,25k-50k,NL,2001-07-12,False,False
+CUS-A986CA68,SND-68660451,Maria Ali,Pharmacist,50k-100k,US,2016-11-15,False,False
+CUS-3F7D12E4,SND-D87BD639,Elena Sharma,Lawyer,100k-250k,FR,2002-05-03,False,False
+CUS-03BC3EEE,SND-B3BF3B51,Anya Ibrahim,Pharmacist,<25k,BE,2015-08-23,False,False
+CUS-B6AB0F36,SND-1904D0B2,Amara Ibrahim,Accountant,100k-250k,HT,2001-09-02,False,True
+CUS-ECD3F088,SND-6730A6E9,Ingrid Ibrahim,Trader,100k-250k,NL,2016-08-28,False,False
+CUS-982C9C28,RCV-A3B6D077,Aiko Hassan,Freelancer,100k-250k,JP,2001-01-06,False,False
+CUS-E4D509DB,RCV-029782EF,Liam Dubois,Consultant,50k-100k,SE,2005-08-10,False,False
+CUS-F2BF7E20,RCV-302595E7,Omar Brown,Civil Servant,50k-100k,JP,2018-01-03,False,False
+CUS-95CB808F,RCV-EB76849F,Chen Ali,Nurse,100k-250k,DE,2011-07-28,False,False
+CUS-35E75485,SND-F0BC5F46,Diego Petrova,Consultant,<25k,CA,2013-07-23,False,False
+CUS-5B3CCD47,RCV-B3798C98,Maria Osei,Trader,50k-100k,FR,2005-07-03,True,False
+CUS-A42D6DA3,RCV-3987D8E4,Diego Dubois,Real Estate Agent,250k+,NO,2007-08-23,False,False
+CUS-BBE0C16D,SND-27AD1F21,Diego Sharma,Student,<25k,CA,2001-04-24,False,False
+CUS-B0C85149,SND-26511E70,Chen Hassan,Politician,250k+,GB,2019-10-21,True,False
+CUS-213F340F,SND-83B009E0,Diego Kim,Chef,100k-250k,NZ,2009-05-13,False,False
+CUS-4608A15D,SND-313BF76F,Diego Ibrahim,Student,25k-50k,FR,2002-11-17,False,False
+CUS-A4C81953,RCV-1C2EED01,Valentina Garcia,Politician,250k+,BE,2021-02-14,False,False
+CUS-3CC9B3C2,RCV-1BD2D976,Priya Hassan,Consultant,25k-50k,CA,2003-07-02,False,False
+CUS-0485ACDA,RCV-90656470,Lucas Dubois,Student,25k-50k,AT,2014-07-16,False,False
+CUS-98550681,SND-503DA3D7,Fatima Tanaka,Architect,250k+,KR,2018-03-10,False,False
+CUS-8FAEB191,RCV-9759BF23,Elena Ibrahim,Software Engineer,250k+,CH,2019-06-03,False,False
+CUS-A57DC55E,SND-17C061B1,Valentina Mueller,Architect,25k-50k,US,2000-05-12,False,False
+CUS-9C09A888,RCV-C5097F45,Valentina Ibrahim,Retired,25k-50k,BE,2012-08-28,False,False
+CUS-2A0657EF,SND-A702F9AA,Liam Santos,Unknown,25k-50k,SE,2019-10-19,False,False
+CUS-6DDF2768,RCV-DB177336,Aiko Brown,Accountant,25k-50k,NZ,2020-06-14,False,False
+CUS-6486D30F,SND-CF8D7F5A,Omar Sharma,Real Estate Agent,<25k,FR,2018-10-23,False,False
+CUS-E85C5D51,SND-4D79691A,Yusuf Wang,Software Engineer,100k-250k,FI,2006-10-06,False,False
+CUS-4282265B,SND-E3770EB3,Noah Lindqvist,Doctor,100k-250k,AT,2009-06-07,False,False
+CUS-420A765F,RCV-DF50AE87,Maria Garcia,Pharmacist,100k-250k,CH,2008-06-09,False,False
+CUS-A89FBEBA,RCV-4DA40800,Omar Brown,Architect,50k-100k,BE,2003-12-24,False,False
+CUS-FB1181AD,RCV-288A9687,Chen Tanaka,Retired,<25k,AU,2009-04-08,False,False
+CUS-6054CB9A,RCV-F5620A39,Yusuf Brown,Chef,<25k,JP,2019-11-06,False,False
+CUS-6EA57A08,SND-186EB367,Chen Smith,Trader,250k+,BY,2002-01-17,False,True
+CUS-58116512,SND-ACBD45AA,Amara Osei,Politician,250k+,FR,2001-11-28,False,False
+CUS-D2AC0CB0,RCV-8984400A,Ingrid Mueller,Chef,100k-250k,AT,2000-04-03,False,False
+CUS-61C07118,RCV-1804D6A6,Maria Sharma,Software Engineer,25k-50k,GB,2001-11-20,False,False
+CUS-C351A627,SND-2B7B78D2,Sofia Kim,Import/Export Manager,100k-250k,PT,2005-06-01,False,False
+CUS-DEB92189,SND-0C0F9F79,Ingrid Fernandez,Trader,250k+,PT,2017-04-13,True,False
+CUS-0F6EF926,SND-5D83642A,Kwame Dubois,Unknown,50k-100k,CH,2007-04-23,False,False
+CUS-B13AB70B,SND-8F16242E,Priya Kim,Business Owner,100k-250k,SE,2002-10-04,False,False
+CUS-D5963B34,RCV-E9CB32C2,Liam Santos,Chef,250k+,FR,2015-03-18,False,False
+CUS-9C055216,SND-6F94417D,Diego Hassan,Retired,<25k,ES,2009-04-04,False,False
+CUS-87C72C3A,SND-CB9F6284,Chen Dubois,Business Owner,50k-100k,YE,2012-09-23,False,True
+CUS-C39972B6,RCV-7CFBDBC3,Mohammed Nguyen,Teacher,100k-250k,SE,2021-09-27,False,False
+CUS-4E282C73,SND-B5C3A34D,Lucas Petrova,Pharmacist,25k-50k,CU,2019-07-17,False,True
+CUS-2E32671C,SND-7789298C,Ingrid Mensah,Politician,25k-50k,ES,2005-05-11,False,False
+CUS-B5DC778B,SND-A60EDC74,Fatima Brown,Politician,25k-50k,AU,2011-07-03,False,False
+CUS-D17C1CBA,SND-CE61098D,Lucas Brown,Pharmacist,100k-250k,NZ,2021-07-18,False,False
+CUS-12F2328F,SND-772F86B3,Kwame Mensah,Chef,50k-100k,AT,2000-07-26,False,False
+CUS-733BD241,SND-274661C1,James Mensah,Doctor,<25k,CA,2014-02-14,False,False
+CUS-D2DC7358,SND-52777B8F,Kwame Sharma,Chef,25k-50k,CH,2014-03-01,False,False
+CUS-306B4EE5,SND-5D1B3B8C,Amara Ibrahim,Civil Servant,100k-250k,US,2014-04-07,False,False
+CUS-7D2FBD3E,SND-90E64B84,Lucas Tanaka,Chef,<25k,AT,2008-03-11,False,False
+CUS-E99FFCBD,SND-837327CB,Diego Ibrahim,Business Owner,100k-250k,AU,2003-04-06,False,False
+CUS-FDD7032A,SND-FE562E98,Valentina Tanaka,Software Engineer,50k-100k,SE,2008-04-28,False,False
+CUS-D9C21269,RCV-E45E9099,Amara Sharma,Software Engineer,50k-100k,KR,2002-11-10,False,False
+CUS-E3A276C6,RCV-24915F25,Noah Hassan,Accountant,50k-100k,NO,2019-02-08,False,False
+CUS-AB7BE158,SND-6B9AF702,James Smith,Pharmacist,250k+,CA,2020-05-17,False,False
+CUS-268AC0E7,RCV-A7B31F1B,Lucas Mensah,Chef,100k-250k,PT,2017-05-17,False,False
+CUS-C4783E5C,RCV-9575E4AB,Diego Sharma,Civil Servant,<25k,AU,2004-07-13,False,False
+CUS-D5BF0E76,SND-9D8EE41A,Omar Santos,Civil Servant,50k-100k,ES,2007-04-10,False,False
+CUS-0959F4CB,RCV-37824883,Aiko Wang,Business Owner,250k+,AT,2021-11-02,False,False
+CUS-84B8034D,SND-4AA927C4,Fatima Petrova,Retired,50k-100k,DE,2017-11-23,False,False

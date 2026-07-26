@@ -66,7 +66,7 @@ rng = np.random.default_rng(RNG_SEED)
 BANKS = [
     "CitiBank", "HSBC", "Deutsche Bank", "Barclays", "BNP Paribas",
     "JPMorgan", "Wells Fargo", "UBS", "Credit Suisse", "Standard Chartered",
-    "Santander", "ING", "UniCredit", "Societe Generale", "Rabobank",
+    "Santander", "ING", "UniCredit", "Nordea", "Rabobank",
     "Commerzbank", "RBS", "Lloyds", "Natwest", "Mizuho",
 ]
 
@@ -82,7 +82,7 @@ CURRENCIES = [
 
 NORMAL_COUNTRIES = [
     "US", "GB", "DE", "FR", "NL", "CA", "AU", "JP", "CH", "SE",
-    "NO", "DK", "FI", "AT", "BE", "ES", "IT", "PT", "NZ", "SG",
+    "NO", "DK", "FI", "AT", "BE", "ES", "IT", "PT", "NZ", "KR",
 ]
 
 HIGH_RISK_COUNTRIES = [

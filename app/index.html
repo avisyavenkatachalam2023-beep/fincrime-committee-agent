@@ -376,6 +376,16 @@
 
   <!-- Sidebar -->
   <nav class="sidebar">
+    <div class="sidebar-section" id="stands-out-section" style="background:linear-gradient(180deg, rgba(31,111,235,.08), transparent)">
+      <h3 style="color:var(--accent2)">✨ Why This Stands Out</h3>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:.55rem; margin-top:.3rem">
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Query-adaptive planning</strong> — the agent parses intent/filters/entities and builds a fresh execution plan per query; it skips EDA and ML entirely when a query doesn't need them (see <em>Preview Plan</em>).</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Forensic accounting</strong> — Benford's Law + threshold-proximity clustering catch structuring patterns deliberately mutated to evade flat-$9,999 rules.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Multi-agent committee</strong> — Transaction Monitoring, KYC/UBO, Sanctions/PEP, and Network Analyst agents vote independently; a Chair Agent synthesizes a real Risk Memo, not a single black-box score.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Runs on the real dataset</strong> — vectorized end-to-end (pandas groupby, sampled betweenness centrality) to stay responsive on the full 9.5M-row / 855k-account Kaggle SAML-D dataset, not just a toy sample.</li>
+        <li style="font-size:.74rem; color:var(--text); line-height:1.4"><strong style="color:var(--accent2)">Multimodal input</strong> — attach a transaction screenshot or KYC document; a vision model extracts details and folds them into the same committee pipeline.</li>
+      </ul>
+    </div>
     <div class="sidebar-section">
       <h3>Example Queries</h3>
       <button class="query-chip" onclick="useQuery(this)">Find structuring patterns in the last 30 days</button>
